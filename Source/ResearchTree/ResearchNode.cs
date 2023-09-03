@@ -124,6 +124,26 @@ public class ResearchNode : Node
                 return false;
             }
 
+            if (Research.prerequisites?.Any() != true)
+            {
+                return true;
+            }
+
+            foreach (var researchPrerequisite in Research.prerequisites)
+            {
+                if (researchPrerequisite.IsFinished)
+                {
+                    continue;
+                }
+
+                if (researchPrerequisite.ResearchNode().Available)
+                {
+                    continue;
+                }
+
+                return false;
+            }
+
             return true;
         }
     }

@@ -43,11 +43,11 @@ The final step is the hardest, but also the most important to create a visually 
 
  - Brandes, U., and Köpf, B. (2001, September). Fast and simple horizontal coordinate assignment. - Eiglsperger M., Siebenhaller M., Kaufmann M. (2005) An Efficient Implementation of Sugiyama’s Algorithm for Layered Graph Drawing. Luckily, the crossing reduction and edge length reduction steps partially achieve the goals of the final step. The final graph is not as pretty as it could be, but it’s still pretty good - in most scenarios. 
 
-## Contributors.png
+## Contributors
 
  - Templarr: Russian translation - Suh. Junmin: Korean translation - rw-chaos: German translation - 53N4: Spanish translation - Silverside: Fix UI scaling bug for vertical text - shiuanyue: Chinese (traditional) translation - notfood: Implement techprint requirements - HanYaodong: Add simplified Chinese translation 
 
-## License.png
+## License
 
 All original code in this mod is licensed under the https://opensource.org/licenses/MIT]MIT license. Do what you want, but give me credit. All original content (e.g. text, imagery, sounds) in this mod is licensed under the http://creativecommons.org/licenses/by-sa/4.0/]CC-BY-SA 4.0 license.
 
@@ -65,5 +65,6 @@ Parts of the code in this mod, and some content may be licensed by their origina
 -  If you have the solution for a problem, please post it to the GitHub repository.
 
 
-https://steamcommunity.com/sharedfiles/filedetails/changelog/3030499331]![Image](https://img.shields.io/github/v/release/emipa606/=latest%20version&style=plastic&color=9f1111&labelColor=black)
+
+https://steamcommunity.com/sharedfiles/filedetails/changelog/3030499331]![Image](https://img.shields.io/github/v/release/emipa606/ResearchTree?label=latest%20version&style=plastic&color=9f1111&labelColor=black)
 

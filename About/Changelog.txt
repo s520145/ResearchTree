@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.4.3 - Should now not be possible to queue prerequisite research that has not had its requirements fulfilled, for example missing techprints
+
+
 1.4.2 - Readded the missing copyright info in the cs-files
 
 
