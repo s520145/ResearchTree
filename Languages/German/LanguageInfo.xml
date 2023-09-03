@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageInfo>
   <friendlyNameNative>Deutsch</friendlyNameNative>
   <friendlyNameEnglish>German</friendlyNameEnglish>
@@ -7,6 +7,6 @@
     <li Class="CreditRecord_Role">
       <roleKey>Credit_Translator</roleKey>
       <creditee>Chaos</creditee>
-    </li>	
+    </li>
   </credits>
 </LanguageInfo>
