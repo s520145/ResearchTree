@@ -1,3 +1,6 @@
+// Building_ResearchBench_Extensions.cs
+// Copyright Karel Kroeze, 2016-2020
+
 using System.Linq;
 using RimWorld;
 using Verse;

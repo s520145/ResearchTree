@@ -1,3 +1,6 @@
+// MainButtonWorker_ResearchTree.cs
+// Copyright Karel Kroeze, 2018-2020
+
 using RimWorld;
 using UnityEngine;
 using Verse;

@@ -4,6 +4,8 @@
 
 Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=1266570759
 
+- Fixed compatibility with Biotech
+
 ![Image](https://i.imgur.com/pufA0kM.png)
 
 	
@@ -11,15 +13,11 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 
 A better research tree.
 
-
-
-![Image](https://banners.karel-kroeze.nl/title/Features.png)
+## Features
 
  - automatically generated to maximize readability*. - shows research projects, buildings, plants and recipes unlocked by each research project. - projects can be queued, and colonists will automatically start the next project when the current research project completes. - search functionality to quickly find research projects. 
 
-
-
-![Image](https://banners.karel-kroeze.nl/title/FAQ.png)
+## FAQ
 
 *Can I add/remove this from an existing save?* You can add it to existing saves without problems. Removing this mod will lead to some errors when loading, but these should not affect gameplay - and will go away after saving.
 
@@ -29,20 +27,11 @@ A better research tree.
 
 *This looks very similar to ResearchPal* Yep. ResearchPal is based on a legacy version of this mod that was kept up-to-date by SkyArkAngel in the HCSK modpack. I haven’t worked on this mod in a long time, but I recently had some spare time and decided to give it another go. Feel free to use whichever you like better (ResearchPal has an entirely different layout algorithm). You can run both mods side by side to check out the different tree layouts, but be aware that the research queue will not work correctly if both mods are loaded.
 
-
-
-![Image](https://banners.karel-kroeze.nl/title/Known%20Issues.png)
+## Known Issues
 
  - Layouts are not perfect, if you have experience with graph layouts - please do feel free to look at the source code, and/or implement a Sugiyama layout algorithm for me that runs in C
 
-
-
-![Image](https://banners.karel-kroeze.nl/title/.NET%203.5%20(Mono%202.0)
-..png)
-
-
-
-![Image](https://banners.karel-kroeze.nl/title/Technical.png)
+## Technical
 
 So how does this all work? 
 
@@ -52,49 +41,17 @@ Creating an optimal layout is a known problem in the area of *Graph Theory*. The
 
 The final step is the hardest, but also the most important to create a visually pleasing tree. Sadly, I’ve been unable to implement two of the most well known algorithms for this purpose;
 
- - Brandes, U., &amp; Köpf, B. (2001, September). Fast and simple horizontal coordinate assignment. - Eiglsperger M., Siebenhaller M., Kaufmann M. (2005) An Efficient Implementation of Sugiyama’s Algorithm for Layered Graph Drawing. Luckily, the crossing reduction and edge length reduction steps partially achieve the goals of the final step. The final graph is not as pretty as it could be, but it’s still pretty good - in most scenarios. 
+ - Brandes, U., and Köpf, B. (2001, September). Fast and simple horizontal coordinate assignment. - Eiglsperger M., Siebenhaller M., Kaufmann M. (2005) An Efficient Implementation of Sugiyama’s Algorithm for Layered Graph Drawing. Luckily, the crossing reduction and edge length reduction steps partially achieve the goals of the final step. The final graph is not as pretty as it could be, but it’s still pretty good - in most scenarios. 
 
-
-
-![Image](https://banners.karel-kroeze.nl/title/Contributors.png)
+## Contributors.png
 
  - Templarr: Russian translation - Suh. Junmin: Korean translation - rw-chaos: German translation - 53N4: Spanish translation - Silverside: Fix UI scaling bug for vertical text - shiuanyue: Chinese (traditional) translation - notfood: Implement techprint requirements - HanYaodong: Add simplified Chinese translation 
 
-
-
-![Image](https://banners.karel-kroeze.nl/title/Think%20you%20found%20a%20bug%3F.png)
-
-Please read http://steamcommunity.com/sharedfiles/filedetails/?id=725234314]this guide before creating a bug report, and then create a bug report https://github.com/fluffy-mods/ResearchTree/issues]here
-
-
-
-![Image](https://banners.karel-kroeze.nl/title/Older%20versions.png)
-
-All current and past versions of this mod can be downloaded from https://github.com/fluffy-mods/ResearchTree/releases]GitHub.
-
-
-
-![Image](https://banners.karel-kroeze.nl/title/License.png)
+## License.png
 
 All original code in this mod is licensed under the https://opensource.org/licenses/MIT]MIT license. Do what you want, but give me credit. All original content (e.g. text, imagery, sounds) in this mod is licensed under the http://creativecommons.org/licenses/by-sa/4.0/]CC-BY-SA 4.0 license.
 
-Parts of the code in this mod, and some content may be licensed by their original authors. If this is the case, the original author &amp; license will either be given in the source code, or be in a LICENSE file next to the content. Please do not decompile my mods, but use the original source code available on https://github.com/fluffy-mods/ResearchTree/]GitHub, so license information in the source code is preserved.
-
-https://ko-fi.com/fluffymods]
-
-
-
-![Image](https://banners.karel-kroeze.nl/donations.png)
-
-
-
-
-![Image](https://banners.karel-kroeze.nl/title/Are%20you%20enjoying%20my%20mods%3F.png)
-
-Become a supporter and show your appreciation by buying me a coffee (or contribute towards a nice single malt).
-
-https://ko-fi.com/fluffymods]![Image](http://i.imgur.com/6P7Ap79.gif)
-[
+Parts of the code in this mod, and some content may be licensed by their original authors. If this is the case, the original author and license will either be given in the source code, or be in a LICENSE file next to the content. Please do not decompile my mods, but use the original source code available on https://github.com/fluffy-mods/ResearchTree/]GitHub, so license information in the source code is preserved.
 
 ![Image](https://i.imgur.com/PwoNOj4.png)
 
@@ -107,4 +64,6 @@ https://ko-fi.com/fluffymods]![Image](http://i.imgur.com/6P7Ap79.gif)
 -  Do not report errors by making a discussion-thread, I get no notification of that.
 -  If you have the solution for a problem, please post it to the GitHub repository.
 
+
+https://steamcommunity.com/sharedfiles/filedetails/changelog/3030499331]![Image](https://img.shields.io/github/v/release/emipa606/=latest%20version&style=plastic&color=9f1111&labelColor=black)
 

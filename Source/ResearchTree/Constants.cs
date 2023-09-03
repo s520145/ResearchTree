@@ -1,3 +1,6 @@
+// Constants.cs
+// Copyright Karel Kroeze, 2018-2020
+
 using UnityEngine;
 
 namespace FluffyResearchTree;

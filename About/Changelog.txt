@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.4.2 - Readded the missing copyright info in the cs-files
+
+
 1.4.1 - Updated for 1.3, 1.4. Added support for Biotech..
 Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
 

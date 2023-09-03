@@ -1,3 +1,6 @@
+// Assets.cs
+// Copyright Karel Kroeze, 2018-2020
+
 using System.Collections.Generic;
 using RimWorld;
 using UnityEngine;

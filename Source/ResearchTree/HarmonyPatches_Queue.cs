@@ -1,3 +1,6 @@
+// Queue_HarmonyPatches.cs
+// Copyright Karel Kroeze, 2020-2020
+
 using HarmonyLib;
 using RimWorld;
 using Verse;

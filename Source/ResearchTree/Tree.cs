@@ -1,3 +1,6 @@
+// Tree.cs
+// Copyright Karel Kroeze, 2020-2020
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

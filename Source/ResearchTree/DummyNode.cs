@@ -1,3 +1,6 @@
+// DummyNode.cs
+// Copyright Karel Kroeze, 2018-2020
+
 using System.Linq;
 using UnityEngine;
 

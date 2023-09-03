@@ -1,3 +1,6 @@
+// Node.cs
+// Copyright Karel Kroeze, 2019-2020
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,3 +1,6 @@
+// ResearchProjectDef_Extensions.cs
+// Copyright Karel Kroeze, 2019-2020
+
 using System.Collections.Generic;
 using System.Linq;
 using Verse;

@@ -1,3 +1,6 @@
+// Log.cs
+// Copyright Karel Kroeze, 2018-2020
+
 using System.Diagnostics;
 
 namespace FluffyResearchTree;

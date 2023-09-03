@@ -1,3 +1,6 @@
+// ResearchTree.cs
+// Copyright Karel Kroeze, 2020-2020
+
 using System.Reflection;
 using HarmonyLib;
 using Verse;

@@ -1,3 +1,6 @@
+// FloatMenu_Fixed.cs
+// Copyright Karel Kroeze, 2018-2020
+
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
