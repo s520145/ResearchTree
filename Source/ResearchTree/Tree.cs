@@ -487,8 +487,16 @@ public static class Tree
         var allDefsListForReading = DefDatabase<ResearchProjectDef>.AllDefsListForReading;
         var hidden = allDefsListForReading.Where(p => p.prerequisites?.Contains(p) ?? false);
         var second = allDefsListForReading.Where(p => p.Ancestors().Intersect(hidden).Any());
-        _nodes = new List<Node>(DefDatabase<ResearchProjectDef>.AllDefsListForReading.Except(hidden).Except(second)
-            .Select((Func<ResearchProjectDef, Node>)(def => new ResearchNode(def))));
+        _nodes = new List<Node>();
+        var iterator = 0;
+        foreach (var def in DefDatabase<ResearchProjectDef>.AllDefsListForReading.Except(hidden).Except(second)
+                     .ToList())
+        {
+            _nodes.Add(new ResearchNode(def, iterator));
+            iterator += 7; // Update speed
+        }
+
+        Assets.AmountOfResearch = iterator;
     }
 
     private static void Collapse()

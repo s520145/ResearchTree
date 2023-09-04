@@ -39,6 +39,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         closeOnClickedOutside = false;
         Instance = this;
+        preventCameraMotion = true;
+        forcePause = true;
     }
 
     public static MainTabWindow_ResearchTree Instance { get; private set; }
@@ -99,7 +101,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             }
 
             var width = Tree.Size.x * (Constants.NodeSize.x + Constants.NodeMargins.x);
-            var height = Tree.Size.z * (Constants.NodeSize.y + Constants.NodeMargins.y);
+            var height = Tree.Size.z * (Constants.NodeSize.y + Constants.NodeMargins.y) * 1.02f; // To avoid cutoff
             _treeRect = new Rect(0f, 0f, width, height);
 
             return _treeRect;

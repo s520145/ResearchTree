@@ -35,6 +35,8 @@ public static class Assets
 
     public static readonly Texture2D Search;
 
+    public static int AmountOfResearch;
+
     static Assets()
     {
         Button = ContentFinder<Texture2D>.Get("Buttons/button");

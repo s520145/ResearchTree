@@ -1,5 +1,12 @@
 # Changelog for ResearchTree
 
+1.4.4 - Added node availability caching
+Added research-infocard
+Locked camera and paused the game on open
+Increased the viewport to stop projects vanishing when zoomed out.
+Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
+
+
 1.4.3 - Should now not be possible to queue prerequisite research that has not had its requirements fulfilled, for example missing techprints
 
 

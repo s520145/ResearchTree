@@ -7,6 +7,7 @@
   <Fluffy.ResearchTree.LClickReplaceQueue>Left-Click to replace queue</Fluffy.ResearchTree.LClickReplaceQueue>
   <Fluffy.ResearchTree.LClickRemoveFromQueue>Left-Click to remove from queue</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.SLClickAddToQueue>Shift-Left-Click to add to queue</Fluffy.ResearchTree.SLClickAddToQueue>
+  <Fluffy.ResearchTree.SRClickShowInfo>Shift-Right-Click to show info-window</Fluffy.ResearchTree.SRClickShowInfo>
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
   <Fluffy.ResearchTree.RClickInstaFinish>(DEBUG) Right-Click to finish instantly</Fluffy.ResearchTree.RClickInstaFinish>
   <Fluffy.ResearchTree.Requires>Requires</Fluffy.ResearchTree.Requires>

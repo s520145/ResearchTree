@@ -22,9 +22,16 @@ public class ResearchNode : Node
 
     public readonly ResearchProjectDef Research;
 
-    public ResearchNode(ResearchProjectDef research)
+    private bool availableCache;
+
+    private int cacheNumber;
+
+
+    public ResearchNode(ResearchProjectDef research, int number)
     {
         Research = research;
+        cacheNumber = number;
+        availableCache = Research.CanStartNow;
         _pos = new Vector2(0f, research.researchViewY + 1f);
     }
 
@@ -99,53 +106,75 @@ public class ResearchNode : Node
                 return false;
             }
 
-            if (DebugSettings.godMode)
-            {
-                return true;
-            }
-
-            if (!BuildingPresent())
-            {
-                return false;
-            }
-
-            if (!TechprintAvailable())
-            {
-                return false;
-            }
-
-            if (!Research.PlayerMechanitorRequirementMet)
-            {
-                return false;
-            }
-
-            if (!Research.StudiedThingsRequirementsMet)
-            {
-                return false;
-            }
-
-            if (Research.prerequisites?.Any() != true)
-            {
-                return true;
-            }
-
-            foreach (var researchPrerequisite in Research.prerequisites)
-            {
-                if (researchPrerequisite.IsFinished)
-                {
-                    continue;
-                }
-
-                if (researchPrerequisite.ResearchNode().Available)
-                {
-                    continue;
-                }
-
-                return false;
-            }
-
-            return true;
+            return DebugSettings.godMode || getCacheValue();
         }
+    }
+
+    private bool getCacheValue()
+    {
+        if (cacheNumber < Assets.AmountOfResearch)
+        {
+            cacheNumber++;
+            return availableCache;
+        }
+
+        cacheNumber = 0;
+
+        if (Research.CanStartNow)
+        {
+            availableCache = true;
+            return availableCache;
+        }
+
+        if (!Research.TechprintRequirementMet)
+        {
+            availableCache = false;
+            return availableCache;
+        }
+
+        if (Research.requiredResearchBuilding != null && !Research.PlayerHasAnyAppropriateResearchBench)
+        {
+            availableCache = false;
+            return availableCache;
+        }
+
+        if (!Research.PlayerMechanitorRequirementMet)
+        {
+            availableCache = false;
+            return availableCache;
+        }
+
+        if (!Research.StudiedThingsRequirementsMet)
+        {
+            availableCache = false;
+            return availableCache;
+        }
+
+        if (Research.prerequisites?.Any() != true)
+        {
+            availableCache = true;
+            return availableCache;
+        }
+
+        foreach (var researchPrerequisite in Research.prerequisites)
+        {
+            if (researchPrerequisite.IsFinished)
+            {
+                continue;
+            }
+
+            if (researchPrerequisite.ResearchNode().Available)
+            {
+                continue;
+            }
+
+            availableCache = false;
+            return availableCache;
+        }
+
+
+        availableCache = true;
+        return availableCache;
     }
 
     public static bool BuildingPresent(ResearchProjectDef research)
@@ -170,11 +199,6 @@ public class ResearchNode : Node
 
         _buildingPresentCache.Add(research, value);
         return value;
-    }
-
-    public static bool TechprintAvailable(ResearchProjectDef research)
-    {
-        return research.TechprintRequirementMet;
     }
 
     public static void ClearCaches()
@@ -257,11 +281,6 @@ public class ResearchNode : Node
         return BuildingPresent(Research);
     }
 
-    public bool TechprintAvailable()
-    {
-        return TechprintAvailable(Research);
-    }
-
     public override void Draw(Rect visibleRect, bool forceDetailedMode = false)
     {
         if (!IsVisible(visibleRect))
@@ -334,7 +353,7 @@ public class ResearchNode : Node
                     (from td in MissingFacilities()
                         select td.LabelCap).ToArray())));
             }
-            else if (!TechprintAvailable())
+            else if (!Research.TechprintRequirementMet)
             {
                 TooltipHandler.TipRegion(Rect,
                     "Fluffy.ResearchTree.MissingTechprints".Translate(Research.TechprintsApplied,
@@ -396,7 +415,19 @@ public class ResearchNode : Node
             }
         }
 
-        if (!Widgets.ButtonInvisible(Rect) || !Available)
+        if (!Widgets.ButtonInvisible(Rect))
+        {
+            return;
+        }
+
+        if (Event.current.button == 1 && Event.current.shift)
+        {
+            var researchCard = new Dialog_ResearchInfoCard(Research);
+            Find.WindowStack.Add(researchCard);
+            return;
+        }
+
+        if (!Available)
         {
             return;
         }
@@ -415,7 +446,12 @@ public class ResearchNode : Node
             }
         }
 
-        if (!DebugSettings.godMode || !Prefs.DevMode || Event.current.button != 1 || Research.IsFinished)
+        if (Event.current.button != 1)
+        {
+            return;
+        }
+
+        if (!DebugSettings.godMode || !Prefs.DevMode || Research.IsFinished)
         {
             return;
         }
@@ -459,6 +495,7 @@ public class ResearchNode : Node
             stringBuilder.AppendLine("Fluffy.ResearchTree.SLClickAddToQueue".Translate());
         }
 
+        stringBuilder.AppendLine("Fluffy.ResearchTree.SRClickShowInfo".Translate());
         if (DebugSettings.godMode)
         {
             stringBuilder.AppendLine("Fluffy.ResearchTree.RClickInstaFinish".Translate());

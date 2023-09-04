@@ -25,4 +25,5 @@
   <Fluffy.ResearchTree.None>无</Fluffy.ResearchTree.None>
   <Fluffy.ResearchTree.MissingStudiedThings>缺少项目研究：{0}</Fluffy.ResearchTree.MissingStudiedThings>
   <Fluffy.ResearchTree.MissingMechanitorRequirement>失踪的机械师</Fluffy.ResearchTree.MissingMechanitorRequirement>
+  <Fluffy.ResearchTree.SRClickShowInfo>Shift-Right-Click 显示信息窗口</Fluffy.ResearchTree.SRClickShowInfo>
 </LanguageData>
