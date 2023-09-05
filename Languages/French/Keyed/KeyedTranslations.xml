@@ -25,4 +25,6 @@
   <Fluffy.ResearchTree.PreparingTree.Layout>Finalisation de la mise en page</Fluffy.ResearchTree.PreparingTree.Layout>
   <Fluffy.ResearchTree.RestoreQueue>Restauration de la file d'attente</Fluffy.ResearchTree.RestoreQueue>
   <Fluffy.ResearchTree.SRClickShowInfo>Majuscule-Clic droit pour afficher la fenêtre d'information</Fluffy.ResearchTree.SRClickShowInfo>
+  <Fluffy.ResearchTree.NotStarted>Non démarré, coûts {0}</Fluffy.ResearchTree.NotStarted>
+  <Fluffy.ResearchTree.InProgress>En cours, {0} de {1} terminé</Fluffy.ResearchTree.InProgress>
 </LanguageData>

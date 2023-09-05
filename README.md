@@ -5,6 +5,9 @@
 Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=1266570759
 
 - Fixed compatibility with Biotech
+- Added research-infocard, visible by Shift-Rightclick
+- Locked camera and paused the game when opening the research-window
+- Added some caching of the research-nodes to avoid stuttering with large research-trees
 
 ![Image](https://i.imgur.com/pufA0kM.png)
 

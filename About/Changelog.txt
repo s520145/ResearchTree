@@ -1,5 +1,9 @@
 # Changelog for ResearchTree
 
+1.4.5 - Made unlocked defs clickable in the infocard. Added research-progress to the infocard. Switched to vanilla drawing of icons instead to support stuff-color..
+Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
+
+
 1.4.4 - Added node availability caching
 Added research-infocard
 Locked camera and paused the game on open

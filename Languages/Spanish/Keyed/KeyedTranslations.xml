@@ -26,4 +26,6 @@
   <Fluffy.ResearchTree.MissingStudiedThings>Faltan artículos-estudios: {0}</Fluffy.ResearchTree.MissingStudiedThings>
   <Fluffy.ResearchTree.MissingMechanitorRequirement>Mecanizador desaparecido</Fluffy.ResearchTree.MissingMechanitorRequirement>
   <Fluffy.ResearchTree.SRClickShowInfo>Pulsa Mayúsculas y haz clic con el botón derecho para mostrar la ventana de información.</Fluffy.ResearchTree.SRClickShowInfo>
+  <Fluffy.ResearchTree.NotStarted>No iniciado, cuesta {0}</Fluffy.ResearchTree.NotStarted>
+  <Fluffy.ResearchTree.InProgress>En curso, {0} de {1} hecho</Fluffy.ResearchTree.InProgress>
 </LanguageData>

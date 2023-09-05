@@ -11,6 +11,8 @@
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
   <Fluffy.ResearchTree.RClickInstaFinish>(DEBUG) Right-Click to finish instantly</Fluffy.ResearchTree.RClickInstaFinish>
   <Fluffy.ResearchTree.Requires>Requires</Fluffy.ResearchTree.Requires>
+  <Fluffy.ResearchTree.NotStarted>Not started, costs {0}</Fluffy.ResearchTree.NotStarted>
+  <Fluffy.ResearchTree.InProgress>In progress, {0} of {1} done</Fluffy.ResearchTree.InProgress>
   <Fluffy.ResearchTree.LeadsTo>Leads to</Fluffy.ResearchTree.LeadsTo>
   <Fluffy.ResearchTree.None>none</Fluffy.ResearchTree.None>
   <Fluffy.ResearchTree.QueuedNode>Already queued node</Fluffy.ResearchTree.QueuedNode>

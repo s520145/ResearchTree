@@ -1,3 +1,4 @@
+using System.Linq;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -6,7 +7,7 @@ namespace FluffyResearchTree;
 
 public class Dialog_ResearchInfoCard : Window
 {
-    private static readonly Color alternateBackground = new Color(0.1f, 0.1f, 0.1f, 0.5f);
+    private static readonly Color alternateBackground = new Color(0.2f, 0.2f, 0.2f, 0.5f);
     private readonly ResearchProjectDef researchProjectDef;
     private Vector2 scrollPosition = Vector2.zero;
 
@@ -16,7 +17,7 @@ public class Dialog_ResearchInfoCard : Window
         Setup();
     }
 
-    public override Vector2 InitialSize => new Vector2(950f, 760f);
+    public override Vector2 InitialSize => new Vector2(955f, 765f);
 
     public override void DoWindowContents(Rect inRect)
     {
@@ -33,6 +34,23 @@ public class Dialog_ResearchInfoCard : Window
         if (!string.IsNullOrEmpty(researchProjectDef.modContentPack?.Name))
         {
             listing_Standard.Label(researchProjectDef.modContentPack.Name);
+        }
+
+        if (researchProjectDef.IsFinished)
+        {
+            listing_Standard.Label("Finished".Translate());
+        }
+        else
+        {
+            if (researchProjectDef.ProgressReal > 0)
+            {
+                listing_Standard.Label("Fluffy.ResearchTree.InProgress".Translate(researchProjectDef.ProgressReal,
+                    researchProjectDef.baseCost));
+            }
+            else
+            {
+                listing_Standard.Label("Fluffy.ResearchTree.NotStarted".Translate(researchProjectDef.baseCost));
+            }
         }
 
         listing_Standard.Label(researchProjectDef.description);
@@ -59,20 +77,32 @@ public class Dialog_ResearchInfoCard : Window
         Widgets.BeginScrollView(borderRect, ref scrollPosition, scrollContentRect);
         scrollListing.Begin(scrollContentRect);
         var alternate = true;
-        foreach (var unlockedThing in unlockDefsAndDescs)
+        foreach (var unlockedThing in unlockDefsAndDescs.OrderBy(pair => pair.Second))
         {
             scrollListing.Gap(1f);
             var rect = scrollListing.GetRect(Constants.LargeIconSize.y);
             alternate = !alternate;
+            var alternateRect = rect;
+            alternateRect.width = scrollContentRect.width;
             if (alternate)
             {
-                var alternateRect = rect;
-                alternateRect.width = scrollContentRect.width;
-                Widgets.DrawBoxSolid(rect.ExpandedBy(1), alternateBackground);
+                Widgets.DrawBoxSolid(rect.ExpandedBy(0, 1), alternateBackground);
+            }
+
+            if (Mouse.IsOver(alternateRect))
+            {
+                Widgets.DrawBox(rect.ExpandedBy(0, 1));
+            }
+
+            if (Widgets.ButtonInvisible(alternateRect))
+            {
+                var itemInfocard = new Dialog_InfoCard(unlockedThing.First);
+                Find.WindowStack.Add(itemInfocard);
             }
 
             rect.width = Constants.LargeIconSize.x;
-            unlockedThing.First.DrawColouredIcon(rect);
+            Widgets.DefIcon(rect, unlockedThing.First);
+            //unlockedThing.First.DrawColouredIcon(rect);
             var textRect = rect;
             textRect.x += Constants.LargeIconSize.x + 2f;
             textRect.width = scrollContentRect.width - Constants.LargeIconSize.x - 2f;

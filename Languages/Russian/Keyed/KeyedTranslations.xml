@@ -26,4 +26,6 @@
   <Fluffy.ResearchTree.MissingStudiedThings>Отсутствующие элементы-исследования: {0}</Fluffy.ResearchTree.MissingStudiedThings>
   <Fluffy.ResearchTree.MissingMechanitorRequirement>Отсутствующий механизатор</Fluffy.ResearchTree.MissingMechanitorRequirement>
   <Fluffy.ResearchTree.SRClickShowInfo>Щелчок правой кнопкой мыши (Shift-Right-Click) для отображения информационного окна</Fluffy.ResearchTree.SRClickShowInfo>
+  <Fluffy.ResearchTree.NotStarted>Не запущен, затраты {0}</Fluffy.ResearchTree.NotStarted>
+  <Fluffy.ResearchTree.InProgress>Выполняется, {0} из {1} сделано</Fluffy.ResearchTree.InProgress>
 </LanguageData>

@@ -390,7 +390,8 @@ public class ResearchNode : Node
                         break;
                     }
 
-                    unlockDefsAndDescs[i].First.DrawColouredIcon(rect);
+                    Widgets.DefIcon(rect, unlockDefsAndDescs[i].First);
+                    //unlockDefsAndDescs[i].First.DrawColouredIcon(rect);
                     TooltipHandler.TipRegion(rect, unlockDefsAndDescs[i].Second);
                 }
             }
