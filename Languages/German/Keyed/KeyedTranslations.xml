@@ -28,4 +28,5 @@
   <Fluffy.ResearchTree.SRClickShowInfo>Shift-Rechts-Klick zum Anzeigen des Info-Fensters</Fluffy.ResearchTree.SRClickShowInfo>
   <Fluffy.ResearchTree.NotStarted>Nicht gestartet, kostet {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>In Arbeit, {0} von {1} erledigt</Fluffy.ResearchTree.InProgress>
+  <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift-Rechtsklick zum sofortigen Beenden</Fluffy.ResearchTree.RClickInstaFinishNew>
 </LanguageData>

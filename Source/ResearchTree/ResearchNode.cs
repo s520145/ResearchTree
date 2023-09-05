@@ -421,7 +421,7 @@ public class ResearchNode : Node
             return;
         }
 
-        if (Event.current.button == 1 && Event.current.shift)
+        if (Event.current.button == 1 && !Event.current.shift)
         {
             var researchCard = new Dialog_ResearchInfoCard(Research);
             Find.WindowStack.Add(researchCard);
@@ -447,7 +447,7 @@ public class ResearchNode : Node
             }
         }
 
-        if (Event.current.button != 1)
+        if (Event.current.button != 1 && !Event.current.shift)
         {
             return;
         }
@@ -499,7 +499,7 @@ public class ResearchNode : Node
         stringBuilder.AppendLine("Fluffy.ResearchTree.SRClickShowInfo".Translate());
         if (DebugSettings.godMode)
         {
-            stringBuilder.AppendLine("Fluffy.ResearchTree.RClickInstaFinish".Translate());
+            stringBuilder.AppendLine("Fluffy.ResearchTree.RClickInstaFinishNew".Translate());
         }
 
         return stringBuilder.ToString();

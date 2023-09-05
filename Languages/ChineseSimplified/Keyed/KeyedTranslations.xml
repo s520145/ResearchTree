@@ -28,4 +28,5 @@
   <Fluffy.ResearchTree.SRClickShowInfo>Shift-Right-Click 显示信息窗口</Fluffy.ResearchTree.SRClickShowInfo>
   <Fluffy.ResearchTree.NotStarted>未启动，费用为 {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>进行中，{1}中的{0}已完成</Fluffy.ResearchTree.InProgress>
+  <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift-右键单击立即完成</Fluffy.ResearchTree.RClickInstaFinishNew>
 </LanguageData>

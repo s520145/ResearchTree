@@ -1,5 +1,9 @@
 # Changelog for ResearchTree
 
+1.4.6 - Switched the insta-complete and research-info commands. Now the insta-complete uses the shift modifier..
+Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
+
+
 1.4.5 - Made unlocked defs clickable in the infocard. Added research-progress to the infocard. Switched to vanilla drawing of icons instead to support stuff-color..
 Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
 

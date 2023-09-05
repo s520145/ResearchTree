@@ -7,9 +7,10 @@
   <Fluffy.ResearchTree.LClickReplaceQueue>Left-Click to replace queue</Fluffy.ResearchTree.LClickReplaceQueue>
   <Fluffy.ResearchTree.LClickRemoveFromQueue>Left-Click to remove from queue</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.SLClickAddToQueue>Shift-Left-Click to add to queue</Fluffy.ResearchTree.SLClickAddToQueue>
-  <Fluffy.ResearchTree.SRClickShowInfo>Shift-Right-Click to show info-window</Fluffy.ResearchTree.SRClickShowInfo>
+  <Fluffy.ResearchTree.SRClickShowInfo>Right-Click to show info-window</Fluffy.ResearchTree.SRClickShowInfo>
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
   <Fluffy.ResearchTree.RClickInstaFinish>(DEBUG) Right-Click to finish instantly</Fluffy.ResearchTree.RClickInstaFinish>
+  <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift-Rightclick to finish instantly</Fluffy.ResearchTree.RClickInstaFinishNew>
   <Fluffy.ResearchTree.Requires>Requires</Fluffy.ResearchTree.Requires>
   <Fluffy.ResearchTree.NotStarted>Not started, costs {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>In progress, {0} of {1} done</Fluffy.ResearchTree.InProgress>
