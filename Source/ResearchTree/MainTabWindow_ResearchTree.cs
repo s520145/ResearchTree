@@ -129,7 +129,9 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             Tree.Initialize();
         }
 
-        ResearchNode.ClearCaches();
+        Assets.RefreshResearch = true;
+        Tree.ResetNodeAvailabilityCache();
+        Queue.RefreshQueue();
         _dragging = false;
         closeOnClickedOutside = false;
     }
@@ -153,7 +155,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        var canvas2 = new Rect(canvas.xMin, canvas.yMin, canvas.width, Constants.TopBarHeight);
+        var canvas2 = new Rect(canvas.xMin, canvas.yMin + 10f, canvas.width, Constants.TopBarHeight);
         DrawTopBar(canvas2);
         ApplyZoomLevel();
         GUI.DrawTexture(ViewRect, Assets.SlightlyDarkBackground);
@@ -283,16 +285,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         }
 
         var list = new List<FloatMenuOption>();
-        foreach (var result2 in from n in Tree.Nodes.OfType<ResearchNode>()
-                 select new
-                 {
-                     node = n,
-                     match = n.Matches(query)
-                 }
-                 into result
-                 where result.match > 0
-                 orderby result.match
-                 select result)
+        foreach (var result2 in Tree.Nodes.OfType<ResearchNode>()
+                     .Select(n => new { node = n, match = n.Matches(query) })
+                     .Where(result => result.match > 0)
+                     .OrderBy(result => result.match))
         {
             list.Add(new FloatMenuOption(result2.node.Label, delegate { CenterOn(result2.node); },
                 MenuOptionPriority.Default, delegate { CenterOn(result2.node); }));

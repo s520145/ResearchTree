@@ -29,4 +29,7 @@
   <Fluffy.ResearchTree.NotStarted>No iniciado, cuesta {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>En curso, {0} de {1} hecho</Fluffy.ResearchTree.InProgress>
   <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Mayúsculas-Haga clic con el botón derecho para terminar al instante</Fluffy.ResearchTree.RClickInstaFinishNew>
+  <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-Izquierda-Clic para pasar al principio de la cola</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
+  <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-Izquierda-Clic para añadir al principio de la cola</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
+  <Fluffy.ResearchTree.CannotMoveMore>{0} no se puede mover más al principio de la cola de lo que ya está</Fluffy.ResearchTree.CannotMoveMore>
 </LanguageData>

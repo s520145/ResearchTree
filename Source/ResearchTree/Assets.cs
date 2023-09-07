@@ -35,7 +35,9 @@ public static class Assets
 
     public static readonly Texture2D Search;
 
-    public static int AmountOfResearch;
+    public static bool RefreshResearch;
+
+    public static int TotalAmountOfResearch;
 
     static Assets()
     {

@@ -29,4 +29,7 @@
   <Fluffy.ResearchTree.NotStarted>Nicht gestartet, kostet {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>In Arbeit, {0} von {1} erledigt</Fluffy.ResearchTree.InProgress>
   <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift-Rechtsklick zum sofortigen Beenden</Fluffy.ResearchTree.RClickInstaFinishNew>
+  <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Strg-Links-Klick, um an den Anfang der Warteschlange zu gelangen</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
+  <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Strg-Links-Klick zum Hinzufügen an den Anfang der Warteschlange</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
+  <Fluffy.ResearchTree.CannotMoveMore>{0} kann nicht weiter nach vorne in der Warteschlange verschoben werden, als er bereits ist</Fluffy.ResearchTree.CannotMoveMore>
 </LanguageData>

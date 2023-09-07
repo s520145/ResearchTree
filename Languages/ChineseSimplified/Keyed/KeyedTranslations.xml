@@ -29,4 +29,7 @@
   <Fluffy.ResearchTree.NotStarted>未启动，费用为 {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>进行中，{1}中的{0}已完成</Fluffy.ResearchTree.InProgress>
   <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift-右键单击立即完成</Fluffy.ResearchTree.RClickInstaFinishNew>
+  <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>按住 Ctrl 左键单击移动到队列前方</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
+  <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>按住 Ctrl 左键单击，添加到队列前面</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
+  <Fluffy.ResearchTree.CannotMoveMore>{0}不能被移动到队列的最前面。</Fluffy.ResearchTree.CannotMoveMore>
 </LanguageData>

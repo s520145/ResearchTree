@@ -6,8 +6,11 @@
   <Fluffy.ResearchTree.AllowsPlantingX>Enables growing {0}</Fluffy.ResearchTree.AllowsPlantingX>
   <Fluffy.ResearchTree.LClickReplaceQueue>Left-Click to replace queue</Fluffy.ResearchTree.LClickReplaceQueue>
   <Fluffy.ResearchTree.LClickRemoveFromQueue>Left-Click to remove from queue</Fluffy.ResearchTree.LClickRemoveFromQueue>
+  <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-Left-Click to move to front of queue</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.SLClickAddToQueue>Shift-Left-Click to add to queue</Fluffy.ResearchTree.SLClickAddToQueue>
+  <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-Left-Click to add to front of queue</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.SRClickShowInfo>Right-Click to show info-window</Fluffy.ResearchTree.SRClickShowInfo>
+  <Fluffy.ResearchTree.CannotMoveMore>{0} cannot be moved more to the front of the queue than it already is</Fluffy.ResearchTree.CannotMoveMore>
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
   <Fluffy.ResearchTree.RClickInstaFinish>(DEBUG) Right-Click to finish instantly</Fluffy.ResearchTree.RClickInstaFinish>
   <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift-Rightclick to finish instantly</Fluffy.ResearchTree.RClickInstaFinishNew>

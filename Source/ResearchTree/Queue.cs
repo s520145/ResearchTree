@@ -112,6 +112,63 @@ public class Queue : WorldComponent
         Find.ResearchManager.currentProj = researchNode?.Research;
     }
 
+
+    private static void Requeue(ResearchNode node)
+    {
+        if (!_instance._queue.Contains(node))
+        {
+            _instance._queue.Insert(0, node);
+            return;
+        }
+
+        var index = _instance._queue.IndexOf(node);
+        for (var i = index; i > 0; i--)
+        {
+            _instance._queue[i] = _instance._queue[i - 1];
+        }
+
+        _instance._queue[0] = node;
+    }
+
+
+    public static void EnqueueRangeFirst(IEnumerable<ResearchNode> nodes)
+    {
+        TutorSystem.Notify_Event("StartResearchProject");
+
+        var researchOrder = nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList();
+
+        if (researchOrder.Count() <= _instance._queue.Count())
+        {
+            var sameOrder = true;
+            for (var i = 0; i < researchOrder.Count(); i++)
+            {
+                if (researchOrder[i] == _instance._queue[i])
+                {
+                    continue;
+                }
+
+                sameOrder = false;
+                break;
+            }
+
+            if (sameOrder)
+            {
+                Messages.Message("Fluffy.ResearchTree.CannotMoveMore".Translate(researchOrder.Last().Label), null,
+                    MessageTypeDefOf.RejectInput);
+                return;
+            }
+        }
+
+        researchOrder.Reverse();
+        foreach (var item in researchOrder)
+        {
+            Requeue(item);
+        }
+
+        Find.ResearchManager.currentProj = researchOrder.Last().Research;
+    }
+
+
     public static void EnqueueRange(IEnumerable<ResearchNode> nodes, bool add)
     {
         TutorSystem.Notify_Event("StartResearchProject");
@@ -121,9 +178,7 @@ public class Queue : WorldComponent
             Find.ResearchManager.currentProj = null;
         }
 
-        foreach (var item in from node in nodes
-                 orderby node.X, node.Research.CostApparent
-                 select node)
+        foreach (var item in nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent))
         {
             Enqueue(item, true);
         }
@@ -234,5 +289,18 @@ public class Queue : WorldComponent
         }
 
         Find.ResearchManager.currentProj = _instance._queue.FirstOrDefault()?.Research;
+    }
+
+    public static void RefreshQueue()
+    {
+        if (Find.ResearchManager.currentProj == null)
+        {
+            return;
+        }
+
+        if (!_instance._queue.Any())
+        {
+            Enqueue(Find.ResearchManager.currentProj.ResearchNode(), true);
+        }
     }
 }

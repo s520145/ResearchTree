@@ -29,4 +29,7 @@
   <Fluffy.ResearchTree.NotStarted>Не запущен, затраты {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>Выполняется, {0} из {1} сделано</Fluffy.ResearchTree.InProgress>
   <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift-Rightclick для мгновенного завершения работы</Fluffy.ResearchTree.RClickInstaFinishNew>
+  <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-Left-Click для перемещения в начало очереди</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
+  <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Нажмите Ctrl-Left-Click, чтобы добавить в начало очереди</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
+  <Fluffy.ResearchTree.CannotMoveMore>{0} не может быть перемещен в начало очереди больше, чем уже находится в ней</Fluffy.ResearchTree.CannotMoveMore>
 </LanguageData>

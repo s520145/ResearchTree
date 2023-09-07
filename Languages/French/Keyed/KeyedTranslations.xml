@@ -28,4 +28,7 @@
   <Fluffy.ResearchTree.NotStarted>Non démarré, coûts {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>En cours, {0} de {1} terminé</Fluffy.ResearchTree.InProgress>
   <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift-Clic droit pour terminer instantanément</Fluffy.ResearchTree.RClickInstaFinishNew>
+  <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-Gauche-Clic pour passer au début de la file d'attente</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
+  <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-Gauche-Clic pour ajouter au début de la file d'attente</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
+  <Fluffy.ResearchTree.CannotMoveMore>{0} ne peut pas être déplacé plus en avant de la file d'attente qu'il ne l'est déjà</Fluffy.ResearchTree.CannotMoveMore>
 </LanguageData>

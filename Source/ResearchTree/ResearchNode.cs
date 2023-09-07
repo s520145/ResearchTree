@@ -20,19 +20,25 @@ public class ResearchNode : Node
     private static readonly Dictionary<ResearchProjectDef, List<ThingDef>> _missingFacilitiesCache =
         new Dictionary<ResearchProjectDef, List<ThingDef>>();
 
+    private readonly int cacheOrder;
+
     public readonly ResearchProjectDef Research;
 
     private bool availableCache;
 
-    private int cacheNumber;
+    private int currentCacheOrder;
+
+    private bool hasRefreshedAvailability;
+    private bool hasRefreshedBuildings;
+    private bool hasRefreshedFacilities;
 
 
-    public ResearchNode(ResearchProjectDef research, int number)
+    public ResearchNode(ResearchProjectDef research, int order)
     {
         Research = research;
-        cacheNumber = number;
         availableCache = Research.CanStartNow;
         _pos = new Vector2(0f, research.researchViewY + 1f);
+        cacheOrder = order;
     }
 
     public List<ResearchNode> Parents
@@ -110,15 +116,33 @@ public class ResearchNode : Node
         }
     }
 
+    public void ClearInstanceCaches()
+    {
+        hasRefreshedAvailability = false;
+        hasRefreshedBuildings = false;
+        hasRefreshedFacilities = false;
+        currentCacheOrder = cacheOrder;
+    }
+
     private bool getCacheValue()
     {
-        if (cacheNumber < Assets.AmountOfResearch)
+        if (!Assets.RefreshResearch)
         {
-            cacheNumber++;
             return availableCache;
         }
 
-        cacheNumber = 0;
+        if (hasRefreshedAvailability)
+        {
+            return availableCache;
+        }
+
+        if (currentCacheOrder < Assets.TotalAmountOfResearch)
+        {
+            currentCacheOrder++;
+            return availableCache;
+        }
+
+        hasRefreshedAvailability = true;
 
         if (Research.CanStartNow)
         {
@@ -177,17 +201,32 @@ public class ResearchNode : Node
         return availableCache;
     }
 
-    public static bool BuildingPresent(ResearchProjectDef research)
+    public bool BuildingPresent(ResearchProjectDef research)
     {
         if (DebugSettings.godMode && Prefs.DevMode)
         {
             return true;
         }
 
-        if (_buildingPresentCache.TryGetValue(research, out var value))
+        var hasCache = _buildingPresentCache.TryGetValue(research, out var value);
+
+        if (!Assets.RefreshResearch && hasCache)
         {
             return value;
         }
+
+        if (hasRefreshedBuildings && hasCache)
+        {
+            return value;
+        }
+
+        if (currentCacheOrder < Assets.TotalAmountOfResearch && hasCache)
+        {
+            currentCacheOrder++;
+            return value;
+        }
+
+        hasRefreshedBuildings = true;
 
         value = research.requiredResearchBuilding == null || Find.Maps
             .SelectMany(map => map.listerBuildings.allBuildingsColonist).OfType<Building_ResearchBench>()
@@ -197,14 +236,14 @@ public class ResearchNode : Node
             value = research.Ancestors().All(BuildingPresent);
         }
 
-        _buildingPresentCache.Add(research, value);
+        _buildingPresentCache[research] = value;
         return value;
     }
 
     public static void ClearCaches()
     {
-        _buildingPresentCache.Clear();
-        _missingFacilitiesCache.Clear();
+        //_buildingPresentCache.Clear();
+        //_missingFacilitiesCache.Clear();
     }
 
     public static implicit operator ResearchNode(ResearchProjectDef def)
@@ -230,20 +269,34 @@ public class ResearchNode : Node
         return Research.description.ToLower(culture).Contains(query) ? 3 : 0;
     }
 
-    public static List<ThingDef> MissingFacilities(ResearchProjectDef research)
+    public List<ThingDef> MissingFacilities(ResearchProjectDef research, bool refresh = false)
     {
-        if (_missingFacilitiesCache.TryGetValue(research, out var value))
+        var hasCache = _missingFacilitiesCache.TryGetValue(research, out var value);
+
+        if (!Assets.RefreshResearch && hasCache)
         {
             return value;
         }
 
-        var list = (from rpd in research.Ancestors()
-            where !rpd.IsFinished
-            select rpd).ToList();
+        if (hasRefreshedFacilities && hasCache)
+        {
+            return value;
+        }
+
+        if (currentCacheOrder < Assets.TotalAmountOfResearch && hasCache)
+        {
+            currentCacheOrder++;
+            return value;
+        }
+
+        hasRefreshedFacilities = true;
+
+        var list = research.Ancestors().Where(rpd => !rpd.IsFinished && !rpd.PlayerHasAnyAppropriateResearchBench)
+            .ToList();
         list.Add(research);
-        var source = Find.Maps.SelectMany(map => map.listerBuildings.allBuildingsColonist)
+        var availableBenches = Find.Maps.SelectMany(map => map.listerBuildings.allBuildingsColonist)
             .OfType<Building_ResearchBench>();
-        var source2 = source.Select(b => b.def).Distinct();
+        var distinctBenches = availableBenches.Select(b => b.def).Distinct();
         value = new List<ThingDef>();
         foreach (var item in list)
         {
@@ -252,7 +305,7 @@ public class ResearchNode : Node
                 continue;
             }
 
-            if (!source2.Contains(item.requiredResearchBuilding))
+            if (!distinctBenches.Contains(item.requiredResearchBuilding))
             {
                 value.Add(item.requiredResearchBuilding);
             }
@@ -264,7 +317,7 @@ public class ResearchNode : Node
 
             foreach (var facility in item.requiredResearchFacilities)
             {
-                if (!source.Any(b => b.HasFacility(facility)))
+                if (!availableBenches.Any(b => b.HasFacility(facility)))
                 {
                     value.Add(facility);
                 }
@@ -272,7 +325,7 @@ public class ResearchNode : Node
         }
 
         value = value.Distinct().ToList();
-        _missingFacilitiesCache.Add(research, value);
+        _missingFacilitiesCache[research] = value;
         return value;
     }
 
@@ -339,36 +392,50 @@ public class ResearchNode : Node
                 MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
             {
                 Text.Anchor = TextAnchor.UpperRight;
-                Text.Font = !(Research.CostApparent > 1000000f) ? GameFont.Small : GameFont.Tiny;
-                Widgets.Label(CostLabelRect, Research.CostApparent.ToStringByStyle(ToStringStyle.Integer));
+                var costString = $"{Research.CostApparent.ToStringByStyle(ToStringStyle.Integer)}";
+                if (!Research.IsFinished)
+                {
+                    costString =
+                        $"{Research.ProgressReal.ToStringByStyle(ToStringStyle.Integer)}/{Research.CostApparent.ToStringByStyle(ToStringStyle.Integer)}";
+                }
+
+                Text.Font = costString.Length > 7 ? GameFont.Small : GameFont.Tiny;
+
+                Widgets.Label(CostLabelRect, costString);
                 GUI.DrawTexture(CostIconRect, !Completed && !Available ? Assets.Lock : Assets.ResearchIcon,
                     ScaleMode.ScaleToFit);
             }
 
             Text.WordWrap = true;
-            TooltipHandler.TipRegion(Rect, GetResearchTooltipString, Research.GetHashCode());
+            var tooltipstring = GetResearchTooltipString();
             if (!BuildingPresent())
             {
-                TooltipHandler.TipRegion(Rect, "Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
-                    (from td in MissingFacilities()
-                        select td.LabelCap).ToArray())));
+                tooltipstring.AppendLine();
+                tooltipstring.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
+                    MissingFacilities().Select(td => td.LabelCap).ToArray())));
             }
-            else if (!Research.TechprintRequirementMet)
+
+            if (!Research.TechprintRequirementMet)
             {
-                TooltipHandler.TipRegion(Rect,
-                    "Fluffy.ResearchTree.MissingTechprints".Translate(Research.TechprintsApplied,
-                        Research.techprintCount));
+                tooltipstring.AppendLine();
+                tooltipstring.AppendLine("Fluffy.ResearchTree.MissingTechprints".Translate(Research.TechprintsApplied,
+                    Research.techprintCount));
             }
-            else if (!Research.StudiedThingsRequirementsMet)
+
+            if (!Research.StudiedThingsRequirementsMet)
             {
-                TooltipHandler.TipRegion(Rect,
-                    "Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
-                        Research.requiredStudied.Select(def => def.LabelCap))));
+                tooltipstring.AppendLine();
+                tooltipstring.AppendLine("Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
+                    Research.requiredStudied.Select(def => def.LabelCap))));
             }
-            else if (!Research.PlayerMechanitorRequirementMet)
+
+            if (!Research.PlayerMechanitorRequirementMet)
             {
-                TooltipHandler.TipRegion(Rect, "Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
+                tooltipstring.AppendLine();
+                tooltipstring.AppendLine("Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
             }
+
+            TooltipHandler.TipRegion(Rect, tooltipstring.ToString());
 
             if (forceDetailedMode ||
                 MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
@@ -433,7 +500,13 @@ public class ResearchNode : Node
             return;
         }
 
-        if (Event.current.button == 0 && !Research.IsFinished)
+        if (Event.current.button == 0 && Event.current.control && !Research.IsFinished)
+        {
+            Queue.EnqueueRangeFirst(GetMissingRequiredRecursive().Concat(new List<ResearchNode>(new[] { this }))
+                .Distinct());
+        }
+
+        if (Event.current.button == 0 && !Event.current.control && !Research.IsFinished)
         {
             if (!Queue.IsQueued(this))
             {
@@ -481,19 +554,22 @@ public class ResearchNode : Node
         return MissingFacilities(Research);
     }
 
-    private string GetResearchTooltipString()
+    private StringBuilder GetResearchTooltipString()
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.AppendLine(Research.description);
+
         stringBuilder.AppendLine();
         if (Queue.IsQueued(this))
         {
             stringBuilder.AppendLine("Fluffy.ResearchTree.LClickRemoveFromQueue".Translate());
+            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickMoveToFrontOfQueue".Translate());
         }
         else
         {
             stringBuilder.AppendLine("Fluffy.ResearchTree.LClickReplaceQueue".Translate());
             stringBuilder.AppendLine("Fluffy.ResearchTree.SLClickAddToQueue".Translate());
+            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickAddToFrontOfQueue".Translate());
         }
 
         stringBuilder.AppendLine("Fluffy.ResearchTree.SRClickShowInfo".Translate());
@@ -502,7 +578,7 @@ public class ResearchNode : Node
             stringBuilder.AppendLine("Fluffy.ResearchTree.RClickInstaFinishNew".Translate());
         }
 
-        return stringBuilder.ToString();
+        return stringBuilder;
     }
 
     public void DrawAt(Vector2 pos, Rect visibleRect, bool forceDetailedMode = false)
