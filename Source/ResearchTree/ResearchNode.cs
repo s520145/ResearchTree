@@ -36,9 +36,9 @@ public class ResearchNode : Node
     public ResearchNode(ResearchProjectDef research, int order)
     {
         Research = research;
-        availableCache = Research.CanStartNow;
         _pos = new Vector2(0f, research.researchViewY + 1f);
         cacheOrder = order;
+        currentCacheOrder = Assets.TotalAmountOfResearch;
     }
 
     public List<ResearchNode> Parents
@@ -344,22 +344,24 @@ public class ResearchNode : Node
 
         if (Event.current.type == EventType.Repaint)
         {
-            GUI.color = Mouse.IsOver(Rect) ? GenUI.MouseoverColor : Color;
+            //GUI.color = Mouse.IsOver(Rect) ? GenUI.MouseoverColor : Color;
+            var color = Mouse.IsOver(Rect) ? GenUI.MouseoverColor : Color;
             if (Mouse.IsOver(Rect) || Highlighted)
             {
-                GUI.DrawTexture(Rect, Assets.ButtonActive);
+                FastGUI.DrawTextureFast(Rect, Assets.ButtonActive, color);
             }
             else
             {
-                GUI.DrawTexture(Rect, Assets.Button);
+                FastGUI.DrawTextureFast(Rect, Assets.Button, color);
             }
 
             if (Available)
             {
                 var position = Rect.ContractedBy(3f);
-                GUI.color = Assets.ColorAvailable[Research.techLevel];
+                //GUI.color = Assets.ColorAvailable[Research.techLevel];
+                color = Assets.ColorAvailable[Research.techLevel];
                 position.xMin += Research.ProgressPercent * position.width;
-                GUI.DrawTexture(position, BaseContent.WhiteTex);
+                FastGUI.DrawTextureFast(position, BaseContent.WhiteTex, color);
             }
 
             Highlighted = false;

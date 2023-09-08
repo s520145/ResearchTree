@@ -31,4 +31,11 @@
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-Gauche-Clic pour passer au début de la file d'attente</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-Gauche-Clic pour ajouter au début de la file d'attente</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.CannotMoveMore>{0} ne peut pas être déplacé plus en avant de la file d'attente qu'il ne l'est déjà</Fluffy.ResearchTree.CannotMoveMore>
+  <Fluffy.ResearchTree.CurrentModVersion>Version installée du mod : {0}</Fluffy.ResearchTree.CurrentModVersion>
+  <Fluffy.ResearchTree.PauseOnOpen>Pause du jeu à l'ouverture de l'arbre de recherche</Fluffy.ResearchTree.PauseOnOpen>
+  <Fluffy.ResearchTree.LoadType>Quand l'arbre de recherche doit-il être généré ?</Fluffy.ResearchTree.LoadType>
+  <Fluffy.ResearchTree.LoadTypeOne>Pendant le chargement du jeu</Fluffy.ResearchTree.LoadTypeOne>
+  <Fluffy.ResearchTree.LoadTypeTwo>Après le chargement du jeu en arrière-plan</Fluffy.ResearchTree.LoadTypeTwo>
+  <Fluffy.ResearchTree.LoadTypeThree>Première ouverture de l'arbre de recherche</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.PreparingTree.LayoutNew>Finalisation de la présentation de l'arbre de recherche</Fluffy.ResearchTree.PreparingTree.LayoutNew>
 </LanguageData>

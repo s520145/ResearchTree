@@ -81,15 +81,12 @@ public class Queue : WorldComponent
 
     public static void DrawLabel(Rect canvas, Color main, Color background, int label)
     {
-        GUI.color = main;
-        GUI.DrawTexture(canvas, Assets.CircleFill);
+        FastGUI.DrawTextureFast(canvas, Assets.CircleFill, main);
         if (background != main)
         {
-            GUI.color = background;
-            GUI.DrawTexture(canvas.ContractedBy(2f), Assets.CircleFill);
+            FastGUI.DrawTextureFast(canvas.ContractedBy(2f), Assets.CircleFill, background);
         }
 
-        GUI.color = Color.white;
         Text.Anchor = TextAnchor.MiddleCenter;
         Widgets.Label(canvas, label.ToString());
         Text.Anchor = TextAnchor.UpperLeft;

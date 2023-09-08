@@ -30,6 +30,8 @@ public static class Tree
 
     public static bool OrderDirty;
 
+    public static bool FirstLoadDone;
+
     public static Dictionary<TechLevel, IntRange> TechLevelBounds
     {
         get
@@ -101,11 +103,11 @@ public static class Tree
             null);
         LongEventHandler.QueueLongEvent(MinimizeCrossings, "Fluffy.ResearchTree.PreparingTree.CrossingReduction",
             false, null);
-        LongEventHandler.QueueLongEvent(MinimizeEdgeLength, "Fluffy.ResearchTree.PreparingTree.Layout", false,
+        LongEventHandler.QueueLongEvent(MinimizeEdgeLength, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false,
             null);
-        LongEventHandler.QueueLongEvent(RemoveEmptyRows, "Fluffy.ResearchTree.PreparingTree.Layout", false, null);
-        LongEventHandler.QueueLongEvent(delegate { Initialized = true; },
-            "Fluffy.ResearchTree.PreparingTree.Layout", false, null);
+        LongEventHandler.QueueLongEvent(RemoveEmptyRows, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false, null);
+        LongEventHandler.QueueLongEvent(delegate { Initialized = true; }, "Fluffy.ResearchTree.PreparingTree.LayoutNew",
+            false, null);
         LongEventHandler.QueueLongEvent(MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized,
             "Fluffy.ResearchTree.RestoreQueue", false, null);
     }
@@ -487,12 +489,15 @@ public static class Tree
         var allDefsListForReading = DefDatabase<ResearchProjectDef>.AllDefsListForReading;
         var hidden = allDefsListForReading.Where(p => p.prerequisites?.Contains(p) ?? false);
         var second = allDefsListForReading.Where(p => p.Ancestors().Intersect(hidden).Any());
+        var researchList = DefDatabase<ResearchProjectDef>.AllDefsListForReading.Except(hidden).Except(second)
+            .ToList();
         _nodes = new List<Node>();
-        foreach (var def in DefDatabase<ResearchProjectDef>.AllDefsListForReading.Except(hidden).Except(second)
-                     .ToList())
+        Assets.TotalAmountOfResearch = researchList.Count;
+        var iterator = 0;
+        foreach (var def in researchList)
         {
-            _nodes.Add(new ResearchNode(def, Assets.TotalAmountOfResearch));
-            Assets.TotalAmountOfResearch++;
+            _nodes.Add(new ResearchNode(def, iterator));
+            iterator++;
         }
     }
 
@@ -891,5 +896,24 @@ public static class Tree
         Log.Message($"out-of-bounds nodes:\n{string.Join("\n", (from n in Nodes
             where n.X < 1 || n.Y < 1
             select n.ToString()).ToArray())}");
+    }
+
+    public static void WaitForInitialization()
+    {
+        if (Initialized)
+        {
+            return;
+        }
+
+        if (_initializing)
+        {
+            while (_initializing)
+            {
+            }
+
+            return;
+        }
+
+        Initialize();
     }
 }

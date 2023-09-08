@@ -32,4 +32,11 @@
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Strg-Links-Klick, um an den Anfang der Warteschlange zu gelangen</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Strg-Links-Klick zum Hinzufügen an den Anfang der Warteschlange</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.CannotMoveMore>{0} kann nicht weiter nach vorne in der Warteschlange verschoben werden, als er bereits ist</Fluffy.ResearchTree.CannotMoveMore>
+  <Fluffy.ResearchTree.CurrentModVersion>Installierte Mod-Version: {0}</Fluffy.ResearchTree.CurrentModVersion>
+  <Fluffy.ResearchTree.PauseOnOpen>Spiel beim Öffnen des Forschungsbaums anhalten</Fluffy.ResearchTree.PauseOnOpen>
+  <Fluffy.ResearchTree.LoadType>Wann soll der Forschungsbaum erstellt werden?</Fluffy.ResearchTree.LoadType>
+  <Fluffy.ResearchTree.LoadTypeOne>Beim Laden des Spiels</Fluffy.ResearchTree.LoadTypeOne>
+  <Fluffy.ResearchTree.LoadTypeTwo>Nach dem Laden des Spiels im Hintergrund</Fluffy.ResearchTree.LoadTypeTwo>
+  <Fluffy.ResearchTree.LoadTypeThree>Erstmaliges Öffnen des Forschungsbaums</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.PreparingTree.LayoutNew>Fertigstellung des Layouts des Forschungsbaums</Fluffy.ResearchTree.PreparingTree.LayoutNew>
 </LanguageData>

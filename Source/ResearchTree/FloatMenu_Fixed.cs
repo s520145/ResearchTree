@@ -19,7 +19,7 @@ public class FloatMenu_Fixed : FloatMenu
         focusWhenOpened = focus;
     }
 
-    protected override void SetInitialSizeAndPosition()
+    public override void SetInitialSizeAndPosition()
     {
         var position = _position;
         if (position.x + InitialSize.x > UI.screenWidth)

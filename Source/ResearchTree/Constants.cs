@@ -19,7 +19,7 @@ public static class Constants
 
     public const float SmallQueueLabelSize = 20f;
 
-    public const float AbsoluteMaxZoomLevel = 3f;
+    public const float AbsoluteMaxZoomLevel = 2.9f;
 
     public const float ZoomStep = 0.05f;
 

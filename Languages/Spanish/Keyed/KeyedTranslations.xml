@@ -32,4 +32,11 @@
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-Izquierda-Clic para pasar al principio de la cola</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-Izquierda-Clic para añadir al principio de la cola</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.CannotMoveMore>{0} no se puede mover más al principio de la cola de lo que ya está</Fluffy.ResearchTree.CannotMoveMore>
+  <Fluffy.ResearchTree.CurrentModVersion>Versión del mod instalada: {0}</Fluffy.ResearchTree.CurrentModVersion>
+  <Fluffy.ResearchTree.PauseOnOpen>Pausa del juego al abrir el árbol de investigación</Fluffy.ResearchTree.PauseOnOpen>
+  <Fluffy.ResearchTree.LoadType>¿Cuándo debe generarse el árbol de investigación?</Fluffy.ResearchTree.LoadType>
+  <Fluffy.ResearchTree.LoadTypeOne>Durante la carga del juego</Fluffy.ResearchTree.LoadTypeOne>
+  <Fluffy.ResearchTree.LoadTypeTwo>Después de cargar el juego en segundo plano</Fluffy.ResearchTree.LoadTypeTwo>
+  <Fluffy.ResearchTree.LoadTypeThree>Abrir por primera vez el árbol de investigación</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.PreparingTree.LayoutNew>Finalizar el diseño del árbol de investigación</Fluffy.ResearchTree.PreparingTree.LayoutNew>
 </LanguageData>

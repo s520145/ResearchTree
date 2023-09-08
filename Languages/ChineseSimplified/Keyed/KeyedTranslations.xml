@@ -32,4 +32,11 @@
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>按住 Ctrl 左键单击移动到队列前方</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>按住 Ctrl 左键单击，添加到队列前面</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.CannotMoveMore>{0}不能被移动到队列的最前面。</Fluffy.ResearchTree.CannotMoveMore>
+  <Fluffy.ResearchTree.CurrentModVersion>已安装模块版本：{0}</Fluffy.ResearchTree.CurrentModVersion>
+  <Fluffy.ResearchTree.PauseOnOpen>打开研究树时暂停游戏</Fluffy.ResearchTree.PauseOnOpen>
+  <Fluffy.ResearchTree.LoadType>何时生成研究树？</Fluffy.ResearchTree.LoadType>
+  <Fluffy.ResearchTree.LoadTypeOne>游戏加载过程中</Fluffy.ResearchTree.LoadTypeOne>
+  <Fluffy.ResearchTree.LoadTypeTwo>游戏在后台加载后</Fluffy.ResearchTree.LoadTypeTwo>
+  <Fluffy.ResearchTree.LoadTypeThree>首次打开研究树</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.PreparingTree.LayoutNew>最终确定研究树布局</Fluffy.ResearchTree.PreparingTree.LayoutNew>
 </LanguageData>

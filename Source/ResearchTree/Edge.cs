@@ -70,50 +70,55 @@ public class Edge<T1, T2> where T1 : Node where T2 : Node
             return;
         }
 
-        GUI.color = Out.EdgeColor;
         var right = In.Right;
         var left = Out.Left;
         if (Math.Abs(right.y - left.y) < Constants.Epsilon)
         {
-            GUI.DrawTexture(new Rect(right.x, right.y - 2f, left.x - right.x, 4f), Assets.Lines.EW);
+            FastGUI.DrawTextureFast(new Rect(right.x, right.y - 2f, left.x - right.x, 4f), Assets.Lines.EW,
+                Out.EdgeColor);
         }
         else
         {
             var num = Math.Min(right.y, left.y) + (Constants.NodeMargins.x / 4f);
             var num2 = Math.Max(right.y, left.y) - (Constants.NodeMargins.x / 4f);
-            GUI.DrawTexture(new Rect(right.x, right.y - 2f, Constants.NodeMargins.x / 4f, 4f), Assets.Lines.EW);
-            GUI.DrawTexture(new Rect(right.x + (Constants.NodeMargins.x / 2f) - 2f, num, 4f, num2 - num),
-                Assets.Lines.NS);
-            GUI.DrawTexture(
+            FastGUI.DrawTextureFast(new Rect(right.x, right.y - 2f, Constants.NodeMargins.x / 4f, 4f), Assets.Lines.EW,
+                Out.EdgeColor);
+            FastGUI.DrawTextureFast(new Rect(right.x + (Constants.NodeMargins.x / 2f) - 2f, num, 4f, num2 - num),
+                Assets.Lines.NS, Out.EdgeColor);
+            FastGUI.DrawTextureFast(
                 new Rect(right.x + (Constants.NodeMargins.x / 4f * 3f), left.y - 2f,
-                    left.x - right.x - (Constants.NodeMargins.x / 4f * 3f), 4f), Assets.Lines.EW);
+                    left.x - right.x - (Constants.NodeMargins.x / 4f * 3f), 4f), Assets.Lines.EW, Out.EdgeColor);
             var position = new Rect(right.x + (Constants.NodeMargins.x / 4f), right.y - (Constants.NodeMargins.x / 4f),
                 Constants.NodeMargins.x / 2f, Constants.NodeMargins.x / 2f);
             var position2 = new Rect(right.x + (Constants.NodeMargins.x / 4f), left.y - (Constants.NodeMargins.x / 4f),
                 Constants.NodeMargins.x / 2f, Constants.NodeMargins.x / 2f);
             if (right.y < left.y)
             {
-                GUI.DrawTextureWithTexCoords(position, Assets.Lines.Circle, new Rect(0.5f, 0.5f, 0.5f, 0.5f));
-                GUI.DrawTextureWithTexCoords(position2, Assets.Lines.Circle, new Rect(0f, 0f, 0.5f, 0.5f));
+                FastGUI.DrawTextureFastWithCoords(position, Assets.Lines.Circle,
+                    new Rect(0.5f, 0.5f, 0.5f, 0.5f), Out.EdgeColor);
+                FastGUI.DrawTextureFastWithCoords(position2, Assets.Lines.Circle,
+                    new Rect(0f, 0f, 0.5f, 0.5f), Out.EdgeColor);
             }
             else
             {
-                GUI.DrawTextureWithTexCoords(position, Assets.Lines.Circle, new Rect(0.5f, 0f, 0.5f, 0.5f));
-                GUI.DrawTextureWithTexCoords(position2, Assets.Lines.Circle, new Rect(0f, 0.5f, 0.5f, 0.5f));
+                FastGUI.DrawTextureFastWithCoords(position, Assets.Lines.Circle,
+                    new Rect(0.5f, 0f, 0.5f, 0.5f), Out.EdgeColor);
+                FastGUI.DrawTextureFastWithCoords(position2, Assets.Lines.Circle,
+                    new Rect(0f, 0.5f, 0.5f, 0.5f), Out.EdgeColor);
             }
         }
 
         if (!IsDummy)
         {
-            GUI.DrawTexture(new Rect(left.x - Constants.HubSize, left.y - 8f, Constants.HubSize, Constants.HubSize),
-                Assets.Lines.End);
+            FastGUI.DrawTextureFast(
+                new Rect(left.x - Constants.HubSize, left.y - 8f, Constants.HubSize, Constants.HubSize),
+                Assets.Lines.End, Out.EdgeColor);
         }
         else
         {
-            GUI.DrawTexture(new Rect(left.x, left.y - 2f, Constants.NodeSize.x, 4f), Assets.Lines.EW);
+            FastGUI.DrawTextureFast(new Rect(left.x, left.y - 2f, Constants.NodeSize.x, 4f), Assets.Lines.EW,
+                Out.EdgeColor);
         }
-
-        GUI.color = Color.white;
     }
 
     public override string ToString()

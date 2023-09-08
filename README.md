@@ -4,10 +4,14 @@
 
 Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=1266570759
 
-- Fixed compatibility with Biotech
 - Added research-infocard, visible by Shift-Rightclick
+- Research can now be added/moved to the front of the queue with Ctrl+Leftclick
+- Added the current progress values on not finished projects
 - Locked camera and paused the game when opening the research-window
 - Added some caching of the research-nodes to avoid stuttering with large research-trees
+- Fixed compatibility with Biotech
+- Fixed compatibility with https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160]Research Reinvented
+- Fixed compatibility with https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060]Research Whatever
 
 ![Image](https://i.imgur.com/pufA0kM.png)
 
@@ -24,7 +28,7 @@ A better research tree.
 
 *Can I add/remove this from an existing save?* You can add it to existing saves without problems. Removing this mod will lead to some errors when loading, but these should not affect gameplay - and will go away after saving.
 
-*Why is research X in position Y?* Honestly, I have no idea. The placement of projects (nodes) is automated to minimize the number of crossings between dependancies (edges), and reduce the total length of these edges. There are many possible scenarios in which this can lead to placements that may appear non-optimal. Sometimes they really are non-optimal, sometimes they just appear to be so. See also the *technical* section below for more information.
+*Why is research X in position Y?* Honestly, I have no idea. The placement of projects (nodes) is automated to minimize the number of crossings between dependencies (edges), and reduce the total length of these edges. There are many possible scenarios in which this can lead to placements that may appear non-optimal. Sometimes they really are non-optimal, sometimes they just appear to be so. See also the *technical* section below for more information.
 
 *Can I use this with mod X* Most likely, yes. Added researches and their requirements are automatically parsed and the tree layout will be updated accordingly. ResearchPal implements a lot of the same functionality as this mod, and the research queue will likely not work correctly if both mods are loaded.
 

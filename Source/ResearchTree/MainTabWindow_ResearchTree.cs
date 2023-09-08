@@ -40,7 +40,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         closeOnClickedOutside = false;
         Instance = this;
         preventCameraMotion = true;
-        forcePause = true;
+        forcePause = FluffyResearchTreeMod.instance.Settings.PauseOnOpen;
     }
 
     public static MainTabWindow_ResearchTree Instance { get; private set; }
@@ -124,13 +124,17 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         base.PreOpen();
         SetRects();
-        if (!Tree.Initialized)
+        Tree.WaitForInitialization();
+        Assets.RefreshResearch = true;
+        if (Tree.FirstLoadDone)
         {
-            Tree.Initialize();
+            Tree.ResetNodeAvailabilityCache();
+        }
+        else
+        {
+            Tree.FirstLoadDone = true;
         }
 
-        Assets.RefreshResearch = true;
-        Tree.ResetNodeAvailabilityCache();
         Queue.RefreshQueue();
         _dragging = false;
         closeOnClickedOutside = false;
@@ -158,7 +162,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         var canvas2 = new Rect(canvas.xMin, canvas.yMin + 10f, canvas.width, Constants.TopBarHeight);
         DrawTopBar(canvas2);
         ApplyZoomLevel();
-        GUI.DrawTexture(ViewRect, Assets.SlightlyDarkBackground);
+        FastGUI.DrawTextureFast(ViewRect, Assets.SlightlyDarkBackground);
         _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect);
         GUI.BeginGroup(new Rect(ScaledMargin, ScaledMargin, TreeRect.width + (ScaledMargin * 2f),
             TreeRect.height + (ScaledMargin * 2f)));
@@ -258,8 +262,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         var rect2 = canvas;
         rect.width = 200f;
         rect2.xMin += 206f;
-        GUI.DrawTexture(rect, Assets.SlightlyDarkBackground);
-        GUI.DrawTexture(rect2, Assets.SlightlyDarkBackground);
+        FastGUI.DrawTextureFast(rect, Assets.SlightlyDarkBackground);
+        FastGUI.DrawTextureFast(rect2, Assets.SlightlyDarkBackground);
         DrawSearchBar(rect.ContractedBy(Constants.Margin));
         Queue.DrawQueue(rect2.ContractedBy(Constants.Margin), !_dragging);
     }
@@ -270,7 +274,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             new Rect(canvas.xMax - Constants.Margin - Constants.HubSize, 0f, Constants.HubSize, Constants.HubSize)
                 .CenteredOnYIn(canvas);
         var rect = new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas);
-        GUI.DrawTexture(position, Assets.Search);
+        FastGUI.DrawTextureFast(position, Assets.Search);
         var query = Widgets.TextField(rect, _query);
         if (query == _query)
         {

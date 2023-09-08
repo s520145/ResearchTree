@@ -19,6 +19,12 @@
   <Fluffy.ResearchTree.InProgress>In progress, {0} of {1} done</Fluffy.ResearchTree.InProgress>
   <Fluffy.ResearchTree.LeadsTo>Leads to</Fluffy.ResearchTree.LeadsTo>
   <Fluffy.ResearchTree.None>none</Fluffy.ResearchTree.None>
+  <Fluffy.ResearchTree.CurrentModVersion>Installed mod-version: {0}</Fluffy.ResearchTree.CurrentModVersion>
+  <Fluffy.ResearchTree.PauseOnOpen>Pause game on opening research-tree</Fluffy.ResearchTree.PauseOnOpen>
+  <Fluffy.ResearchTree.LoadType>When should the research-tree get generated?</Fluffy.ResearchTree.LoadType>
+  <Fluffy.ResearchTree.LoadTypeOne>During game load</Fluffy.ResearchTree.LoadTypeOne>
+  <Fluffy.ResearchTree.LoadTypeTwo>After game load in background</Fluffy.ResearchTree.LoadTypeTwo>
+  <Fluffy.ResearchTree.LoadTypeThree>First time opening research-tree</Fluffy.ResearchTree.LoadTypeThree>
   <Fluffy.ResearchTree.QueuedNode>Already queued node</Fluffy.ResearchTree.QueuedNode>
   <Fluffy.ResearchTree.MissingFacilities>Missing {0}</Fluffy.ResearchTree.MissingFacilities>
   <Fluffy.ResearchTree.MissingTechprints>Insufficient techprints {0}/{1}</Fluffy.ResearchTree.MissingTechprints>
@@ -30,5 +36,6 @@
   <Fluffy.ResearchTree.PreparingTree.Setup>Preparing research nodes</Fluffy.ResearchTree.PreparingTree.Setup>
   <Fluffy.ResearchTree.PreparingTree.CrossingReduction>Reducing crossings</Fluffy.ResearchTree.PreparingTree.CrossingReduction>
   <Fluffy.ResearchTree.PreparingTree.Layout>Finalizing layout</Fluffy.ResearchTree.PreparingTree.Layout>
+  <Fluffy.ResearchTree.PreparingTree.LayoutNew>Finalizing research tree layout</Fluffy.ResearchTree.PreparingTree.LayoutNew>
   <Fluffy.ResearchTree.RestoreQueue>Restoring queue</Fluffy.ResearchTree.RestoreQueue>
 </LanguageData>

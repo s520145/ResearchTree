@@ -1,5 +1,11 @@
 # Changelog for ResearchTree
 
+1.4.8 - Added mod option, pause on open research tree
+Added mod option, load on game start (similar to research pal/powl)
+Adapted some of Research Powls graphical improvements.
+Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
+
+
 1.4.7 - Research can now be added and moved to the front of the queue with Ctrl+leftclick
 Fixed compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160]Research Reinvented[/url]
 Fixed compatibility witn [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060]Research Whatever[/url]

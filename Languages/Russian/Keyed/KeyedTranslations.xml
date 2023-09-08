@@ -32,4 +32,11 @@
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-Left-Click для перемещения в начало очереди</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Нажмите Ctrl-Left-Click, чтобы добавить в начало очереди</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.CannotMoveMore>{0} не может быть перемещен в начало очереди больше, чем уже находится в ней</Fluffy.ResearchTree.CannotMoveMore>
+  <Fluffy.ResearchTree.CurrentModVersion>Установленная версия мода: {0}</Fluffy.ResearchTree.CurrentModVersion>
+  <Fluffy.ResearchTree.PauseOnOpen>Приостановка игры при открытии дерева исследований</Fluffy.ResearchTree.PauseOnOpen>
+  <Fluffy.ResearchTree.LoadType>Когда должно быть сформировано дерево исследований?</Fluffy.ResearchTree.LoadType>
+  <Fluffy.ResearchTree.LoadTypeOne>Во время загрузки игры</Fluffy.ResearchTree.LoadTypeOne>
+  <Fluffy.ResearchTree.LoadTypeTwo>После загрузки игры в фоновом режиме</Fluffy.ResearchTree.LoadTypeTwo>
+  <Fluffy.ResearchTree.LoadTypeThree>Первое открытие дерева исследований</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.PreparingTree.LayoutNew>Доработка схемы дерева исследований</Fluffy.ResearchTree.PreparingTree.LayoutNew>
 </LanguageData>
