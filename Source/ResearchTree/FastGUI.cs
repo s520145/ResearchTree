@@ -47,6 +47,15 @@ internal static class FastGUI
             color = GUI.color;
         }
 
+        if (FluffyResearchTreeMod.instance.Settings.VanillaGraphics)
+        {
+            var oldcolor = GUI.color;
+            GUI.color = color;
+            GUI.DrawTexture(position, image);
+            GUI.color = oldcolor;
+            return;
+        }
+
         drawArguments.screenRect = position;
         drawArguments.texture = image;
         drawArguments.color = color;
@@ -58,6 +67,15 @@ internal static class FastGUI
         if (color == new Color())
         {
             color = GUI.color;
+        }
+
+        if (FluffyResearchTreeMod.instance.Settings.VanillaGraphics)
+        {
+            var oldcolor = GUI.color;
+            GUI.color = color;
+            GUI.DrawTextureWithTexCoords(position, image, rect);
+            GUI.color = oldcolor;
+            return;
         }
 
         drawArguments2.screenRect = position;

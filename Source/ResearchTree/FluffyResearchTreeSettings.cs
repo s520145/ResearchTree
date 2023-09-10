@@ -9,6 +9,7 @@ internal class FluffyResearchTreeSettings : ModSettings
 {
     public int LoadType = 1;
     public bool PauseOnOpen = true;
+    public bool VanillaGraphics;
 
     /// <summary>
     ///     Saving and loading the values
@@ -17,6 +18,7 @@ internal class FluffyResearchTreeSettings : ModSettings
     {
         base.ExposeData();
         Scribe_Values.Look(ref PauseOnOpen, "PauseOnOpen", true);
+        Scribe_Values.Look(ref VanillaGraphics, "VanillaGraphics");
         Scribe_Values.Look(ref LoadType, "LoadType", 1);
     }
 }

@@ -1,5 +1,10 @@
 # Changelog for ResearchTree
 
+1.4.9 - Added setting for the old graphic-methods, someong experienced flickering
+Made the load on game-start run in the background (for real this time).
+Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
+
+
 1.4.8 - Added mod option, pause on open research tree
 Added mod option, load on game start (similar to research pal/powl)
 Adapted some of Research Powls graphical improvements.

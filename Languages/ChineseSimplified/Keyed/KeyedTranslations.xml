@@ -39,4 +39,5 @@
   <Fluffy.ResearchTree.LoadTypeTwo>游戏在后台加载后</Fluffy.ResearchTree.LoadTypeTwo>
   <Fluffy.ResearchTree.LoadTypeThree>首次打开研究树</Fluffy.ResearchTree.LoadTypeThree>
   <Fluffy.ResearchTree.PreparingTree.LayoutNew>最终确定研究树布局</Fluffy.ResearchTree.PreparingTree.LayoutNew>
+  <Fluffy.ResearchTree.VanillaGraphics>使用旧的图形方法（如果闪烁）</Fluffy.ResearchTree.VanillaGraphics>
 </LanguageData>

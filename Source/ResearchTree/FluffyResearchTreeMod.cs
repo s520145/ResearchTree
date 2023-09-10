@@ -91,6 +91,8 @@ internal class FluffyResearchTreeMod : Mod
 
         listing_Standard.Gap();
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.PauseOnOpen".Translate(), ref Settings.PauseOnOpen);
+        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VanillaGraphics".Translate(),
+            ref Settings.VanillaGraphics);
         if (currentVersion != null)
         {
             listing_Standard.Gap();

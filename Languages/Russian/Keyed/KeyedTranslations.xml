@@ -39,4 +39,5 @@
   <Fluffy.ResearchTree.LoadTypeTwo>После загрузки игры в фоновом режиме</Fluffy.ResearchTree.LoadTypeTwo>
   <Fluffy.ResearchTree.LoadTypeThree>Первое открытие дерева исследований</Fluffy.ResearchTree.LoadTypeThree>
   <Fluffy.ResearchTree.PreparingTree.LayoutNew>Доработка схемы дерева исследований</Fluffy.ResearchTree.PreparingTree.LayoutNew>
+  <Fluffy.ResearchTree.VanillaGraphics>Использовать старые графические методы (при наличии мерцания)</Fluffy.ResearchTree.VanillaGraphics>
 </LanguageData>

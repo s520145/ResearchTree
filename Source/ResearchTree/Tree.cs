@@ -94,6 +94,22 @@ public static class Tree
         }
 
         _initializing = true;
+
+        if (FluffyResearchTreeMod.instance.Settings.LoadType == 1)
+        {
+            CheckPrerequisites();
+            CreateEdges();
+            HorizontalPositions();
+            NormalizeEdges();
+            Collapse();
+            MinimizeCrossings();
+            MinimizeEdgeLength();
+            RemoveEmptyRows();
+            Initialized = true;
+            MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized();
+            return;
+        }
+
         LongEventHandler.QueueLongEvent(CheckPrerequisites, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
         LongEventHandler.QueueLongEvent(CreateEdges, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
         LongEventHandler.QueueLongEvent(HorizontalPositions, "Fluffy.ResearchTree.PreparingTree.Setup", false,
