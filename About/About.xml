@@ -25,7 +25,7 @@
   <description>[img]https://i.imgur.com/buuPQel.png[/img]
 Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=1266570759
 
-- Added research-infocard, visible by Shift-Rightclick
+- Added research-infocard, visible by Rightclick
 - Research can now be added/moved to the front of the queue with Ctrl+Leftclick
 - Added the current progress values on not finished projects
 - Locked camera when opening the research-window

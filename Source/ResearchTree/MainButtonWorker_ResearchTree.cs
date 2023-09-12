@@ -20,4 +20,9 @@ public class MainButtonWorker_ResearchTree : MainButtonWorker_ToggleResearchTab
                 Color.grey, Queue.NumQueued);
         }
     }
+
+    public override void Activate()
+    {
+        Find.MainTabsRoot.ToggleTab(Event.current.shift ? Assets.MainButtonDefOf.ResearchOriginal : def);
+    }
 }

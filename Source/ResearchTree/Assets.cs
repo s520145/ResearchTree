@@ -74,4 +74,11 @@ public static class Assets
 
         public static readonly Texture2D NS = ContentFinder<Texture2D>.Get("Lines/Outline/ns");
     }
+
+
+    [DefOf]
+    public static class MainButtonDefOf
+    {
+        public static MainButtonDef ResearchOriginal;
+    }
 }
