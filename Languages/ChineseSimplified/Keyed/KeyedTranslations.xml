@@ -40,4 +40,6 @@
   <Fluffy.ResearchTree.LoadTypeThree>首次打开研究树</Fluffy.ResearchTree.LoadTypeThree>
   <Fluffy.ResearchTree.PreparingTree.LayoutNew>最终确定研究树布局</Fluffy.ResearchTree.PreparingTree.LayoutNew>
   <Fluffy.ResearchTree.VanillaGraphics>使用旧的图形方法（如果闪烁）</Fluffy.ResearchTree.VanillaGraphics>
+  <Fluffy.ResearchTree.ShowCompletion>显示已完成研究的完成信息</Fluffy.ResearchTree.ShowCompletion>
+  <Fluffy.ResearchTree.StillLoading>树木首次加载，可能需要一段时间</Fluffy.ResearchTree.StillLoading>
 </LanguageData>

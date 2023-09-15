@@ -1,5 +1,10 @@
 # Changelog for ResearchTree
 
+1.4.11 - Added info about loading tree
+Added option for showing vanilla completion info.
+Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
+
+
 1.4.10 - The original research tree can now be shown by holding Shift when opening, same as in ResearchPowl
 
 

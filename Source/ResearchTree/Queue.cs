@@ -1,6 +1,7 @@
 // Queue.cs
 // Copyright Karel Kroeze, 2020-2020
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -72,14 +73,19 @@ public class Queue : WorldComponent
             {
                 var color = Assets.ColorCompleted[item.Research.techLevel];
                 var background = num > 1 ? Assets.ColorUnavailable[item.Research.techLevel] : color;
-                DrawLabel(item.QueueRect, color, background, num);
+                DrawLabel(item.QueueRect, color, background, num.ToString());
             }
 
             num++;
         }
     }
 
-    public static void DrawLabel(Rect canvas, Color main, Color background, int label)
+    public static void DrawLabel(Rect canvas, Color main, Color background, string label)
+    {
+        DrawLabel(canvas, main, background, label, String.Empty);
+    }
+
+    public static void DrawLabel(Rect canvas, Color main, Color background, string label, string tooltip)
     {
         FastGUI.DrawTextureFast(canvas, Assets.CircleFill, main);
         if (background != main)
@@ -88,7 +94,12 @@ public class Queue : WorldComponent
         }
 
         Text.Anchor = TextAnchor.MiddleCenter;
-        Widgets.Label(canvas, label.ToString());
+        Widgets.Label(canvas, label);
+        if (!string.IsNullOrEmpty(tooltip))
+        {
+            TooltipHandler.TipRegion(canvas, tooltip);
+        }
+
         Text.Anchor = TextAnchor.UpperLeft;
     }
 

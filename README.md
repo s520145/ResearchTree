@@ -8,6 +8,7 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 - Research can now be added/moved to the front of the queue with Ctrl+Leftclick
 - Added the current progress values on not finished projects
 - Locked camera when opening the research-window
+- Original research-window can be opened by holding shift
 - Added mod-option for when the tree should be generated, the default is now during game start
 - Added mod-option to pause the game when the tree is open
 - Added some caching of the research-nodes to avoid stuttering with large research-trees

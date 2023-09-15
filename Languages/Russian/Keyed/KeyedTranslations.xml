@@ -40,4 +40,6 @@
   <Fluffy.ResearchTree.LoadTypeThree>Первое открытие дерева исследований</Fluffy.ResearchTree.LoadTypeThree>
   <Fluffy.ResearchTree.PreparingTree.LayoutNew>Доработка схемы дерева исследований</Fluffy.ResearchTree.PreparingTree.LayoutNew>
   <Fluffy.ResearchTree.VanillaGraphics>Использовать старые графические методы (при наличии мерцания)</Fluffy.ResearchTree.VanillaGraphics>
+  <Fluffy.ResearchTree.ShowCompletion>Показать сообщение о завершении исследования</Fluffy.ResearchTree.ShowCompletion>
+  <Fluffy.ResearchTree.StillLoading>Дерево загружается в первый раз, это может занять некоторое время</Fluffy.ResearchTree.StillLoading>
 </LanguageData>

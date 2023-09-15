@@ -19,6 +19,8 @@
   <Fluffy.ResearchTree.InProgress>In progress, {0} of {1} done</Fluffy.ResearchTree.InProgress>
   <Fluffy.ResearchTree.LeadsTo>Leads to</Fluffy.ResearchTree.LeadsTo>
   <Fluffy.ResearchTree.None>none</Fluffy.ResearchTree.None>
+  <Fluffy.ResearchTree.ShowCompletion>Show completion message for finished research</Fluffy.ResearchTree.ShowCompletion>
+  <Fluffy.ResearchTree.StillLoading>Tree is loading for the first time, this can take a while</Fluffy.ResearchTree.StillLoading>
   <Fluffy.ResearchTree.CurrentModVersion>Installed mod-version: {0}</Fluffy.ResearchTree.CurrentModVersion>
   <Fluffy.ResearchTree.PauseOnOpen>Pause game on opening research-tree</Fluffy.ResearchTree.PauseOnOpen>
   <Fluffy.ResearchTree.VanillaGraphics>Use the old graphical methods (if flickering)</Fluffy.ResearchTree.VanillaGraphics>

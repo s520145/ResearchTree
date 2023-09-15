@@ -40,4 +40,6 @@
   <Fluffy.ResearchTree.LoadTypeThree>Erstmaliges Öffnen des Forschungsbaums</Fluffy.ResearchTree.LoadTypeThree>
   <Fluffy.ResearchTree.PreparingTree.LayoutNew>Fertigstellung des Layouts des Forschungsbaums</Fluffy.ResearchTree.PreparingTree.LayoutNew>
   <Fluffy.ResearchTree.VanillaGraphics>Verwenden Sie die alten grafischen Methoden (bei Flackern)</Fluffy.ResearchTree.VanillaGraphics>
+  <Fluffy.ResearchTree.ShowCompletion>Abschlussmeldung für beendete Recherchen anzeigen</Fluffy.ResearchTree.ShowCompletion>
+  <Fluffy.ResearchTree.StillLoading>Baum wird zum ersten Mal geladen, dies kann eine Weile dauern</Fluffy.ResearchTree.StillLoading>
 </LanguageData>

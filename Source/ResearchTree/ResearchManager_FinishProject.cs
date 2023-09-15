@@ -14,7 +14,10 @@ public class ResearchManager_FinishProject
     {
         private static void Prefix(ref bool doCompletionDialog)
         {
-            doCompletionDialog = false;
+            if (doCompletionDialog)
+            {
+                doCompletionDialog = FluffyResearchTreeMod.instance.Settings.ShowCompletion;
+            }
         }
 
         private static void Postfix(ResearchProjectDef proj)
