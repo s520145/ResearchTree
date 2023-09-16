@@ -1,7 +1,6 @@
 // Queue.cs
 // Copyright Karel Kroeze, 2020-2020
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -14,6 +13,8 @@ namespace FluffyResearchTree;
 public class Queue : WorldComponent
 {
     private static Queue _instance;
+
+    private static Vector2 _sideScrollPosition = Vector2.zero;
 
     private readonly List<ResearchNode> _queue = new List<ResearchNode>();
 
@@ -82,7 +83,7 @@ public class Queue : WorldComponent
 
     public static void DrawLabel(Rect canvas, Color main, Color background, string label)
     {
-        DrawLabel(canvas, main, background, label, String.Empty);
+        DrawLabel(canvas, main, background, label, string.Empty);
     }
 
     public static void DrawLabel(Rect canvas, Color main, Color background, string label, string tooltip)
@@ -264,17 +265,21 @@ public class Queue : WorldComponent
             return;
         }
 
-        var min = canvas.min;
+        var scrollContentRect = canvas;
+        scrollContentRect.width = _instance._queue.Count * (Constants.NodeSize.x + Constants.Margin);
+        scrollContentRect.height -= 20;
+        scrollContentRect.x = 0;
+        scrollContentRect.y = 0;
+
+        Widgets.BeginScrollView(canvas, ref _sideScrollPosition, scrollContentRect);
+        var min = scrollContentRect.min;
         // ReSharper disable once ForCanBeConvertedToForeach
         for (var index = 0; index < _instance._queue.Count; index++)
         {
             var node = _instance._queue[index];
-            if (!(min.x + Constants.NodeSize.x < canvas.xMax))
-            {
-                break;
-            }
 
-            var rect = new Rect(min.x - Constants.Margin, min.y - Constants.Margin, Constants.NodeSize.x + 12f,
+            var rect = new Rect(min.x - Constants.Margin, min.y - Constants.Margin,
+                Constants.NodeSize.x + (Constants.Margin * 2),
                 Constants.NodeSize.y + 12f);
             node.DrawAt(min, rect, true);
             if (interactible && Mouse.IsOver(rect))
@@ -284,6 +289,8 @@ public class Queue : WorldComponent
 
             min.x += Constants.NodeSize.x + Constants.Margin;
         }
+
+        Widgets.EndScrollView();
     }
 
     public static void Notify_InstantFinished()

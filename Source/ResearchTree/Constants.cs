@@ -31,7 +31,7 @@ public static class Constants
 
     public static readonly Vector2 NodeSize = new Vector2(200f, 50f);
 
-    public static readonly float TopBarHeight = NodeSize.y + 12f;
+    public static readonly float TopBarHeight = NodeSize.y + 12f + 20f;
 
     public static readonly Vector2 TechLevelLabelSize = new Vector2(200f, QueueLabelSize);
 }

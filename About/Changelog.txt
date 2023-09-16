@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.4.12 - Added a scrollbar for the queue if its wider than the screen
+
+
 1.4.11 - Added info about loading tree
 Added option for showing vanilla completion info.
 Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
