@@ -2,6 +2,8 @@
 // Copyright Karel Kroeze, 2018-2020
 
 using System.Collections.Generic;
+using System.Reflection;
+using HarmonyLib;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -39,6 +41,10 @@ public static class Assets
 
     public static int TotalAmountOfResearch;
 
+    public static readonly bool UsingVanillaVehiclesExpanded;
+
+    public static MethodInfo IsDisabledMethod;
+
     static Assets()
     {
         Button = ContentFinder<Texture2D>.Get("Buttons/button");
@@ -53,6 +59,41 @@ public static class Assets
         TechLevelColor = new Color(1f, 1f, 1f, 0.2f);
         SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture(0f, 0f, 0f, 0.1f);
         Search = ContentFinder<Texture2D>.Get("Icons/magnifying-glass");
+        UsingVanillaVehiclesExpanded =
+            ModLister.GetActiveModWithIdentifier("OskarPotocki.VanillaVehiclesExpanded") != null;
+
+        if (UsingVanillaVehiclesExpanded)
+        {
+            var utilsType = AccessTools.TypeByName("VanillaVehiclesExpanded.Utils");
+            if (utilsType == null)
+            {
+                Log.Warning(
+                    "[FluffyResearchTree]: Failed to find the Utils-type in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
+                UsingVanillaVehiclesExpanded = false;
+            }
+            else
+            {
+                var utilsMethods = AccessTools.GetDeclaredMethods(utilsType);
+                if (utilsMethods == null || !utilsMethods.Any())
+                {
+                    Log.Warning(
+                        "[FluffyResearchTree]: Failed to find any methods in Utils in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
+                    UsingVanillaVehiclesExpanded = false;
+                }
+                else
+                {
+                    IsDisabledMethod =
+                        utilsMethods.FirstOrDefault(methodInfo => methodInfo.GetParameters().Length == 2);
+                    if (IsDisabledMethod == null)
+                    {
+                        Log.Warning(
+                            "[FluffyResearchTree]: Failed to find any methods in Utils in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
+                        UsingVanillaVehiclesExpanded = false;
+                    }
+                }
+            }
+        }
+
         var relevantTechLevels = Tree.RelevantTechLevels;
         var count = relevantTechLevels.Count;
         for (var i = 0; i < count; i++)

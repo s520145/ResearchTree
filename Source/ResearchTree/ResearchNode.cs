@@ -174,6 +174,17 @@ public class ResearchNode : Node
             return availableCache;
         }
 
+        object[] parameters = { Research, null };
+        if (Assets.UsingVanillaVehiclesExpanded)
+        {
+            var boolResult = (bool)Assets.IsDisabledMethod.Invoke(null, parameters);
+            if (boolResult)
+            {
+                availableCache = false;
+                return availableCache;
+            }
+        }
+
         if (Research.prerequisites?.Any() != true)
         {
             availableCache = true;
@@ -412,9 +423,14 @@ public class ResearchNode : Node
             var tooltipstring = GetResearchTooltipString();
             if (!BuildingPresent())
             {
-                tooltipstring.AppendLine();
-                tooltipstring.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
-                    MissingFacilities().Select(td => td.LabelCap).ToArray())));
+                var missingFacilities = MissingFacilities();
+
+                if (missingFacilities?.Any() == true)
+                {
+                    tooltipstring.AppendLine();
+                    tooltipstring.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
+                        MissingFacilities().Select(td => td.LabelCap).ToArray())));
+                }
             }
 
             if (!Research.TechprintRequirementMet)
@@ -435,6 +451,22 @@ public class ResearchNode : Node
             {
                 tooltipstring.AppendLine();
                 tooltipstring.AppendLine("Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
+            }
+
+            if (Assets.UsingVanillaVehiclesExpanded)
+            {
+                var valueArray = new object[] { Research, null };
+                var boolResult = (bool)Assets.IsDisabledMethod.Invoke(null, valueArray);
+
+                if (boolResult)
+                {
+                    tooltipstring.AppendLine();
+                    var wreck = (ThingDef)valueArray[1];
+                    if (wreck != null)
+                    {
+                        tooltipstring.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
+                    }
+                }
             }
 
             TooltipHandler.TipRegion(Rect, tooltipstring.ToString());
@@ -460,7 +492,6 @@ public class ResearchNode : Node
                     }
 
                     Widgets.DefIcon(rect, unlockDefsAndDescs[i].First);
-                    //unlockDefsAndDescs[i].First.DrawColouredIcon(rect);
                     TooltipHandler.TipRegion(rect, unlockDefsAndDescs[i].Second);
                 }
             }

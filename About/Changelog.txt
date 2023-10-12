@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.4.13 - Added support for the custom research requirements in [url=https://steamcommunity.com/workshop/filedetails/?id=3014906877]Vanilla Vehicles Expanded[/url]
+
+
 1.4.12 - Added a scrollbar for the queue if its wider than the screen
 
 

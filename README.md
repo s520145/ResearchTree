@@ -13,6 +13,7 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 - Added mod-option to pause the game when the tree is open
 - Added some caching of the research-nodes to avoid stuttering with large research-trees
 - Adapted some of the graphical tricks in https://steamcommunity.com/sharedfiles/filedetails/?id=2877856030]ResearchPowl
+- Added a scroll-bar for the research-queue to be able to see all queued projects
 - Fixed compatibility with Biotech
 - Fixed compatibility with https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160]Research Reinvented
 - Fixed compatibility with https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060]Research Whatever
@@ -74,6 +75,7 @@ Parts of the code in this mod, and some content may be licensed by their origina
 -  For best support, please use the Discord-channel for error-reporting.
 -  Do not report errors by making a discussion-thread, I get no notification of that.
 -  If you have the solution for a problem, please post it to the GitHub repository.
+-  Use https://github.com/RimSort/RimSort/releases/latest]RimSort to sort your mods
 
 
 
