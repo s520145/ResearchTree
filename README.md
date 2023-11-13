@@ -17,6 +17,7 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 - Fixed compatibility with Biotech
 - Fixed compatibility with https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160]Research Reinvented
 - Fixed compatibility with https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060]Research Whatever
+- Added support for the custom research requirements in https://steamcommunity.com/workshop/filedetails/?id=3014906877]Vanilla Vehicles Expanded
 
 ![Image](https://i.imgur.com/pufA0kM.png)
 

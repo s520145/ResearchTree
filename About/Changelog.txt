@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.4.14 - Should no longer have issues generating the research tree when mods that modifies tech-levels after load are used
+
+
 1.4.13 - Added support for the custom research requirements in [url=https://steamcommunity.com/workshop/filedetails/?id=3014906877]Vanilla Vehicles Expanded[/url]
 
 

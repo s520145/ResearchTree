@@ -389,6 +389,11 @@ public static class Tree
             var source = from n in Nodes.OfType<ResearchNode>()
                 where n.Research.techLevel == techlevel
                 select n;
+            if (!source.Any())
+            {
+                continue;
+            }
+
             _techLevelBounds[techlevel] = new IntRange(source.Min(n => n.X) - 1, source.Max(n => n.X));
         }
     }
@@ -574,6 +579,11 @@ public static class Tree
 
     public static void DrawTechLevel(TechLevel techlevel, Rect visibleRect)
     {
+        if (!TechLevelBounds.ContainsKey(techlevel))
+        {
+            return;
+        }
+
         var num = ((Constants.NodeSize.x + Constants.NodeMargins.x) * TechLevelBounds[techlevel].min) -
                   (Constants.NodeMargins.x / 2f);
         var num2 = ((Constants.NodeSize.x + Constants.NodeMargins.x) * TechLevelBounds[techlevel].max) -
