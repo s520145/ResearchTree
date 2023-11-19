@@ -42,4 +42,6 @@
   <Fluffy.ResearchTree.VanillaGraphics>Utilizar los métodos gráficos antiguos (si parpadea)</Fluffy.ResearchTree.VanillaGraphics>
   <Fluffy.ResearchTree.ShowCompletion>Mostrar el mensaje de finalización de la investigación</Fluffy.ResearchTree.ShowCompletion>
   <Fluffy.ResearchTree.StillLoading>El árbol se está cargando por primera vez, esto puede tomar un tiempo</Fluffy.ResearchTree.StillLoading>
+  <Fluffy.ResearchTree.UIScaleWarning>Cuando se utiliza una escala de interfaz de usuario superior a 1x, es posible que las etiquetas de investigación se corten si se utiliza la opción de carga en segundo plano.
+Si esto ocurre, utilice la opción de carga la primera vez que abra la aplicación.</Fluffy.ResearchTree.UIScaleWarning>
 </LanguageData>

@@ -41,4 +41,6 @@
   <Fluffy.ResearchTree.VanillaGraphics>Utiliser les anciennes méthodes graphiques (en cas de scintillement)</Fluffy.ResearchTree.VanillaGraphics>
   <Fluffy.ResearchTree.ShowCompletion>Afficher un message d'achèvement pour les recherches terminées</Fluffy.ResearchTree.ShowCompletion>
   <Fluffy.ResearchTree.StillLoading>L'arbre se charge pour la première fois, ce qui peut prendre un certain temps.</Fluffy.ResearchTree.StillLoading>
+  <Fluffy.ResearchTree.UIScaleWarning>Lorsque l'échelle de l'interface utilisateur est supérieure à 1x, il se peut que les étiquettes de recherche soient coupées si vous utilisez l'option de chargement en arrière-plan.
+Veuillez utiliser l'option de chargement à la première ouverture si vous rencontrez ce problème.</Fluffy.ResearchTree.UIScaleWarning>
 </LanguageData>

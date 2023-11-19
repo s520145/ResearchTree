@@ -89,6 +89,11 @@ internal class FluffyResearchTreeMod : Mod
             Settings.LoadType = 2;
         }
 
+        if (Settings.LoadType == 1 && Prefs.UIScale > 1f)
+        {
+            listing_Standard.Label("Fluffy.ResearchTree.UIScaleWarning".Translate());
+        }
+
         listing_Standard.Gap();
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.PauseOnOpen".Translate(), ref Settings.PauseOnOpen);
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.ShowCompletion".Translate(), ref Settings.ShowCompletion);

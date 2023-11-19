@@ -391,13 +391,35 @@ public class ResearchNode : Node
                 Text.Anchor = TextAnchor.UpperLeft;
                 Text.WordWrap = false;
                 Text.Font = !_largeLabel ? GameFont.Small : GameFont.Tiny;
-                Widgets.Label(LabelRect, Research.LabelCap);
+
+                if (Text.CalcSize(Research.LabelCap).x > LabelRect.width)
+                {
+                    Text.WordWrap = true;
+                    var newRect = LabelRect;
+                    newRect.height *= 2f;
+                    Widgets.Label(newRect, Research.LabelCap);
+                    Text.WordWrap = false;
+                }
+                else
+                {
+                    Widgets.Label(LabelRect, Research.LabelCap);
+                }
             }
             else
             {
                 Text.Anchor = TextAnchor.MiddleCenter;
                 Text.WordWrap = false;
                 Text.Font = GameFont.Medium;
+                if (Text.CalcSize(Label).x > LabelRect.width)
+                {
+                    Text.Font = GameFont.Small;
+                }
+
+                if (Text.CalcSize(Label).x > LabelRect.width)
+                {
+                    Text.Font = GameFont.Tiny;
+                }
+
                 Widgets.Label(Rect, Research.LabelCap);
             }
 

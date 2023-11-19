@@ -42,4 +42,6 @@
   <Fluffy.ResearchTree.VanillaGraphics>Использовать старые графические методы (при наличии мерцания)</Fluffy.ResearchTree.VanillaGraphics>
   <Fluffy.ResearchTree.ShowCompletion>Показать сообщение о завершении исследования</Fluffy.ResearchTree.ShowCompletion>
   <Fluffy.ResearchTree.StillLoading>Дерево загружается в первый раз, это может занять некоторое время</Fluffy.ResearchTree.StillLoading>
+  <Fluffy.ResearchTree.UIScaleWarning>При использовании масштаба пользовательского интерфейса более 1х возможно обрезание исследовательских меток при использовании опции фоновой загрузки.
+В этом случае используйте загрузку при первом открытии.</Fluffy.ResearchTree.UIScaleWarning>
 </LanguageData>
