@@ -209,6 +209,12 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
+        if (Event.current.control)
+        {
+            _scrollPosition.y += Event.current.delta.y * 10f;
+            return;
+        }
+
         var mousePosition = Event.current.mousePosition;
         var vector = (Event.current.mousePosition - _scrollPosition) / ZoomLevel;
         ZoomLevel += Event.current.delta.y * Constants.ZoomStep * ZoomLevel;

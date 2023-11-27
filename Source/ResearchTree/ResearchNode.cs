@@ -185,28 +185,49 @@ public class ResearchNode : Node
             }
         }
 
-        if (Research.prerequisites?.Any() != true)
+        if (Research.prerequisites?.Any() != true && Research.hiddenPrerequisites?.Any() != true)
         {
             availableCache = true;
             return availableCache;
         }
 
-        foreach (var researchPrerequisite in Research.prerequisites)
+        if (Research.prerequisites?.Any() == true)
         {
-            if (researchPrerequisite.IsFinished)
+            foreach (var researchPrerequisite in Research.prerequisites)
             {
-                continue;
-            }
+                if (researchPrerequisite.IsFinished)
+                {
+                    continue;
+                }
 
-            if (researchPrerequisite.ResearchNode().Available)
-            {
-                continue;
-            }
+                if (researchPrerequisite.ResearchNode().Available)
+                {
+                    continue;
+                }
 
-            availableCache = false;
-            return availableCache;
+                availableCache = false;
+                return availableCache;
+            }
         }
 
+        if (Research.hiddenPrerequisites?.Any() == true)
+        {
+            foreach (var researchPrerequisite in Research.hiddenPrerequisites)
+            {
+                if (researchPrerequisite.IsFinished)
+                {
+                    continue;
+                }
+
+                if (researchPrerequisite.ResearchNode().Available)
+                {
+                    continue;
+                }
+
+                availableCache = false;
+                return availableCache;
+            }
+        }
 
         availableCache = true;
         return availableCache;
@@ -592,7 +613,9 @@ public class ResearchNode : Node
     public List<ResearchNode> GetMissingRequiredRecursive()
     {
         var enumerable =
-            (Research.prerequisites?.Where(rpd => !rpd.IsFinished) ?? Array.Empty<ResearchProjectDef>()).Select(rpd =>
+            (Research.prerequisites?.Where(rpd => !rpd.IsFinished) ?? Array.Empty<ResearchProjectDef>())
+            .Concat(Research.hiddenPrerequisites?.Where(rpd => !rpd.IsFinished) ?? Array.Empty<ResearchProjectDef>())
+            .Select(rpd =>
                 rpd.ResearchNode());
 
         var list = new List<ResearchNode>(enumerable);
