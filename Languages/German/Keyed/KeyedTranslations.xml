@@ -44,4 +44,6 @@
   <Fluffy.ResearchTree.StillLoading>Baum wird zum ersten Mal geladen, dies kann eine Weile dauern</Fluffy.ResearchTree.StillLoading>
   <Fluffy.ResearchTree.UIScaleWarning>Wenn Sie die UI-Skala größer als 1x verwenden, kann es vorkommen, dass die Forschungsbeschriftungen abgeschnitten werden, wenn Sie die Option zum Laden im Hintergrund verwenden.
 Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Problem haben.</Fluffy.ResearchTree.UIScaleWarning>
+  <Fluffy.ResearchTree.CtrlFunctionScroll>Verwenden Sie die Strg-Taste, um den Suchbaum vertikal zu verschieben.</Fluffy.ResearchTree.CtrlFunctionScroll>
+  <Fluffy.ResearchTree.CtrlFunctionZoom>Verwenden Sie die Strg-Taste, um den Forschungsbaum zu vergrößern.</Fluffy.ResearchTree.CtrlFunctionZoom>
 </LanguageData>

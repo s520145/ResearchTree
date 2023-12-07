@@ -95,6 +95,18 @@ internal class FluffyResearchTreeMod : Mod
         }
 
         listing_Standard.Gap();
+
+        if (listing_Standard.RadioButton("Fluffy.ResearchTree.CtrlFunctionScroll".Translate(), Settings.CtrlFunction))
+        {
+            Settings.CtrlFunction = true;
+        }
+
+        if (listing_Standard.RadioButton("Fluffy.ResearchTree.CtrlFunctionZoom".Translate(), !Settings.CtrlFunction))
+        {
+            Settings.CtrlFunction = false;
+        }
+
+        listing_Standard.Gap();
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.PauseOnOpen".Translate(), ref Settings.PauseOnOpen);
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.ShowCompletion".Translate(), ref Settings.ShowCompletion);
 

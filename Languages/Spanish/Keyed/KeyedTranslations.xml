@@ -44,4 +44,6 @@
   <Fluffy.ResearchTree.StillLoading>El árbol se está cargando por primera vez, esto puede tomar un tiempo</Fluffy.ResearchTree.StillLoading>
   <Fluffy.ResearchTree.UIScaleWarning>Cuando se utiliza una escala de interfaz de usuario superior a 1x, es posible que las etiquetas de investigación se corten si se utiliza la opción de carga en segundo plano.
 Si esto ocurre, utilice la opción de carga la primera vez que abra la aplicación.</Fluffy.ResearchTree.UIScaleWarning>
+  <Fluffy.ResearchTree.CtrlFunctionScroll>Utilice Ctrl para desplazarse verticalmente por el árbol de búsqueda.</Fluffy.ResearchTree.CtrlFunctionScroll>
+  <Fluffy.ResearchTree.CtrlFunctionZoom>Utilice Ctrl para ampliar el árbol de investigación</Fluffy.ResearchTree.CtrlFunctionZoom>
 </LanguageData>

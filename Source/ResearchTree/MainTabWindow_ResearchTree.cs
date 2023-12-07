@@ -209,7 +209,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        if (Event.current.control)
+        if (Event.current.control == FluffyResearchTreeMod.instance.Settings.CtrlFunction)
         {
             _scrollPosition.y += Event.current.delta.y * 10f;
             return;

@@ -12,9 +12,11 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 - Added mod-option for when the tree should be generated, the default is now during game start
 - Added mod-option to pause the game when the tree is open
 - Added some caching of the research-nodes to avoid stuttering with large research-trees
+- Added scroll-wheel scrolling when holding Ctrl
 - Adapted some of the graphical tricks in https://steamcommunity.com/sharedfiles/filedetails/?id=2877856030]ResearchPowl
 - Added a scroll-bar for the research-queue to be able to see all queued projects
 - Fixed compatibility with Biotech
+- Fixed check for hiddenRequirements
 - Fixed compatibility with https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160]Research Reinvented
 - Fixed compatibility with https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060]Research Whatever
 - Added support for the custom research requirements in https://steamcommunity.com/workshop/filedetails/?id=3014906877]Vanilla Vehicles Expanded
