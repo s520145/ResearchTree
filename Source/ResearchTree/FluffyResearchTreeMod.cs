@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Threading;
 using HarmonyLib;
 using Mlie;
 using UnityEngine;
@@ -7,7 +6,6 @@ using Verse;
 
 namespace FluffyResearchTree;
 
-[StaticConstructorOnStartup]
 internal class FluffyResearchTreeMod : Mod
 {
     /// <summary>
@@ -17,7 +15,7 @@ internal class FluffyResearchTreeMod : Mod
 
     private static string currentVersion;
 
-    public static Thread initializeWorker;
+    //public static Thread initializeWorker;
 
     /// <summary>
     ///     Constructor
@@ -30,16 +28,16 @@ internal class FluffyResearchTreeMod : Mod
         Settings = GetSettings<FluffyResearchTreeSettings>();
         currentVersion = VersionFromManifest.GetVersionFromModMetaData(content.ModMetaData);
 
-        switch (Settings.LoadType)
-        {
-            //case 0: // No point really
-            //    LongEventHandler.QueueLongEvent(Tree.Initialize, "ResearchPal.BuildingResearchTree", false, null);
-            //    return;
-            case 1:
-                LongEventHandler.QueueLongEvent(StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true,
-                    null);
-                break;
-        }
+        //switch (Settings.LoadType)
+        //{
+        //    //case 0: // No point really
+        //    //    LongEventHandler.QueueLongEvent(Tree.Initialize, "ResearchPal.BuildingResearchTree", false, null);
+        //    //    return;
+        //    case 1:
+        //        LongEventHandler.QueueLongEvent(StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true,
+        //            null);
+        //        break;
+        //}
     }
 
     /// <summary>
@@ -47,12 +45,12 @@ internal class FluffyResearchTreeMod : Mod
     /// </summary>
     internal FluffyResearchTreeSettings Settings { get; }
 
-    private static void StartLoadingWorker()
-    {
-        initializeWorker = new Thread(Tree.Initialize);
-        Log.Message("[ResearchTree]: Initialization start in background");
-        initializeWorker.Start();
-    }
+    //private static void StartLoadingWorker()
+    //{
+    //    initializeWorker = new Thread(Tree.Initialize);
+    //    Log.Message("[ResearchTree]: Initialization start in background");
+    //    initializeWorker.Start();
+    //}
 
     /// <summary>
     ///     The title for the mod-settings

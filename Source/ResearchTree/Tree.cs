@@ -239,17 +239,21 @@ public static class Tree
                 var node = NodeAt(l, i);
                 if (node != null)
                 {
-                    Swap(item, node);
+                    if (!TrySwap(item, node))
+                    {
+                        continue;
+                    }
+
                     if (Crossings(l) > num2)
                     {
-                        Swap(node, item);
+                        TrySwap(node, item);
                         continue;
                     }
 
                     var num5 = EdgeLength(l, @in);
                     if (num - num5 < Constants.Epsilon)
                     {
-                        Swap(node, item);
+                        TrySwap(node, item);
                     }
                     else
                     {
@@ -312,17 +316,21 @@ public static class Tree
                     var node2 = NodeAt(num, i);
                     if (node2 != null)
                     {
-                        Swap(node, node2);
+                        if (!TrySwap(node, node2))
+                        {
+                            continue;
+                        }
+
                         if (Crossings(num) > num2)
                         {
-                            Swap(node2, node);
+                            TrySwap(node2, node);
                             continue;
                         }
 
                         var length = item2.Length;
                         if (num3 - length < Constants.Epsilon)
                         {
-                            Swap(node2, node);
+                            TrySwap(node2, node);
                         }
                         else
                         {
@@ -459,9 +467,32 @@ public static class Tree
         }
     }
 
-    private static void CheckPrerequisites()
+    public static void CheckPrerequisites()
+    {
+        var keepIterating = true;
+        var iterator = 10;
+        while (keepIterating)
+        {
+            if (checkPrerequisites())
+            {
+                keepIterating = false;
+            }
+
+            iterator--;
+            if (iterator > 0)
+            {
+                continue;
+            }
+
+            Verse.Log.Message("Tried fixing research prerequisite issues for 10 iterations, aborting.");
+            keepIterating = false;
+        }
+    }
+
+    private static bool checkPrerequisites()
     {
         var queue = new Queue<ResearchNode>(Nodes.OfType<ResearchNode>());
+        var returnValue = true;
         while (queue.Count > 0)
         {
             var researchNode = queue.Dequeue();
@@ -478,12 +509,14 @@ public static class Tree
                 continue;
             }
 
-            Log.Warning("\tredundant prerequisites for {0}: {1}", researchNode.Research.LabelCap,
+            Log.Warning("\tredundant prerequisites for {0}: {1}. Removing.", researchNode.Research.LabelCap,
                 string.Join(", ", enumerable.Select(r => r.LabelCap).ToArray()));
             foreach (var item in enumerable)
             {
                 researchNode.Research.prerequisites.Remove(item);
             }
+
+            returnValue = false;
         }
 
         queue = new Queue<ResearchNode>(Nodes.OfType<ResearchNode>());
@@ -496,13 +529,36 @@ public static class Tree
                 continue;
             }
 
-            Log.Warning("\t{0} has a lower techlevel than (one of) it's prerequisites", node.Research.defName);
+            Log.Warning("\t{0} has a lower techlevel than (one of) it's prerequisites, increasing.",
+                node.Research.defName);
             node.Research.techLevel = node.Research.prerequisites.Max(r => r.techLevel);
-            foreach (var item2 in node.Descendants.OfType<ResearchNode>())
+            returnValue = false;
+            foreach (var researchNode in node.Children)
             {
-                queue.Enqueue(item2);
+                if (queue.Contains(researchNode))
+                {
+                    continue;
+                }
+
+                Log.Warning(
+                    $"Re-evaluating {researchNode.Research.defName} since one of its parents has changed tech-level.");
+                queue.Enqueue(researchNode);
+            }
+
+            foreach (var researchNode in node.Parents)
+            {
+                if (queue.Contains(researchNode))
+                {
+                    continue;
+                }
+
+                Log.Warning(
+                    $"Re-evaluating {researchNode.Research.defName} since one of its children has changed tech-level.");
+                queue.Enqueue(researchNode);
             }
         }
+
+        return returnValue;
     }
 
     private static void PopulateNodes()
@@ -698,7 +754,11 @@ public static class Tree
         {
             for (var j = i + 1; j < list.Count; j++)
             {
-                Swap(list[i], list[j]);
+                if (!TrySwap(list[i], list[j]))
+                {
+                    continue;
+                }
+
                 var num2 = Crossings(l);
                 if (num2 < num)
                 {
@@ -706,20 +766,22 @@ public static class Tree
                 }
                 else
                 {
-                    Swap(list[j], list[i]);
+                    TrySwap(list[j], list[i]);
                 }
             }
         }
     }
 
-    private static void Swap(Node A, Node B)
+    private static bool TrySwap(Node A, Node B)
     {
         if (A.X != B.X)
         {
-            throw new Exception("Can't swap nodes on different layers");
+            Verse.Log.Warning($"Can't swap {A} and {B}, nodes on different layers");
+            return false;
         }
 
         (A.Y, B.Y) = (B.Y, A.Y);
+        return true;
     }
 
     private static bool BarymetricSweep(int iteration)

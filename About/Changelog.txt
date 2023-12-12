@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.4.18 - Added some extra fixes for research requirements issues. Moved pregeneration until after other mods have loaded. Generation of the tree should now no longer hang, regardless of research-issues, will probably generate a silly tree instead.
+
+
 1.4.17 - Added setting to define the function of holding Ctrl and scrolling.
 Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
 

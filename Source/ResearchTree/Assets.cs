@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
@@ -44,6 +45,8 @@ public static class Assets
     public static readonly bool UsingVanillaVehiclesExpanded;
 
     public static MethodInfo IsDisabledMethod;
+
+    public static Thread initializeWorker;
 
     static Assets()
     {
@@ -102,6 +105,18 @@ public static class Assets
             ColorAvailable[relevantTechLevels[i]] = Color.HSVToRGB(1f / count * i, 0.33f, 0.33f);
             ColorUnavailable[relevantTechLevels[i]] = Color.HSVToRGB(1f / count * i, 0.125f, 0.33f);
         }
+
+        if (FluffyResearchTreeMod.instance.Settings.LoadType == 1)
+        {
+            LongEventHandler.QueueLongEvent(StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true, null);
+        }
+    }
+
+    private static void StartLoadingWorker()
+    {
+        initializeWorker = new Thread(Tree.Initialize);
+        Log.Message("[ResearchTree]: Initialization start in background");
+        initializeWorker.Start();
     }
 
     [StaticConstructorOnStartup]
