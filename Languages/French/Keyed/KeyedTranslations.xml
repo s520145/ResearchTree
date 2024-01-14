@@ -45,4 +45,5 @@
 Veuillez utiliser l'option de chargement à la première ouverture si vous rencontrez ce problème.</Fluffy.ResearchTree.UIScaleWarning>
   <Fluffy.ResearchTree.CtrlFunctionScroll>Utilisez la touche Ctrl pour faire défiler verticalement l'arbre de recherche.</Fluffy.ResearchTree.CtrlFunctionScroll>
   <Fluffy.ResearchTree.CtrlFunctionZoom>Utilisez la touche Ctrl pour agrandir l'arbre de recherche.</Fluffy.ResearchTree.CtrlFunctionZoom>
+  <Fluffy.ResearchTree.ResolutionChange>Arbre de recherche : Changement graphique détecté, l'arbre de recherche sera régénéré</Fluffy.ResearchTree.ResolutionChange>
 </LanguageData>

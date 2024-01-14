@@ -174,7 +174,7 @@ public class ResearchNode : Node
             return availableCache;
         }
 
-        object[] parameters = { Research, null };
+        object[] parameters = [Research, null];
         if (Assets.UsingVanillaVehiclesExpanded)
         {
             var boolResult = (bool)Assets.IsDisabledMethod.Invoke(null, parameters);
@@ -329,7 +329,7 @@ public class ResearchNode : Node
         var availableBenches = Find.Maps.SelectMany(map => map.listerBuildings.allBuildingsColonist)
             .OfType<Building_ResearchBench>();
         var distinctBenches = availableBenches.Select(b => b.def).Distinct();
-        value = new List<ThingDef>();
+        value = [];
         foreach (var item in list)
         {
             if (item.requiredResearchBuilding == null)
@@ -366,7 +366,7 @@ public class ResearchNode : Node
         return BuildingPresent(Research);
     }
 
-    public override void Draw(Rect visibleRect, bool forceDetailedMode = false)
+    public override void Draw(Rect visibleRect, bool forceDetailedMode = false, bool forceNonDetailedMode = false)
     {
         if (!IsVisible(visibleRect))
         {
@@ -407,7 +407,8 @@ public class ResearchNode : Node
             }
 
             if (forceDetailedMode ||
-                MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
+                MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff ||
+                forceNonDetailedMode)
             {
                 Text.Anchor = TextAnchor.UpperLeft;
                 Text.WordWrap = false;
@@ -445,7 +446,8 @@ public class ResearchNode : Node
             }
 
             if (forceDetailedMode ||
-                MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
+                MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff ||
+                forceNonDetailedMode)
             {
                 Text.Anchor = TextAnchor.UpperRight;
                 var costString = $"{Research.CostApparent.ToStringByStyle(ToStringStyle.Integer)}";
@@ -514,8 +516,9 @@ public class ResearchNode : Node
 
             TooltipHandler.TipRegion(Rect, tooltipstring.ToString());
 
-            if (forceDetailedMode ||
-                MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
+            if ((forceDetailedMode ||
+                 MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
+                && !forceNonDetailedMode)
             {
                 var unlockDefsAndDescs = Research.GetUnlockDefsAndDescs();
                 for (var i = 0; i < unlockDefsAndDescs.Count; i++)
@@ -659,10 +662,10 @@ public class ResearchNode : Node
         return stringBuilder;
     }
 
-    public void DrawAt(Vector2 pos, Rect visibleRect, bool forceDetailedMode = false)
+    public void DrawAt(Vector2 pos, Rect visibleRect, bool forceDetailedMode = false, bool forceNonDetailedMode = false)
     {
-        SetRects(pos);
-        Draw(visibleRect, forceDetailedMode);
+        SetRects(pos, visibleRect.size);
+        Draw(visibleRect, forceDetailedMode, forceNonDetailedMode);
         SetRects();
     }
 }

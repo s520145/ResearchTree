@@ -112,7 +112,7 @@ public static class Assets
         }
     }
 
-    private static void StartLoadingWorker()
+    public static void StartLoadingWorker()
     {
         initializeWorker = new Thread(Tree.Initialize);
         Log.Message("[ResearchTree]: Initialization start in background");

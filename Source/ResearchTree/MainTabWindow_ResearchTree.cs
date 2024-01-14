@@ -29,9 +29,9 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private Rect _viewRect_Inner;
 
-    private bool _viewRect_InnerDirty = true;
+    public bool _viewRect_InnerDirty = true;
 
-    private bool _viewRectDirty = true;
+    public bool _viewRectDirty = true;
 
     private float _zoomLevel = 1f;
 
@@ -45,7 +45,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public static MainTabWindow_ResearchTree Instance { get; private set; }
 
-    public float ScaledMargin => Constants.Margin * ZoomLevel / Prefs.UIScale;
+    public float ScaledMargin => Constants.Margin * ZoomLevel;
 
     public float ZoomLevel
     {
@@ -67,8 +67,9 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                 return _viewRect;
             }
 
-            _viewRect = new Rect(_baseViewRect.xMin * ZoomLevel, _baseViewRect.yMin * ZoomLevel,
-                _baseViewRect.width * ZoomLevel, _baseViewRect.height * ZoomLevel);
+            _viewRect = new Rect(_baseViewRect.xMin * ZoomLevel / Prefs.UIScale,
+                _baseViewRect.yMin * ZoomLevel / Prefs.UIScale,
+                _baseViewRect.width * ZoomLevel / Prefs.UIScale, _baseViewRect.height * ZoomLevel / Prefs.UIScale);
             _viewRectDirty = false;
 
             return _viewRect;
@@ -84,7 +85,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                 return _viewRect_Inner;
             }
 
-            _viewRect_Inner = _viewRect.ContractedBy(Margin * ZoomLevel);
+            _viewRect_Inner = _viewRect.ContractedBy(Margin * ZoomLevel / Prefs.UIScale);
             _viewRect_InnerDirty = false;
 
             return _viewRect_Inner;
@@ -142,10 +143,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private void SetRects()
     {
-        _baseViewRect = new Rect(18f / Prefs.UIScale, (Constants.TopBarHeight + Constants.Margin + 18f) / Prefs.UIScale,
-            (Screen.width - 36f) / Prefs.UIScale,
-            (Screen.height - 35 - 36f - Constants.TopBarHeight - Constants.Margin) / Prefs.UIScale);
-        _baseViewRect_Inner = _baseViewRect.ContractedBy(Constants.Margin / Prefs.UIScale);
+        _baseViewRect = new Rect(18f / Prefs.UIScale, Constants.TopBarHeight + Constants.Margin + (18f / Prefs.UIScale),
+            Screen.width - (36f / Prefs.UIScale),
+            Screen.height - 35f - 36f - Constants.TopBarHeight - Constants.Margin);
+        _baseViewRect_Inner = _baseViewRect.ContractedBy(Constants.Margin);
         windowRect.x = 0f;
         windowRect.y = 0f;
         windowRect.width = UI.screenWidth;
@@ -255,7 +256,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             new Vector3(Prefs.UIScale / ZoomLevel, Prefs.UIScale / ZoomLevel, 1f));
     }
 
-    private void ResetZoomLevel()
+    public void ResetZoomLevel()
     {
         UI.ApplyUIScale();
         GUI.BeginClip(windowRect);
@@ -278,8 +279,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         var position =
             new Rect(canvas.xMax - Constants.Margin - Constants.HubSize, 0f, Constants.HubSize, Constants.HubSize)
-                .CenteredOnYIn(canvas);
-        var rect = new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas);
+                .CenteredOnYIn(canvas.TopHalf());
+        var rect = new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.TopHalf());
         FastGUI.DrawTextureFast(position, Assets.Search);
         var query = Widgets.TextField(rect, _query);
         if (query == _query)

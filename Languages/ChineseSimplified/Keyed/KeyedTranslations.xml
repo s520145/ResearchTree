@@ -46,4 +46,5 @@
 如果遇到这种情况，请使用首次打开时加载。</Fluffy.ResearchTree.UIScaleWarning>
   <Fluffy.ResearchTree.CtrlFunctionScroll>使用 Ctrl 键垂直滚动研究树</Fluffy.ResearchTree.CtrlFunctionScroll>
   <Fluffy.ResearchTree.CtrlFunctionZoom>使用 Ctrl 键缩放研究树</Fluffy.ResearchTree.CtrlFunctionZoom>
+  <Fluffy.ResearchTree.ResolutionChange>研究树：检测到图形变化，研究树将重新生成</Fluffy.ResearchTree.ResolutionChange>
 </LanguageData>

@@ -86,6 +86,33 @@ public static class Tree
         }
     }
 
+    public static void Reset()
+    {
+        Messages.Message("Fluffy.ResearchTree.ResolutionChange".Translate(), MessageTypeDefOf.NeutralEvent);
+
+        Size = IntVec2.Zero;
+        _nodes = null;
+        _edges = null;
+        _relevantTechLevels = null;
+        _techLevelBounds = null;
+        _initializing = false;
+        Initialized = false;
+        OrderDirty = false;
+        FirstLoadDone = false;
+        if (MainTabWindow_ResearchTree.Instance != null)
+        {
+            MainTabWindow_ResearchTree.Instance.ResetZoomLevel();
+            MainTabWindow_ResearchTree.Instance._viewRect_InnerDirty = true;
+            MainTabWindow_ResearchTree.Instance._viewRectDirty = true;
+        }
+
+        if (FluffyResearchTreeMod.instance.Settings.LoadType == 1)
+        {
+            LongEventHandler.QueueLongEvent(Assets.StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true,
+                null);
+        }
+    }
+
     public static void Initialize()
     {
         if (Initialized || _initializing)
@@ -441,7 +468,7 @@ public static class Tree
     {
         if (_edges.NullOrEmpty())
         {
-            _edges = new List<Edge<Node, Node>>();
+            _edges = [];
         }
 
         foreach (var item2 in Nodes.OfType<ResearchNode>())
@@ -568,7 +595,7 @@ public static class Tree
         var second = allDefsListForReading.Where(p => p.Ancestors().Intersect(hidden).Any());
         var researchList = DefDatabase<ResearchProjectDef>.AllDefsListForReading.Except(hidden).Except(second)
             .ToList();
-        _nodes = new List<Node>();
+        _nodes = [];
         Assets.TotalAmountOfResearch = researchList.Count;
         var iterator = 0;
         foreach (var def in researchList)
@@ -818,7 +845,7 @@ public static class Tree
             if (Math.Abs(item.Value - num) > Constants.Epsilon)
             {
                 num = item.Value;
-                dictionary[num] = new List<Node>();
+                dictionary[num] = [];
             }
 
             dictionary[num].Add(item.Key);

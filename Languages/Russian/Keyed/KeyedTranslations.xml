@@ -46,4 +46,5 @@
 В этом случае используйте загрузку при первом открытии.</Fluffy.ResearchTree.UIScaleWarning>
   <Fluffy.ResearchTree.CtrlFunctionScroll>Используйте Ctrl для вертикальной прокрутки дерева исследований</Fluffy.ResearchTree.CtrlFunctionScroll>
   <Fluffy.ResearchTree.CtrlFunctionZoom>Используйте Ctrl, чтобы увеличить дерево исследований</Fluffy.ResearchTree.CtrlFunctionZoom>
+  <Fluffy.ResearchTree.ResolutionChange>ResearchTree: Обнаружено изменение графики, дерево исследований будет регенерировано</Fluffy.ResearchTree.ResolutionChange>
 </LanguageData>

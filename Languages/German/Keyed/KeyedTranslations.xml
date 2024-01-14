@@ -46,4 +46,5 @@
 Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Problem haben.</Fluffy.ResearchTree.UIScaleWarning>
   <Fluffy.ResearchTree.CtrlFunctionScroll>Verwenden Sie die Strg-Taste, um den Suchbaum vertikal zu verschieben.</Fluffy.ResearchTree.CtrlFunctionScroll>
   <Fluffy.ResearchTree.CtrlFunctionZoom>Verwenden Sie die Strg-Taste, um den Forschungsbaum zu vergrößern.</Fluffy.ResearchTree.CtrlFunctionZoom>
+  <Fluffy.ResearchTree.ResolutionChange>ForschungsBaum: Grafik-Änderung erkannt, Forschungsbaum wird neu generiert</Fluffy.ResearchTree.ResolutionChange>
 </LanguageData>

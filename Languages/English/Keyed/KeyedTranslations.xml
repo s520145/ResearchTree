@@ -43,6 +43,7 @@
   <Fluffy.ResearchTree.RestoreQueue>Restoring queue</Fluffy.ResearchTree.RestoreQueue>
   <Fluffy.ResearchTree.CtrlFunctionScroll>Use Ctrl to vertically scroll the research-tree</Fluffy.ResearchTree.CtrlFunctionScroll>
   <Fluffy.ResearchTree.CtrlFunctionZoom>Use Ctrl to zoom the research-tree</Fluffy.ResearchTree.CtrlFunctionZoom>
+  <Fluffy.ResearchTree.ResolutionChange>ResearchTree: Graphic-change detected, research tree will be regenerated</Fluffy.ResearchTree.ResolutionChange>
   <Fluffy.ResearchTree.UIScaleWarning>When using UI scale larger than 1x you may experience research labels getting cut off if using the background loading option.
 Please use the load on first time opening if you experience this.</Fluffy.ResearchTree.UIScaleWarning>
 </LanguageData>

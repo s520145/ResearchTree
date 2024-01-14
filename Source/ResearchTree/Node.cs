@@ -14,9 +14,9 @@ public class Node
 {
     protected const float Offset = 2f;
 
-    protected readonly List<Edge<Node, Node>> _inEdges = new List<Edge<Node, Node>>();
+    protected readonly List<Edge<Node, Node>> _inEdges = [];
 
-    protected readonly List<Edge<Node, Node>> _outEdges = new List<Edge<Node, Node>>();
+    protected readonly List<Edge<Node, Node>> _outEdges = [];
 
     protected Rect _costIconRect;
 
@@ -297,9 +297,15 @@ public class Node
         SetRects(_topLeft);
     }
 
-    protected void SetRects(Vector2 topLeft)
+    protected void SetRects(Vector2 topLeft, Vector2 limitingDimensions = default)
     {
-        _rect = new Rect(topLeft.x, topLeft.y, Constants.NodeSize.x, Constants.NodeSize.y);
+        if (limitingDimensions == default)
+        {
+            limitingDimensions = Vector2.positiveInfinity;
+        }
+
+        _rect = new Rect(topLeft.x, topLeft.y, Math.Min(Constants.NodeSize.x, limitingDimensions.x),
+            Math.Min(Constants.NodeSize.y, limitingDimensions.y));
         _left = new Vector2(_rect.xMin, _rect.yMin + (_rect.height / Offset));
         _right = new Vector2(_rect.xMax, _left.y);
         _queueRect = new Rect(_rect.xMax - 15f, _rect.yMin + ((_rect.height - Constants.QueueLabelSize) / Offset), 30f,
@@ -330,7 +336,7 @@ public class Node
         return false;
     }
 
-    public virtual void Draw(Rect visibleRect, bool forceDetailedMode = false)
+    public virtual void Draw(Rect visibleRect, bool forceDetailedMode = false, bool forceNonDetailedMode = false)
     {
     }
 }

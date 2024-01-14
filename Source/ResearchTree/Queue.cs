@@ -1,6 +1,7 @@
 // Queue.cs
 // Copyright Karel Kroeze, 2020-2020
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -16,7 +17,7 @@ public class Queue : WorldComponent
 
     private static Vector2 _sideScrollPosition = Vector2.zero;
 
-    private readonly List<ResearchNode> _queue = new List<ResearchNode>();
+    private readonly List<ResearchNode> _queue = [];
 
     private List<ResearchProjectDef> _saveableQueue;
 
@@ -281,7 +282,18 @@ public class Queue : WorldComponent
             var rect = new Rect(min.x - Constants.Margin, min.y - Constants.Margin,
                 Constants.NodeSize.x + (Constants.Margin * 2),
                 Constants.NodeSize.y + 12f);
-            node.DrawAt(min, rect, true);
+            if (rect.height > scrollContentRect.height)
+            {
+                rect = new Rect(min.x - Constants.Margin, min.y - Constants.Margin,
+                    Constants.NodeSize.x + (Constants.Margin * 2),
+                    Math.Min(Constants.NodeSize.y + 12f, scrollContentRect.height));
+                node.DrawAt(min, rect, false, true);
+            }
+            else
+            {
+                node.DrawAt(min, rect, true);
+            }
+
             if (interactible && Mouse.IsOver(rect))
             {
                 MainTabWindow_ResearchTree.Instance.CenterOn(node);
