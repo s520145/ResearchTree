@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.4.20 - Highlights research prerequisites regardless if the selected research is available or not
+
+
 1.4.19 - Will behave a bit better on UIScale other than 1x
 Will redraw the tree if resolution or UIScale is changed
 Queue nodes will not change depending on zoom as they are always the same size.

@@ -544,19 +544,19 @@ public class ResearchNode : Node
 
             if (Mouse.IsOver(Rect))
             {
-                if (Available)
+                if (Completed)
+                {
+                    foreach (var child in Children)
+                    {
+                        child.Highlighted = true;
+                    }
+                }
+                else
                 {
                     Highlighted = true;
                     foreach (var item in GetMissingRequiredRecursive())
                     {
                         item.Highlighted = true;
-                    }
-                }
-                else if (Completed)
-                {
-                    foreach (var child in Children)
-                    {
-                        child.Highlighted = true;
                     }
                 }
             }
