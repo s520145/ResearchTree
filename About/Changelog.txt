@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.4.21 - Reverted some of the UIscale changes as they caused more issues than they solved
+
+
 1.4.20 - Highlights research prerequisites regardless if the selected research is available or not
 
 

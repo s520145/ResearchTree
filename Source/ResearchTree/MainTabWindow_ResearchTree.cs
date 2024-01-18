@@ -45,7 +45,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public static MainTabWindow_ResearchTree Instance { get; private set; }
 
-    public float ScaledMargin => Constants.Margin * ZoomLevel;
+    public float ScaledMargin => Constants.Margin * ZoomLevel / Prefs.UIScale;
 
     public float ZoomLevel
     {
@@ -67,9 +67,9 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                 return _viewRect;
             }
 
-            _viewRect = new Rect(_baseViewRect.xMin * ZoomLevel / Prefs.UIScale,
-                _baseViewRect.yMin * ZoomLevel / Prefs.UIScale,
-                _baseViewRect.width * ZoomLevel / Prefs.UIScale, _baseViewRect.height * ZoomLevel / Prefs.UIScale);
+            _viewRect = new Rect(_baseViewRect.xMin * ZoomLevel,
+                _baseViewRect.yMin * ZoomLevel,
+                _baseViewRect.width * ZoomLevel, _baseViewRect.height * ZoomLevel);
             _viewRectDirty = false;
 
             return _viewRect;
@@ -85,7 +85,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                 return _viewRect_Inner;
             }
 
-            _viewRect_Inner = _viewRect.ContractedBy(Margin * ZoomLevel / Prefs.UIScale);
+            _viewRect_Inner = _viewRect.ContractedBy(Margin * ZoomLevel);
             _viewRect_InnerDirty = false;
 
             return _viewRect_Inner;
@@ -144,9 +144,9 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     private void SetRects()
     {
         _baseViewRect = new Rect(18f / Prefs.UIScale, Constants.TopBarHeight + Constants.Margin + (18f / Prefs.UIScale),
-            Screen.width - (36f / Prefs.UIScale),
-            Screen.height - 35f - 36f - Constants.TopBarHeight - Constants.Margin);
-        _baseViewRect_Inner = _baseViewRect.ContractedBy(Constants.Margin);
+            (Screen.width - 36f) / Prefs.UIScale,
+            (Screen.height - 35f - 36f - Constants.TopBarHeight - Constants.Margin) / Prefs.UIScale);
+        _baseViewRect_Inner = _baseViewRect.ContractedBy(Constants.Margin / Prefs.UIScale);
         windowRect.x = 0f;
         windowRect.y = 0f;
         windowRect.width = UI.screenWidth;
