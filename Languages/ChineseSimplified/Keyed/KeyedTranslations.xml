@@ -47,4 +47,6 @@
   <Fluffy.ResearchTree.CtrlFunctionScroll>使用 Ctrl 键垂直滚动研究树</Fluffy.ResearchTree.CtrlFunctionScroll>
   <Fluffy.ResearchTree.CtrlFunctionZoom>使用 Ctrl 键缩放研究树</Fluffy.ResearchTree.CtrlFunctionZoom>
   <Fluffy.ResearchTree.ResolutionChange>研究树：检测到图形变化，研究树将重新生成</Fluffy.ResearchTree.ResolutionChange>
+  <Fluffy.ResearchTree.StorytellerDoesNotAllow>故事讲述人不允许使用这种技术</Fluffy.ResearchTree.StorytellerDoesNotAllow>
+  <Fluffy.ResearchTree.RimedievalDoesNotAllow>Rimedieval 设置不允许使用这种技术。</Fluffy.ResearchTree.RimedievalDoesNotAllow>
 </LanguageData>

@@ -18,6 +18,8 @@
   <Fluffy.ResearchTree.NotStarted>Not started, costs {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>In progress, {0} of {1} done</Fluffy.ResearchTree.InProgress>
   <Fluffy.ResearchTree.LeadsTo>Leads to</Fluffy.ResearchTree.LeadsTo>
+  <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller does not allow this tech</Fluffy.ResearchTree.StorytellerDoesNotAllow>
+  <Fluffy.ResearchTree.RimedievalDoesNotAllow>Rimedieval settings does not allow this tech</Fluffy.ResearchTree.RimedievalDoesNotAllow>
   <Fluffy.ResearchTree.None>none</Fluffy.ResearchTree.None>
   <Fluffy.ResearchTree.ShowCompletion>Show completion message for finished research</Fluffy.ResearchTree.ShowCompletion>
   <Fluffy.ResearchTree.StillLoading>Tree is loading for the first time, this can take a while</Fluffy.ResearchTree.StillLoading>

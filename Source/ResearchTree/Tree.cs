@@ -86,7 +86,7 @@ public static class Tree
         }
     }
 
-    public static void Reset()
+    public static void Reset(bool alsoZoom)
     {
         Messages.Message("Fluffy.ResearchTree.ResolutionChange".Translate(), MessageTypeDefOf.NeutralEvent);
 
@@ -101,7 +101,11 @@ public static class Tree
         FirstLoadDone = false;
         if (MainTabWindow_ResearchTree.Instance != null)
         {
-            MainTabWindow_ResearchTree.Instance.ResetZoomLevel();
+            if (alsoZoom)
+            {
+                MainTabWindow_ResearchTree.Instance.ResetZoomLevel();
+            }
+
             MainTabWindow_ResearchTree.Instance._viewRect_InnerDirty = true;
             MainTabWindow_ResearchTree.Instance._viewRectDirty = true;
         }
@@ -122,7 +126,7 @@ public static class Tree
 
         _initializing = true;
 
-        if (FluffyResearchTreeMod.instance.Settings.LoadType == 1)
+        if (FluffyResearchTreeMod.instance.Settings?.LoadType == 1)
         {
             CheckPrerequisites();
             CreateEdges();

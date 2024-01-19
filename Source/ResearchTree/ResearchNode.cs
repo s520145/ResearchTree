@@ -144,6 +144,12 @@ public class ResearchNode : Node
 
         hasRefreshedAvailability = true;
 
+        if (Assets.UsingRimedieval && !Assets.AllowedResearchDefs.Contains(Research))
+        {
+            availableCache = false;
+            return availableCache;
+        }
+
         if (Research.CanStartNow)
         {
             availableCache = true;
@@ -179,6 +185,16 @@ public class ResearchNode : Node
         {
             var boolResult = (bool)Assets.IsDisabledMethod.Invoke(null, parameters);
             if (boolResult)
+            {
+                availableCache = false;
+                return availableCache;
+            }
+        }
+
+        if (Assets.UsingVanillaExpanded)
+        {
+            var boolResult = (bool)Assets.TechLevelAllowedMethod.Invoke(null, [Research.techLevel]);
+            if (!boolResult)
             {
                 availableCache = false;
                 return availableCache;
@@ -231,6 +247,22 @@ public class ResearchNode : Node
 
         availableCache = true;
         return availableCache;
+    }
+
+    public bool Exists()
+    {
+        if (Assets.UsingRimedieval && !Assets.AllowedResearchDefs.Contains(Research))
+        {
+            return false;
+        }
+
+        if (!Assets.UsingVanillaExpanded)
+        {
+            return true;
+        }
+
+        var boolResult = (bool)Assets.TechLevelAllowedMethod.Invoke(null, [Research.techLevel]);
+        return boolResult;
     }
 
     public bool BuildingPresent(ResearchProjectDef research)
@@ -374,10 +406,22 @@ public class ResearchNode : Node
             return;
         }
 
+        var overrideColor = Color.magenta;
+        if (!Completed && !Exists())
+        {
+            forceNonDetailedMode = true;
+            overrideColor = new Color(0.2f, 0.2f, 0.2f);
+        }
+
         if (Event.current.type == EventType.Repaint)
         {
             //GUI.color = Mouse.IsOver(Rect) ? GenUI.MouseoverColor : Color;
             var color = Mouse.IsOver(Rect) ? GenUI.MouseoverColor : Color;
+            if (overrideColor != Color.magenta)
+            {
+                color = overrideColor;
+            }
+
             if (Mouse.IsOver(Rect) || Highlighted)
             {
                 FastGUI.DrawTextureFast(Rect, Assets.ButtonActive, color);
@@ -509,9 +553,26 @@ public class ResearchNode : Node
                     var wreck = (ThingDef)valueArray[1];
                     if (wreck != null)
                     {
+                        tooltipstring.AppendLine();
                         tooltipstring.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
                     }
                 }
+            }
+
+            if (Assets.UsingVanillaExpanded)
+            {
+                var boolResult = (bool)Assets.TechLevelAllowedMethod.Invoke(null, [Research.techLevel]);
+                if (!boolResult)
+                {
+                    tooltipstring.AppendLine();
+                    tooltipstring.AppendLine("Fluffy.ResearchTree.StorytellerDoesNotAllow".Translate());
+                }
+            }
+
+            if (Assets.UsingRimedieval && !Assets.AllowedResearchDefs.Contains(Research))
+            {
+                tooltipstring.AppendLine();
+                tooltipstring.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
             }
 
             TooltipHandler.TipRegion(Rect, tooltipstring.ToString());
@@ -565,6 +626,11 @@ public class ResearchNode : Node
         if (!Widgets.ButtonInvisible(Rect))
         {
             return;
+        }
+
+        if (Event.current.button == 0 || Event.current.button == 1)
+        {
+            UI.UnfocusCurrentControl();
         }
 
         if (Event.current.button == 1 && !Event.current.shift)

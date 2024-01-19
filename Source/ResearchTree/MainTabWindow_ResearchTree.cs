@@ -143,14 +143,19 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private void SetRects()
     {
-        _baseViewRect = new Rect(18f / Prefs.UIScale, Constants.TopBarHeight + Constants.Margin + (18f / Prefs.UIScale),
-            (Screen.width - 36f) / Prefs.UIScale,
-            (Screen.height - 35f - 36f - Constants.TopBarHeight - Constants.Margin) / Prefs.UIScale);
+        var startPosition = new Vector2(18f / Prefs.UIScale,
+            Constants.TopBarHeight + Constants.Margin + (18f / Prefs.UIScale));
+        var size = new Vector2((Screen.width - 36f) / Prefs.UIScale,
+            UI.screenHeight - 35f - startPosition.y);
+
+        _baseViewRect = new Rect(startPosition, size);
         _baseViewRect_Inner = _baseViewRect.ContractedBy(Constants.Margin / Prefs.UIScale);
         windowRect.x = 0f;
         windowRect.y = 0f;
         windowRect.width = UI.screenWidth;
-        windowRect.height = UI.screenHeight - 35;
+        windowRect.height = UI.screenHeight - (35f / Prefs.UIScale);
+        Log.Message($"screen: {Screen.width}x{Screen.height}");
+        Log.Message($"_baseViewRect: {_baseViewRect.width}x{_baseViewRect.height}");
     }
 
     public override void DoWindowContents(Rect canvas)
@@ -160,8 +165,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        var canvas2 = new Rect(canvas.xMin, canvas.yMin + 10f, canvas.width, Constants.TopBarHeight);
-        DrawTopBar(canvas2);
+        DrawTopBar(new Rect(canvas.xMin, canvas.yMin + 10f, canvas.width, Constants.TopBarHeight));
         ApplyZoomLevel();
         FastGUI.DrawTextureFast(ViewRect, Assets.SlightlyDarkBackground);
         _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect);
@@ -227,6 +231,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         if (Event.current.type == EventType.MouseDown)
         {
+            UI.UnfocusCurrentControl();
             _dragging = true;
             _mousePosition = Event.current.mousePosition;
             Event.current.Use();
@@ -302,7 +307,11 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                      .OrderBy(result => result.match))
         {
             list.Add(new FloatMenuOption(result2.node.Label, delegate { CenterOn(result2.node); },
-                MenuOptionPriority.Default, delegate { CenterOn(result2.node); }));
+                MenuOptionPriority.Default, delegate
+                {
+                    UI.UnfocusCurrentControl();
+                    CenterOn(result2.node);
+                }));
         }
 
         if (!list.Any())

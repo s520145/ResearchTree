@@ -47,4 +47,6 @@ Si esto ocurre, utilice la opción de carga la primera vez que abra la aplicaci�
   <Fluffy.ResearchTree.CtrlFunctionScroll>Utilice Ctrl para desplazarse verticalmente por el árbol de búsqueda.</Fluffy.ResearchTree.CtrlFunctionScroll>
   <Fluffy.ResearchTree.CtrlFunctionZoom>Utilice Ctrl para ampliar el árbol de investigación</Fluffy.ResearchTree.CtrlFunctionZoom>
   <Fluffy.ResearchTree.ResolutionChange>Árbol de investigación: Detectado cambio gráfico, se regenerará el árbol de investigación</Fluffy.ResearchTree.ResolutionChange>
+  <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller no permite esta tecnología</Fluffy.ResearchTree.StorytellerDoesNotAllow>
+  <Fluffy.ResearchTree.RimedievalDoesNotAllow>La configuración medieval no permite esta tecnología</Fluffy.ResearchTree.RimedievalDoesNotAllow>
 </LanguageData>

@@ -44,7 +44,17 @@ public static class Assets
 
     public static readonly bool UsingVanillaVehiclesExpanded;
 
-    public static MethodInfo IsDisabledMethod;
+    public static readonly bool UsingVanillaExpanded;
+
+    public static readonly bool UsingRimedieval;
+
+    public static readonly MethodInfo IsDisabledMethod;
+
+    public static readonly MethodInfo TechLevelAllowedMethod;
+
+    public static readonly MethodInfo GetAllowedProjectDefsMethod;
+
+    public static readonly List<ResearchProjectDef> AllowedResearchDefs;
 
     public static Thread initializeWorker;
 
@@ -62,6 +72,62 @@ public static class Assets
         TechLevelColor = new Color(1f, 1f, 1f, 0.2f);
         SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture(0f, 0f, 0f, 0.1f);
         Search = ContentFinder<Texture2D>.Get("Icons/magnifying-glass");
+        UsingRimedieval =
+            ModLister.GetActiveModWithIdentifier("Ogam.Rimedieval") != null;
+        AllowedResearchDefs = [];
+
+        if (UsingRimedieval)
+        {
+            var defCleanerType = AccessTools.TypeByName("Rimedieval.DefCleaner");
+            if (defCleanerType == null)
+            {
+                Log.Warning(
+                    "[FluffyResearchTree]: Failed to find the DefCleaner-type in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
+                UsingRimedieval = false;
+            }
+            else
+            {
+                GetAllowedProjectDefsMethod = AccessTools.Method(defCleanerType, "GetAllowedProjectDefs",
+                    [typeof(List<ResearchProjectDef>)]);
+                if (GetAllowedProjectDefsMethod == null)
+                {
+                    Log.Warning(
+                        "[FluffyResearchTree]: Failed to find method GetAllowedProjectDefs in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
+                    UsingRimedieval = false;
+                }
+                else
+                {
+                    AllowedResearchDefs =
+                        (List<ResearchProjectDef>)GetAllowedProjectDefsMethod.Invoke(null,
+                            [DefDatabase<ResearchProjectDef>.AllDefsListForReading]);
+                }
+            }
+        }
+
+        UsingVanillaExpanded =
+            ModLister.GetActiveModWithIdentifier("OskarPotocki.VanillaFactionsExpanded.Core") != null;
+        if (UsingVanillaExpanded)
+        {
+            var storyTellerUtility = AccessTools.TypeByName("VanillaStorytellersExpanded.CustomStorytellerUtility");
+            if (storyTellerUtility == null)
+            {
+                Log.Warning(
+                    "[FluffyResearchTree]: Failed to find the CustomStorytellerUtility-type in VanillaExpanded. Will not be able to show or block research based on storyteller limitations.");
+                UsingVanillaExpanded = false;
+            }
+            else
+            {
+                TechLevelAllowedMethod =
+                    AccessTools.Method(storyTellerUtility, "TechLevelAllowed", [typeof(TechLevel)]);
+                if (TechLevelAllowedMethod == null)
+                {
+                    Log.Warning(
+                        "[FluffyResearchTree]: Failed to find method TechLevelAllowed in VanillaExpanded. Will not be able to show or block research based on storyteller limitations.");
+                    UsingVanillaExpanded = false;
+                }
+            }
+        }
+
         UsingVanillaVehiclesExpanded =
             ModLister.GetActiveModWithIdentifier("OskarPotocki.VanillaVehiclesExpanded") != null;
 
