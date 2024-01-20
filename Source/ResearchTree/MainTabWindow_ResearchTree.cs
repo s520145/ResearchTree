@@ -69,7 +69,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
             _viewRect = new Rect(_baseViewRect.xMin * ZoomLevel,
                 _baseViewRect.yMin * ZoomLevel,
-                _baseViewRect.width * ZoomLevel, _baseViewRect.height * ZoomLevel);
+                _baseViewRect.width * ZoomLevel,
+                _baseViewRect.height * ZoomLevel);
             _viewRectDirty = false;
 
             return _viewRect;
@@ -153,7 +154,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         windowRect.x = 0f;
         windowRect.y = 0f;
         windowRect.width = UI.screenWidth;
-        windowRect.height = UI.screenHeight - (35f / Prefs.UIScale);
+        windowRect.height = UI.screenHeight - (35f / Prefs.UIScale) - (Constants.Margin / Prefs.UIScale);
         Log.Message($"screen: {Screen.width}x{Screen.height}");
         Log.Message($"_baseViewRect: {_baseViewRect.width}x{_baseViewRect.height}");
     }
@@ -309,8 +310,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             list.Add(new FloatMenuOption(result2.node.Label, delegate { CenterOn(result2.node); },
                 MenuOptionPriority.Default, delegate
                 {
-                    UI.UnfocusCurrentControl();
                     CenterOn(result2.node);
+                    UI.UnfocusCurrentControl();
                 }));
         }
 

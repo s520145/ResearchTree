@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.4.24 - Fixed the tree layering over the bottom bar on higher uiscales
+
+
 1.4.23 - Fixed research covering the lower tabs on higher UIscale
 Added compatibility with the tech-limiting storyteller options in [url=https://steamcommunity.com/workshop/filedetails/?id=2023507013]Vanilla Expanded Framework[/url]
 Added compatibility with the tech limiting in [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2516523040]Rimedieval[/url]. Needs a reload if the settings in Rimedieval are changed..

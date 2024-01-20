@@ -20,6 +20,8 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 - Fixed compatibility with https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160]Research Reinvented
 - Fixed compatibility with https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060]Research Whatever
 - Added support for the custom research requirements in https://steamcommunity.com/workshop/filedetails/?id=3014906877]Vanilla Vehicles Expanded
+- Added compatibility with the tech-limiting storyteller options in https://steamcommunity.com/workshop/filedetails/?id=2023507013]Vanilla Expanded Framework
+- Added compatibility with the tech-limiting in https://steamcommunity.com/sharedfiles/filedetails/?id=2516523040]Rimedieval. Needs a reload if the settings in Rimedieval are changed.
 
 ![Image](https://i.imgur.com/pufA0kM.png)
 
@@ -45,18 +47,6 @@ A better research tree.
 ## Known Issues
 
  - Layouts are not perfect, if you have experience with graph layouts - please do feel free to look at the source code, and/or implement a Sugiyama layout algorithm for me that runs in C
-
-## Technical
-
-So how does this all work? 
-
-Creating an optimal layout is a known problem in the area of *Graph Theory*. There’s serious mathematicians who’ve spent years of their live trying to figure out this problem, and numerous solutions exist. The group of solutions most relevant to our research tree (a *directed acyclic graph*, or *DAG*) is that derived from Sugiyama’s work. Generally speaking, these algorithms have four steps;
-
- - layering (set the *x* coordinates of nodes, enforcing that follow-up research is always at a higher x position than any of its prerequisites, this is a fairly straightforward heuristic) - crossing reduction (set the *y* coordinates of nodes such that there is a minimal amount of intersections of connections between nodes) - edge length reduction (set the *y* coordinates of nodes such that the length of connections between nodes is minimal) - horizontal alignment (set the *y* coordinates of nodes such that the connections between nodes are straight as much as possible) 
-
-The final step is the hardest, but also the most important to create a visually pleasing tree. Sadly, I’ve been unable to implement two of the most well known algorithms for this purpose;
-
- - Brandes, U., and Köpf, B. (2001, September). Fast and simple horizontal coordinate assignment. - Eiglsperger M., Siebenhaller M., Kaufmann M. (2005) An Efficient Implementation of Sugiyama’s Algorithm for Layered Graph Drawing. Luckily, the crossing reduction and edge length reduction steps partially achieve the goals of the final step. The final graph is not as pretty as it could be, but it’s still pretty good - in most scenarios. 
 
 ## Contributors
 
