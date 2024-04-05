@@ -155,8 +155,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         windowRect.y = 0f;
         windowRect.width = UI.screenWidth;
         windowRect.height = UI.screenHeight - (35f / Prefs.UIScale) - (Constants.Margin / Prefs.UIScale);
-        Log.Message($"screen: {Screen.width}x{Screen.height}");
-        Log.Message($"_baseViewRect: {_baseViewRect.width}x{_baseViewRect.height}");
     }
 
     public override void DoWindowContents(Rect canvas)
@@ -288,6 +286,18 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                 .CenteredOnYIn(canvas.TopHalf());
         var rect = new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.TopHalf());
         FastGUI.DrawTextureFast(position, Assets.Search);
+
+        if (ModLister.AnomalyInstalled &&
+            Widgets.ButtonText(
+                new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.BottomHalf()),
+                "Anomaly"))
+        {
+            Find.MainTabsRoot.ToggleTab(Assets.MainButtonDefOf.ResearchOriginal);
+            ((MainTabWindow_Research)Assets.MainButtonDefOf.ResearchOriginal.TabWindow).CurTab =
+                ResearchTabDefOf.Anomaly;
+            return;
+        }
+
         var query = Widgets.TextField(rect, _query);
         if (query == _query)
         {

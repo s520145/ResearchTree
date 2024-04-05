@@ -2,6 +2,7 @@
 // Copyright Karel Kroeze, 2018-2020
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using HarmonyLib;
@@ -99,7 +100,10 @@ public static class Assets
                 {
                     AllowedResearchDefs =
                         (List<ResearchProjectDef>)GetAllowedProjectDefsMethod.Invoke(null,
-                            [DefDatabase<ResearchProjectDef>.AllDefsListForReading]);
+                        [
+                            DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def =>
+                                def.knowledgeCategory == null)
+                        ]);
                 }
             }
         }

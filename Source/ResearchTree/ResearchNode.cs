@@ -174,7 +174,7 @@ public class ResearchNode : Node
             return availableCache;
         }
 
-        if (!Research.StudiedThingsRequirementsMet)
+        if (!Research.AnalyzedThingsRequirementsMet)
         {
             availableCache = false;
             return availableCache;
@@ -529,11 +529,11 @@ public class ResearchNode : Node
                     Research.techprintCount));
             }
 
-            if (!Research.StudiedThingsRequirementsMet)
+            if (!Research.AnalyzedThingsRequirementsMet)
             {
                 tooltipstring.AppendLine();
                 tooltipstring.AppendLine("Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
-                    Research.requiredStudied.Select(def => def.LabelCap))));
+                    Research.requiredAnalyzed.Select(def => def.LabelCap))));
             }
 
             if (!Research.PlayerMechanitorRequirementMet)

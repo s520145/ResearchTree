@@ -594,11 +594,11 @@ public static class Tree
 
     private static void PopulateNodes()
     {
-        var allDefsListForReading = DefDatabase<ResearchProjectDef>.AllDefsListForReading;
+        var allDefsListForReading =
+            DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def => def.knowledgeCategory == null);
         var hidden = allDefsListForReading.Where(p => p.prerequisites?.Contains(p) ?? false);
         var second = allDefsListForReading.Where(p => p.Ancestors().Intersect(hidden).Any());
-        var researchList = DefDatabase<ResearchProjectDef>.AllDefsListForReading.Except(hidden).Except(second)
-            .ToList();
+        var researchList = allDefsListForReading.Except(hidden).Except(second).ToList();
         _nodes = [];
         Assets.TotalAmountOfResearch = researchList.Count;
         var iterator = 0;

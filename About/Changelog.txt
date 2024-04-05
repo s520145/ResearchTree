@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.5.0 - Updated for 1.5
+
+
 1.4.24 - Fixed the tree layering over the bottom bar on higher uiscales
 
 
