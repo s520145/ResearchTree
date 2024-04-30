@@ -36,12 +36,6 @@ public class MainButtonWorker_ResearchTree : MainButtonWorker_ToggleResearchTab
 
     public override void Activate()
     {
-        if (!Event.current.shift && !Tree.Initialized && FluffyResearchTreeMod.instance.Settings.LoadType != 2)
-        {
-            Messages.Message("Fluffy.ResearchTree.StillLoading".Translate(), MessageTypeDefOf.RejectInput);
-            return;
-        }
-
-        Find.MainTabsRoot.ToggleTab(Event.current.shift ? Assets.MainButtonDefOf.ResearchOriginal : def);
+        Assets.OpenResearchWindow();
     }
 }
