@@ -436,7 +436,7 @@ public class ResearchNode : Node
                 var position = Rect.ContractedBy(3f);
                 //GUI.color = Assets.ColorAvailable[Research.techLevel];
                 color = Assets.ColorAvailable[Research.techLevel];
-                position.xMin += Research.ProgressPercent * position.width;
+                position.xMin += Research.ApparentPercent() * position.width;
                 FastGUI.DrawTextureFast(position, BaseContent.WhiteTex, color);
             }
 
@@ -498,7 +498,7 @@ public class ResearchNode : Node
                 if (!Research.IsFinished)
                 {
                     costString =
-                        $"{Research.ProgressReal.ToStringByStyle(ToStringStyle.Integer)}/{Research.CostApparent.ToStringByStyle(ToStringStyle.Integer)}";
+                        $"{Research.ProgressApparent.ToStringByStyle(ToStringStyle.Integer)}/{Research.CostApparent.ToStringByStyle(ToStringStyle.Integer)}";
                 }
 
                 Text.Font = costString.Length > 7 ? GameFont.Small : GameFont.Tiny;

@@ -31,7 +31,6 @@ public class MainButtonWorker_ResearchTree : MainButtonWorker_ToggleResearchTab
             new Rect(currentStart, 0f, Constants.SmallQueueLabelSize, Constants.SmallQueueLabelSize)
                 .CenteredOnYIn(rect), Color.white,
             Color.grey, Queue.NumQueued.ToString());
-        currentStart -= Constants.SmallQueueLabelSize - Constants.Margin;
     }
 
     public override void Activate()

@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.5.2 - Should work better with tech advancing
+
+
 1.5.1 - Fixed Need research alerts
 
 

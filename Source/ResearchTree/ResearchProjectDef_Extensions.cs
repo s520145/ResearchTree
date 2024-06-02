@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace FluffyResearchTree;
@@ -125,6 +126,11 @@ public static class ResearchProjectDef_Extensions
 
         _unlocksCache.Add(research, list);
         return list;
+    }
+
+    public static float ApparentPercent(this ResearchProjectDef research)
+    {
+        return Mathf.Clamp01(research.ProgressApparent / research.CostApparent);
     }
 
     public static ResearchNode ResearchNode(this ResearchProjectDef research)
