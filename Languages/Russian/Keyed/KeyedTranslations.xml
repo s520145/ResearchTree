@@ -48,4 +48,5 @@
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller не позволяет использовать эту технику</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Средневековая обстановка не позволяет использовать эту технику</Fluffy.ResearchTree.RimedievalDoesNotAllow>
+  <ResearchPal.BuildingResearchTreeAsync>Построение дерева исследований</ResearchPal.BuildingResearchTreeAsync>
 </LanguageData>

@@ -126,18 +126,35 @@ public static class Tree
 
         _initializing = true;
 
-        if (FluffyResearchTreeMod.instance.Settings?.LoadType == 1)
+        if (FluffyResearchTreeMod.instance?.Settings?.LoadType == 1)
         {
-            CheckPrerequisites();
-            CreateEdges();
-            HorizontalPositions();
-            NormalizeEdges();
-            Collapse();
-            MinimizeCrossings();
-            MinimizeEdgeLength();
-            RemoveEmptyRows();
-            Initialized = true;
-            MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized();
+            try
+            {
+                Log.Message("[ResearchTree]: CheckPrerequisites");
+                CheckPrerequisites();
+                Log.Message("[ResearchTree]: CreateEdges");
+                CreateEdges();
+                Log.Message("[ResearchTree]: HorizontalPositions");
+                HorizontalPositions();
+                Log.Message("[ResearchTree]: NormalizeEdges");
+                NormalizeEdges();
+                Log.Message("[ResearchTree]: Collapse");
+                Collapse();
+                Log.Message("[ResearchTree]: MinimizeCrossings");
+                MinimizeCrossings();
+                Log.Message("[ResearchTree]: MinimizeEdgeLength");
+                MinimizeEdgeLength();
+                Log.Message("[ResearchTree]: RemoveEmptyRows");
+                RemoveEmptyRows();
+                Initialized = true;
+                Log.Message("[ResearchTree]: Done");
+                return;
+            }
+            catch (Exception)
+            {
+                Log.Message("[ResearchTree]: Error initializing research tree, will retry.", true);
+            }
+
             return;
         }
 

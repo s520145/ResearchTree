@@ -49,4 +49,5 @@ Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Prob
   <Fluffy.ResearchTree.ResolutionChange>ForschungsBaum: Grafik-Änderung erkannt, Forschungsbaum wird neu generiert</Fluffy.ResearchTree.ResolutionChange>
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller erlaubt diese Technik nicht</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Die mittelalterlichen Einstellungen erlauben diese Technik nicht</Fluffy.ResearchTree.RimedievalDoesNotAllow>
+  <ResearchPal.BuildingResearchTreeAsync>Aufbau eines Forschungsbaums</ResearchPal.BuildingResearchTreeAsync>
 </LanguageData>

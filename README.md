@@ -1,6 +1,7 @@
 # [Research Tree (Continued)](https://steamcommunity.com/sharedfiles/filedetails/?id=3030499331)
 
 ![Image](https://i.imgur.com/buuPQel.png)
+
 Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=1266570759
 
 - Added research-infocard, visible by Rightclick
@@ -12,19 +13,20 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 - Added mod-option to pause the game when the tree is open
 - Added some caching of the research-nodes to avoid stuttering with large research-trees
 - Added scroll-wheel scrolling when holding Ctrl
-- Adapted some of the graphical tricks in [https://steamcommunity.com/sharedfiles/filedetails/?id=2877856030](ResearchPowl)
+- Adapted some of the graphical tricks in [ResearchPowl](https://steamcommunity.com/sharedfiles/filedetails/?id=2877856030)
 - Added a scroll-bar for the research-queue to be able to see all queued projects
 - Fixed compatibility with Biotech
 - Fixed check for hiddenRequirements
-- Fixed compatibility with [https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160](Research Reinvented)
-- Fixed compatibility with [https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060](Research Whatever)
-- Added support for the custom research requirements in [https://steamcommunity.com/workshop/filedetails/?id=3014906877](Vanilla Vehicles Expanded)
-- Added compatibility with the tech-limiting storyteller options in [https://steamcommunity.com/workshop/filedetails/?id=2023507013](Vanilla Expanded Framework)
-- Added compatibility with the tech-limiting in [https://steamcommunity.com/sharedfiles/filedetails/?id=2516523040](Rimedieval). Needs a reload if the settings in Rimedieval are changed.
+- Fixed compatibility with [Research Reinvented](https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160)
+- Fixed compatibility with [Research Whatever](https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060)
+- Added support for the custom research requirements in [Vanilla Vehicles Expanded](https://steamcommunity.com/workshop/filedetails/?id=3014906877)
+- Added compatibility with the tech-limiting storyteller options in [Vanilla Expanded Framework](https://steamcommunity.com/workshop/filedetails/?id=2023507013)
+- Added compatibility with the tech-limiting in [Rimedieval](https://steamcommunity.com/sharedfiles/filedetails/?id=2516523040). Needs a reload if the settings in Rimedieval are changed.
 
 ![Image](https://i.imgur.com/pufA0kM.png)
 	
 ![Image](https://i.imgur.com/Z4GOv8H.png)
+
 A better research tree.
 
 ## Features
@@ -51,21 +53,22 @@ A better research tree.
 
 ## License
 
-All original code in this mod is licensed under the [https://opensource.org/licenses/MIT]MIT license[/url]. Do what you want, but give me credit. All original content (e.g. text, imagery, sounds) in this mod is licensed under the [url=http://creativecommons.org/licenses/by-sa/4.0/](CC-BY-SA 4.0 license).
+All original code in this mod is licensed under the [MIT license](https://opensource.org/licenses/MIT). Do what you want, but give me credit. All original content (e.g. text, imagery, sounds) in this mod is licensed under the [CC-BY-SA 4.0 license](http://creativecommons.org/licenses/by-sa/4.0/).
 
-Parts of the code in this mod, and some content may be licensed by their original authors. If this is the case, the original author and license will either be given in the source code, or be in a LICENSE file next to the content. Please do not decompile my mods, but use the original source code available on [https://github.com/fluffy-mods/ResearchTree/](GitHub), so license information in the source code is preserved.
+Parts of the code in this mod, and some content may be licensed by their original authors. If this is the case, the original author and license will either be given in the source code, or be in a LICENSE file next to the content. Please do not decompile my mods, but use the original source code available on [GitHub](https://github.com/fluffy-mods/ResearchTree/), so license information in the source code is preserved.
 
 ![Image](https://i.imgur.com/PwoNOj4.png)
 
 
+
 -  See if the the error persists if you just have this mod and its requirements active.
 -  If not, try adding your other mods until it happens again.
--  Post your error-log using [https://steamcommunity.com/workshop/filedetails/?id=818773962]HugsLib[/url] or the standalone [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873415404](Uploader) and command Ctrl+F12
+-  Post your error-log using [HugsLib](https://steamcommunity.com/workshop/filedetails/?id=818773962) or the standalone [Uploader](https://steamcommunity.com/sharedfiles/filedetails/?id=2873415404) and command Ctrl+F12
 -  For best support, please use the Discord-channel for error-reporting.
 -  Do not report errors by making a discussion-thread, I get no notification of that.
 -  If you have the solution for a problem, please post it to the GitHub repository.
--  Use [https://github.com/RimSort/RimSort/releases/latest](RimSort) to sort your mods
+-  Use [RimSort](https://github.com/RimSort/RimSort/releases/latest) to sort your mods
 
 
 
-[https://steamcommunity.com/sharedfiles/filedetails/changelog/3030499331]![Image]((https://img.shields.io/github/v/release/emipa606/ResearchTree?label=latest%20version&style=plastic&color=9f1111&labelColor=black))
+[![Image](https://img.shields.io/github/v/release/emipa606/ResearchTree?label=latest%20version&style=plastic&color=9f1111&labelColor=black)](https://steamcommunity.com/sharedfiles/filedetails/changelog/3030499331)

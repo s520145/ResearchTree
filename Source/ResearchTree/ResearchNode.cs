@@ -647,7 +647,7 @@ public class ResearchNode : Node
 
         if (Event.current.button == 0 && Event.current.control && !Research.IsFinished)
         {
-            Queue.EnqueueRangeFirst(GetMissingRequiredRecursive().Concat(new List<ResearchNode>(new[] { this }))
+            Queue.EnqueueRangeFirst(GetMissingRequiredRecursive().Concat(new List<ResearchNode>([this]))
                 .Distinct());
         }
 
@@ -656,7 +656,7 @@ public class ResearchNode : Node
             if (!Queue.IsQueued(this))
             {
                 Queue.EnqueueRange(
-                    GetMissingRequiredRecursive().Concat(new List<ResearchNode>(new[] { this }))
+                    GetMissingRequiredRecursive().Concat(new List<ResearchNode>([this]))
                         .Distinct(), Event.current.shift);
             }
             else

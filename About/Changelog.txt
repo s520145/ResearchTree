@@ -1,5 +1,9 @@
 # Changelog for ResearchTree
 
+1.5.3 - Fixed missing translation-string and fixed a background-loading issue
+Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
+
+
 1.5.2 - Should work better with tech advancing
 
 

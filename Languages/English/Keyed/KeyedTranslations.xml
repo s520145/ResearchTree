@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
   <Fluffy.ResearchTree.AllowsBuildingX>Enables construction {0}</Fluffy.ResearchTree.AllowsBuildingX>
   <Fluffy.ResearchTree.AllowsCraftingX>Enables recipe {0}</Fluffy.ResearchTree.AllowsCraftingX>
@@ -43,6 +43,7 @@
   <Fluffy.ResearchTree.PreparingTree.Layout>Finalizing layout</Fluffy.ResearchTree.PreparingTree.Layout>
   <Fluffy.ResearchTree.PreparingTree.LayoutNew>Finalizing research tree layout</Fluffy.ResearchTree.PreparingTree.LayoutNew>
   <Fluffy.ResearchTree.RestoreQueue>Restoring queue</Fluffy.ResearchTree.RestoreQueue>
+  <ResearchPal.BuildingResearchTreeAsync>Building research-tree</ResearchPal.BuildingResearchTreeAsync>
   <Fluffy.ResearchTree.CtrlFunctionScroll>Use Ctrl to vertically scroll the research-tree</Fluffy.ResearchTree.CtrlFunctionScroll>
   <Fluffy.ResearchTree.CtrlFunctionZoom>Use Ctrl to zoom the research-tree</Fluffy.ResearchTree.CtrlFunctionZoom>
   <Fluffy.ResearchTree.ResolutionChange>ResearchTree: Graphic-change detected, research tree will be regenerated</Fluffy.ResearchTree.ResolutionChange>
