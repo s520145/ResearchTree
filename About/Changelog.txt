@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.5.4 - Removed the patch for VEF tech-locking since that feature no longer exists
+
+
 1.5.3 - Fixed missing translation-string and fixed a background-loading issue
 Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
 

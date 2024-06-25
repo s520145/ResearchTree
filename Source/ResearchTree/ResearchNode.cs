@@ -191,16 +191,6 @@ public class ResearchNode : Node
             }
         }
 
-        if (Assets.UsingVanillaExpanded)
-        {
-            var boolResult = (bool)Assets.TechLevelAllowedMethod.Invoke(null, [Research.techLevel]);
-            if (!boolResult)
-            {
-                availableCache = false;
-                return availableCache;
-            }
-        }
-
         if (Research.prerequisites?.Any() != true && Research.hiddenPrerequisites?.Any() != true)
         {
             availableCache = true;
@@ -251,18 +241,7 @@ public class ResearchNode : Node
 
     public bool Exists()
     {
-        if (Assets.UsingRimedieval && !Assets.AllowedResearchDefs.Contains(Research))
-        {
-            return false;
-        }
-
-        if (!Assets.UsingVanillaExpanded)
-        {
-            return true;
-        }
-
-        var boolResult = (bool)Assets.TechLevelAllowedMethod.Invoke(null, [Research.techLevel]);
-        return boolResult;
+        return !Assets.UsingRimedieval || Assets.AllowedResearchDefs.Contains(Research);
     }
 
     public bool BuildingPresent(ResearchProjectDef research)
@@ -556,16 +535,6 @@ public class ResearchNode : Node
                         tooltipstring.AppendLine();
                         tooltipstring.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
                     }
-                }
-            }
-
-            if (Assets.UsingVanillaExpanded)
-            {
-                var boolResult = (bool)Assets.TechLevelAllowedMethod.Invoke(null, [Research.techLevel]);
-                if (!boolResult)
-                {
-                    tooltipstring.AppendLine();
-                    tooltipstring.AppendLine("Fluffy.ResearchTree.StorytellerDoesNotAllow".Translate());
                 }
             }
 

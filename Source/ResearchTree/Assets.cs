@@ -45,13 +45,9 @@ public static class Assets
 
     public static readonly bool UsingVanillaVehiclesExpanded;
 
-    public static readonly bool UsingVanillaExpanded;
-
     public static readonly bool UsingRimedieval;
 
     public static readonly MethodInfo IsDisabledMethod;
-
-    public static readonly MethodInfo TechLevelAllowedMethod;
 
     public static readonly MethodInfo GetAllowedProjectDefsMethod;
 
@@ -83,7 +79,7 @@ public static class Assets
             if (defCleanerType == null)
             {
                 Log.Warning(
-                    "[FluffyResearchTree]: Failed to find the DefCleaner-type in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
+                    "[ResearchTree]: Failed to find the DefCleaner-type in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
                 UsingRimedieval = false;
             }
             else
@@ -93,7 +89,7 @@ public static class Assets
                 if (GetAllowedProjectDefsMethod == null)
                 {
                     Log.Warning(
-                        "[FluffyResearchTree]: Failed to find method GetAllowedProjectDefs in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
+                        "[ResearchTree]: Failed to find method GetAllowedProjectDefs in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
                     UsingRimedieval = false;
                 }
                 else
@@ -108,30 +104,6 @@ public static class Assets
             }
         }
 
-        UsingVanillaExpanded =
-            ModLister.GetActiveModWithIdentifier("OskarPotocki.VanillaFactionsExpanded.Core") != null;
-        if (UsingVanillaExpanded)
-        {
-            var storyTellerUtility = AccessTools.TypeByName("VanillaStorytellersExpanded.CustomStorytellerUtility");
-            if (storyTellerUtility == null)
-            {
-                Log.Warning(
-                    "[FluffyResearchTree]: Failed to find the CustomStorytellerUtility-type in VanillaExpanded. Will not be able to show or block research based on storyteller limitations.");
-                UsingVanillaExpanded = false;
-            }
-            else
-            {
-                TechLevelAllowedMethod =
-                    AccessTools.Method(storyTellerUtility, "TechLevelAllowed", [typeof(TechLevel)]);
-                if (TechLevelAllowedMethod == null)
-                {
-                    Log.Warning(
-                        "[FluffyResearchTree]: Failed to find method TechLevelAllowed in VanillaExpanded. Will not be able to show or block research based on storyteller limitations.");
-                    UsingVanillaExpanded = false;
-                }
-            }
-        }
-
         UsingVanillaVehiclesExpanded =
             ModLister.GetActiveModWithIdentifier("OskarPotocki.VanillaVehiclesExpanded") != null;
 
@@ -141,7 +113,7 @@ public static class Assets
             if (utilsType == null)
             {
                 Log.Warning(
-                    "[FluffyResearchTree]: Failed to find the Utils-type in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
+                    "[ResearchTree]: Failed to find the Utils-type in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
                 UsingVanillaVehiclesExpanded = false;
             }
             else
@@ -150,7 +122,7 @@ public static class Assets
                 if (utilsMethods == null || !utilsMethods.Any())
                 {
                     Log.Warning(
-                        "[FluffyResearchTree]: Failed to find any methods in Utils in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
+                        "[ResearchTree]: Failed to find any methods in Utils in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
                     UsingVanillaVehiclesExpanded = false;
                 }
                 else
@@ -160,7 +132,7 @@ public static class Assets
                     if (IsDisabledMethod == null)
                     {
                         Log.Warning(
-                            "[FluffyResearchTree]: Failed to find any methods in Utils in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
+                            "[ResearchTree]: Failed to find any methods in Utils in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
                         UsingVanillaVehiclesExpanded = false;
                     }
                 }
