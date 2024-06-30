@@ -377,6 +377,11 @@ public class ResearchNode : Node
         return BuildingPresent(Research);
     }
 
+    public override bool IsVisible(Rect visibleRect)
+    {
+        return base.IsVisible(visibleRect) && !Assets.IsBlockedBySOS2(Research);
+    }
+
     public override void Draw(Rect visibleRect, bool forceDetailedMode = false, bool forceNonDetailedMode = false)
     {
         if (!IsVisible(visibleRect))

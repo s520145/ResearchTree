@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.5.5 - Added support for SOS2 hidden research
+
+
 1.5.4 - Removed the patch for VEF tech-locking since that feature no longer exists
 
 

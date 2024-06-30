@@ -47,9 +47,15 @@ public static class Assets
 
     public static readonly bool UsingRimedieval;
 
+    public static readonly bool UsingSOS2;
+
     public static readonly MethodInfo IsDisabledMethod;
 
     public static readonly MethodInfo GetAllowedProjectDefsMethod;
+
+    public static readonly PropertyInfo Sos2WorldCompPropertyInfo;
+
+    public static readonly FieldInfo Sos2UlocksFieldInfo;
 
     public static readonly List<ResearchProjectDef> AllowedResearchDefs;
 
@@ -69,10 +75,10 @@ public static class Assets
         TechLevelColor = new Color(1f, 1f, 1f, 0.2f);
         SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture(0f, 0f, 0f, 0.1f);
         Search = ContentFinder<Texture2D>.Get("Icons/magnifying-glass");
-        UsingRimedieval =
-            ModLister.GetActiveModWithIdentifier("Ogam.Rimedieval") != null;
         AllowedResearchDefs = [];
 
+        UsingRimedieval =
+            ModLister.GetActiveModWithIdentifier("Ogam.Rimedieval") != null;
         if (UsingRimedieval)
         {
             var defCleanerType = AccessTools.TypeByName("Rimedieval.DefCleaner");
@@ -106,7 +112,6 @@ public static class Assets
 
         UsingVanillaVehiclesExpanded =
             ModLister.GetActiveModWithIdentifier("OskarPotocki.VanillaVehiclesExpanded") != null;
-
         if (UsingVanillaVehiclesExpanded)
         {
             var utilsType = AccessTools.TypeByName("VanillaVehiclesExpanded.Utils");
@@ -139,6 +144,50 @@ public static class Assets
             }
         }
 
+
+        UsingSOS2 =
+            ModLister.GetActiveModWithIdentifier("kentington.saveourship2") != null;
+        if (UsingSOS2)
+        {
+            var shipInteriorType = AccessTools.TypeByName("SaveOurShip2.ShipInteriorMod2");
+            if (shipInteriorType == null)
+            {
+                Log.Warning(
+                    "[ResearchTree]: Failed to find the ShipInteriorType-type in SOS2. Will not be able to show or block research based on ArchotechSpore.");
+                UsingSOS2 = false;
+            }
+            else
+            {
+                Sos2WorldCompPropertyInfo = AccessTools.Property(shipInteriorType, "WorldComp");
+                if (Sos2WorldCompPropertyInfo == null)
+                {
+                    Log.Warning(
+                        "[ResearchTree]: Failed to find method ShipWorldComp in ShipInteriorMod2 in SOS2. Will not be able to show or block research based on ArchotechSpore.");
+                    UsingSOS2 = false;
+                }
+                else
+                {
+                    var shipWorldCompType = AccessTools.TypeByName("SaveOurShip2.ShipWorldComp");
+                    if (shipWorldCompType == null)
+                    {
+                        Log.Warning(
+                            "[ResearchTree]: Failed to find type shipWorldCompType in ShipInteriorMod2 in SOS2. Will not be able to show or block research based on ArchotechSpore.");
+                        UsingSOS2 = false;
+                    }
+                    else
+                    {
+                        Sos2UlocksFieldInfo = AccessTools.Field(shipWorldCompType, "Unlocks");
+                        if (Sos2UlocksFieldInfo == null)
+                        {
+                            Log.Warning(
+                                "[ResearchTree]: Failed to find field Sos2UlocksFieldInfo in ShipInteriorMod2 in SOS2. Will not be able to show or block research based on ArchotechSpore.");
+                            UsingSOS2 = false;
+                        }
+                    }
+                }
+            }
+        }
+
         var relevantTechLevels = Tree.RelevantTechLevels;
         var count = relevantTechLevels.Count;
         for (var i = 0; i < count; i++)
@@ -152,6 +201,38 @@ public static class Assets
         {
             LongEventHandler.QueueLongEvent(StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true, null);
         }
+    }
+
+    public static bool IsBlockedBySOS2(ResearchProjectDef researchProject)
+    {
+        if (!UsingSOS2)
+        {
+            return false;
+        }
+
+        if (researchProject.tab is not { defName: "ResearchTabArchotech" })
+        {
+            return false;
+        }
+
+        var worldComp = Sos2WorldCompPropertyInfo.GetValue(null, null);
+        if (worldComp == null)
+        {
+            return false;
+        }
+
+        var unlocks = (List<string>)Sos2UlocksFieldInfo.GetValue(worldComp);
+        if (unlocks == null)
+        {
+            return false;
+        }
+
+        if (!unlocks.Any())
+        {
+            return true;
+        }
+
+        return !unlocks.Contains("ArchotechUplink");
     }
 
     public static void OpenResearchWindow()
