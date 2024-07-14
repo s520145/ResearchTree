@@ -7,7 +7,6 @@
   <Fluffy.ResearchTree.LClickReplaceQueue>左键：替换队列</Fluffy.ResearchTree.LClickReplaceQueue>
   <Fluffy.ResearchTree.LClickRemoveFromQueue>左键：从队列中移除</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.SLClickAddToQueue>Shift+左键：添加到队列</Fluffy.ResearchTree.SLClickAddToQueue>
-  <!-- <Fluffy.ResearchTree.RClickForDetails>右键：详细信息</Fluffy.ResearchTree.RClickForDetails> -->
   <Fluffy.ResearchTree.RClickInstaFinish>(DEBUG) 右键：立即完成</Fluffy.ResearchTree.RClickInstaFinish>
   <Fluffy.ResearchTree.Requires>需要</Fluffy.ResearchTree.Requires>
   <Fluffy.ResearchTree.LeadsTo>导向</Fluffy.ResearchTree.LeadsTo>
@@ -25,12 +24,12 @@
   <Fluffy.ResearchTree.None>无</Fluffy.ResearchTree.None>
   <Fluffy.ResearchTree.MissingStudiedThings>缺少项目研究：{0}</Fluffy.ResearchTree.MissingStudiedThings>
   <Fluffy.ResearchTree.MissingMechanitorRequirement>缺少机械师</Fluffy.ResearchTree.MissingMechanitorRequirement>
-  <Fluffy.ResearchTree.SRClickShowInfo>Shift-Right-Click 显示信息窗口</Fluffy.ResearchTree.SRClickShowInfo>
-  <Fluffy.ResearchTree.NotStarted>未启动，费用为 {0}</Fluffy.ResearchTree.NotStarted>
+  <Fluffy.ResearchTree.SRClickShowInfo>右键：显示信息窗口</Fluffy.ResearchTree.SRClickShowInfo>
+  <Fluffy.ResearchTree.NotStarted>未解锁，费用为 {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>进行中，{1}中的{0}已完成</Fluffy.ResearchTree.InProgress>
-  <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift-右键单击立即完成</Fluffy.ResearchTree.RClickInstaFinishNew>
-  <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>按住 Ctrl 左键单击移动到队列前方</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
-  <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>按住 Ctrl 左键单击，添加到队列前面</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
+  <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift+右键：立即完成</Fluffy.ResearchTree.RClickInstaFinishNew>
+  <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl+左键：移动到队首</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
+  <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl+左键：添加到队首</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.CannotMoveMore>{0}不能被移动到队列的最前面。</Fluffy.ResearchTree.CannotMoveMore>
   <Fluffy.ResearchTree.CurrentModVersion>已安装模块版本：{0}</Fluffy.ResearchTree.CurrentModVersion>
   <Fluffy.ResearchTree.PauseOnOpen>打开研究树时暂停游戏</Fluffy.ResearchTree.PauseOnOpen>
@@ -41,8 +40,8 @@
   <Fluffy.ResearchTree.PreparingTree.LayoutNew>最终确定研究树布局</Fluffy.ResearchTree.PreparingTree.LayoutNew>
   <Fluffy.ResearchTree.VanillaGraphics>使用旧的图形方法（如果闪烁）</Fluffy.ResearchTree.VanillaGraphics>
   <Fluffy.ResearchTree.ShowCompletion>显示已完成研究的完成信息</Fluffy.ResearchTree.ShowCompletion>
-  <Fluffy.ResearchTree.StillLoading>树木首次加载，可能需要一段时间</Fluffy.ResearchTree.StillLoading>
-  <Fluffy.ResearchTree.UIScaleWarning>如果使用背景加载选项，当用户界面比例大于 1x 时，可能会出现研究标签被切断的情况。
+  <Fluffy.ResearchTree.StillLoading>研究树首次加载，可能需要一段时间</Fluffy.ResearchTree.StillLoading>
+  <Fluffy.ResearchTree.UIScaleWarning>如果使用后台加载选项，当用户界面比例大于 1x 时，可能会出现研究标签被切断的情况。
 如果遇到这种情况，请使用首次打开时加载。</Fluffy.ResearchTree.UIScaleWarning>
   <Fluffy.ResearchTree.CtrlFunctionScroll>使用 Ctrl 键垂直滚动研究树</Fluffy.ResearchTree.CtrlFunctionScroll>
   <Fluffy.ResearchTree.CtrlFunctionZoom>使用 Ctrl 键缩放研究树</Fluffy.ResearchTree.CtrlFunctionZoom>
