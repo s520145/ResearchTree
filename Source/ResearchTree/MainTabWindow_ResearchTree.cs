@@ -147,7 +147,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         var startPosition = new Vector2(18f / Prefs.UIScale,
             Constants.TopBarHeight + Constants.Margin + (18f / Prefs.UIScale));
         var size = new Vector2((Screen.width - 36f) / Prefs.UIScale,
-            UI.screenHeight - 35f - startPosition.y);
+            UI.screenHeight - MainButtonDef.ButtonHeight - startPosition.y);
 
         _baseViewRect = new Rect(startPosition, size);
         _baseViewRect_Inner = _baseViewRect.ContractedBy(Constants.Margin / Prefs.UIScale);
@@ -287,8 +287,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         var rect = new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.TopHalf());
         FastGUI.DrawTextureFast(position, Assets.Search);
 
-        if (ModLister.AnomalyInstalled &&
-            Widgets.ButtonText(
+        if (ModsConfig.AnomalyActive && Widgets.ButtonText(
                 new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.BottomHalf()),
                 "Anomaly"))
         {
