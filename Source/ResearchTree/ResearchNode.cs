@@ -471,7 +471,7 @@ public class ResearchNode : Node
                 }
 
                 Text.Font = costString.Length > 7 ? GameFont.Small : GameFont.Tiny;
-
+                // TODO: fix ui display problem. eg: 405/1200  4 does not show.  0 shows half.
                 Widgets.Label(CostLabelRect, costString);
                 GUI.DrawTexture(CostIconRect, !Completed && !Available ? Assets.Lock : Assets.ResearchIcon,
                     ScaleMode.ScaleToFit);

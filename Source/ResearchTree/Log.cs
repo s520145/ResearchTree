@@ -16,6 +16,19 @@ public static class Log
     {
         Verse.Log.Warning(Format(msg, args));
     }
+    
+    public static void Warning(string msg, bool once, params object[] args)
+    {
+        var text = Format(msg, args);
+        if (once)
+        {
+            Verse.Log.WarningOnce(text, text.GetHashCode());
+        }
+        else
+        {
+            Verse.Log.Warning(text);
+        }
+    }
 
     private static string Format(string msg, params object[] args)
     {

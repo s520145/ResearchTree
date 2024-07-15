@@ -138,7 +138,10 @@ public static class ResearchProjectDef_Extensions
         var researchNode = Tree.Nodes.OfType<ResearchNode>().FirstOrDefault(n => n.Research == research);
         if (researchNode == null)
         {
-            Log.Error("Node for {0} not found. Was it intentionally hidden or locked?", true, research.LabelCap);
+            // It would be better to use warning instead of error. This is just a reminder.
+            // eg: RimFridge_PowerFactorSetting def is hidden, but it is also finished.
+            // So the patch of "ResearchManager.FinishProject" method will be executed to jump here.
+            Log.Warning("Node for {0} not found. Was it intentionally hidden or locked?", true, research.LabelCap);
         }
 
         return researchNode;

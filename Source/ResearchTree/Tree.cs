@@ -611,9 +611,12 @@ public static class Tree
 
     private static void PopulateNodes()
     {
+        // filter Anomaly DLC research
         var allDefsListForReading =
             DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def => def.knowledgeCategory == null);
+        // find hidden nodes (nodes that have themselves as a prerequisite)
         var hidden = allDefsListForReading.Where(p => p.prerequisites?.Contains(p) ?? false);
+        // find locked nodes (nodes that have a hidden node as a prerequisite)
         var second = allDefsListForReading.Where(p => p.Ancestors().Intersect(hidden).Any());
         var researchList = allDefsListForReading.Except(hidden).Except(second).ToList();
         _nodes = [];
