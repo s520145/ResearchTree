@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using RimWorld;
@@ -371,10 +370,12 @@ public class ResearchNode : Node
             Highlighted = false;
             return;
         }
+
         if (MainTabWindow_ResearchTree.Instance.IsHighlighted(Research))
         {
             Highlighted = true;
         }
+
         var overrideColor = Color.magenta;
         if (!Completed && !Exists())
         {
@@ -669,20 +670,27 @@ public class ResearchNode : Node
         stringBuilder.AppendLine();
         if (Queue.IsQueued(this))
         {
-            stringBuilder.AppendLine("Fluffy.ResearchTree.LClickRemoveFromQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
-            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickMoveToFrontOfQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+            stringBuilder.AppendLine("Fluffy.ResearchTree.LClickRemoveFromQueue".Translate()
+                .Colorize(ColoredText.SubtleGrayColor));
+            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickMoveToFrontOfQueue".Translate()
+                .Colorize(ColoredText.SubtleGrayColor));
         }
         else
         {
-            stringBuilder.AppendLine("Fluffy.ResearchTree.LClickReplaceQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
-            stringBuilder.AppendLine("Fluffy.ResearchTree.SLClickAddToQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
-            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickAddToFrontOfQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+            stringBuilder.AppendLine("Fluffy.ResearchTree.LClickReplaceQueue".Translate()
+                .Colorize(ColoredText.SubtleGrayColor));
+            stringBuilder.AppendLine("Fluffy.ResearchTree.SLClickAddToQueue".Translate()
+                .Colorize(ColoredText.SubtleGrayColor));
+            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickAddToFrontOfQueue".Translate()
+                .Colorize(ColoredText.SubtleGrayColor));
         }
 
-        stringBuilder.AppendLine("Fluffy.ResearchTree.SRClickShowInfo".Translate().Colorize(ColoredText.SubtleGrayColor));
+        stringBuilder.AppendLine(
+            "Fluffy.ResearchTree.SRClickShowInfo".Translate().Colorize(ColoredText.SubtleGrayColor));
         if (DebugSettings.godMode)
         {
-            stringBuilder.AppendLine("Fluffy.ResearchTree.RClickInstaFinishNew".Translate().Colorize(ColoredText.SubtleGrayColor));
+            stringBuilder.AppendLine("Fluffy.ResearchTree.RClickInstaFinishNew".Translate()
+                .Colorize(ColoredText.SubtleGrayColor));
         }
 
         return stringBuilder;

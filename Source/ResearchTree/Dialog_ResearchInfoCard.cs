@@ -112,11 +112,11 @@ public class Dialog_ResearchInfoCard : Window
             var textRect = rect;
             textRect.x += Constants.LargeIconSize.x + 2f;
             textRect.width = scrollContentRect.width - Constants.LargeIconSize.x - 2f;
-            Verse.Text.Anchor = TextAnchor.MiddleLeft;
-            Verse.Text.WordWrap = false;
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Text.WordWrap = false;
             Widgets.Label(textRect, unlockedThing.Second);
-            Verse.Text.Anchor = TextAnchor.UpperLeft;
-            Verse.Text.WordWrap = true;
+            Text.Anchor = TextAnchor.UpperLeft;
+            Text.WordWrap = true;
             scrollListing.Gap(1f);
         }
 

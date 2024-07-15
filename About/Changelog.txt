@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.5.6 - Search improvements and UI adjustments, thanks to JiaRG!
+
+
 1.5.5 - Added support for SOS2 hidden research
 
 

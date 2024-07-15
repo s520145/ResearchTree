@@ -10,7 +10,6 @@ using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
-using Verse.Sound;
 
 namespace FluffyResearchTree;
 
@@ -20,10 +19,10 @@ public class Queue : WorldComponent
 
     private static Vector2 _sideScrollPosition = Vector2.zero;
 
-    private static MethodInfo _doBeginResearchMethodInfo =
+    private static readonly MethodInfo _doBeginResearchMethodInfo =
         AccessTools.Method(typeof(MainTabWindow_Research), "DoBeginResearch", [typeof(ResearchProjectDef)]);
 
-    private static MainTabWindow_Research _mainTabWindow_ResearchInstance = 
+    private static readonly MainTabWindow_Research _mainTabWindow_ResearchInstance =
         (MainTabWindow_Research)Assets.MainButtonDefOf.ResearchOriginal.TabWindow;
 
     private readonly List<ResearchNode> _queue = [];
@@ -155,10 +154,10 @@ public class Queue : WorldComponent
 
         var researchOrder = nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList();
 
-        if (researchOrder.Count() <= _instance._queue.Count())
+        if (researchOrder.Count <= _instance._queue.Count)
         {
             var sameOrder = true;
-            for (var i = 0; i < researchOrder.Count(); i++)
+            for (var i = 0; i < researchOrder.Count; i++)
             {
                 if (researchOrder[i] == _instance._queue[i])
                 {
@@ -201,13 +200,14 @@ public class Queue : WorldComponent
             Enqueue(item, true);
         }
     }
-    
+
     private static void DoBeginResearch(ResearchProjectDef projectToStart)
     {
         if (projectToStart == null)
         {
             return;
         }
+
         _doBeginResearchMethodInfo.Invoke(_mainTabWindow_ResearchInstance, [projectToStart]);
     }
 

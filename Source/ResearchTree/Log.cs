@@ -16,7 +16,7 @@ public static class Log
     {
         Verse.Log.Warning(Format(msg, args));
     }
-    
+
     public static void Warning(string msg, bool once, params object[] args)
     {
         var text = Format(msg, args);
