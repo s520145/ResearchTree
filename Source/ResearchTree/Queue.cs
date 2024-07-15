@@ -4,10 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
+using Verse.Sound;
 
 namespace FluffyResearchTree;
 
@@ -16,6 +19,12 @@ public class Queue : WorldComponent
     private static Queue _instance;
 
     private static Vector2 _sideScrollPosition = Vector2.zero;
+
+    private static MethodInfo _doBeginResearchMethodInfo =
+        AccessTools.Method(typeof(MainTabWindow_Research), "DoBeginResearch", [typeof(ResearchProjectDef)]);
+
+    private static MainTabWindow_Research _mainTabWindow_ResearchInstance = 
+        (MainTabWindow_Research)Assets.MainButtonDefOf.ResearchOriginal.TabWindow;
 
     private readonly List<ResearchNode> _queue = [];
 
@@ -118,8 +127,7 @@ public class Queue : WorldComponent
             _instance._queue.Add(node);
         }
 
-        var researchNode = _instance._queue.First();
-        Find.ResearchManager.currentProj = researchNode?.Research;
+        DoBeginResearch(_instance._queue.First()?.Research);
     }
 
 
@@ -175,7 +183,7 @@ public class Queue : WorldComponent
             Requeue(item);
         }
 
-        Find.ResearchManager.currentProj = researchOrder.Last().Research;
+        DoBeginResearch(researchOrder.Last()?.Research);
     }
 
 
@@ -193,6 +201,15 @@ public class Queue : WorldComponent
             Enqueue(item, true);
         }
     }
+    
+    private static void DoBeginResearch(ResearchProjectDef projectToStart)
+    {
+        if (projectToStart == null)
+        {
+            return;
+        }
+        _doBeginResearchMethodInfo.Invoke(_mainTabWindow_ResearchInstance, [projectToStart]);
+    }
 
     public static bool IsQueued(ResearchNode node)
     {
@@ -204,13 +221,13 @@ public class Queue : WorldComponent
         var current = _instance._queue.FirstOrDefault()?.Research;
         if (finished != _instance._queue.FirstOrDefault()?.Research)
         {
-            TryDequeue(finished);
+            TryDequeue(finished.ResearchNode());
             return;
         }
 
         _instance._queue.RemoveAt(0);
         var researchProjectDef = _instance._queue.FirstOrDefault()?.Research;
-        Find.ResearchManager.currentProj = researchProjectDef;
+        DoBeginResearch(researchProjectDef);
         DoCompletionLetter(current, researchProjectDef);
     }
 
@@ -315,7 +332,7 @@ public class Queue : WorldComponent
             }
         }
 
-        Find.ResearchManager.currentProj = _instance._queue.FirstOrDefault()?.Research;
+        DoBeginResearch(_instance._queue.FirstOrDefault()?.Research);
     }
 
     public static void RefreshQueue()

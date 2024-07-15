@@ -294,24 +294,6 @@ public class ResearchNode : Node
         return def.ResearchNode();
     }
 
-    public int Matches(string query)
-    {
-        var culture = CultureInfo.CurrentUICulture;
-        query = query.ToLower(culture);
-        if (Research.LabelCap.RawText.ToLower(culture).Contains(query))
-        {
-            return 1;
-        }
-
-        if (Research.GetUnlockDefsAndDescs()
-            .Any(unlock => unlock.First.LabelCap.RawText.ToLower(culture).Contains(query)))
-        {
-            return 2;
-        }
-
-        return Research.description.ToLower(culture).Contains(query) ? 3 : 0;
-    }
-
     public List<ThingDef> MissingFacilities(ResearchProjectDef research, bool refresh = false)
     {
         var hasCache = _missingFacilitiesCache.TryGetValue(research, out var value);
@@ -389,7 +371,10 @@ public class ResearchNode : Node
             Highlighted = false;
             return;
         }
-
+        if (MainTabWindow_ResearchTree.Instance.IsHighlighted(Research))
+        {
+            Highlighted = true;
+        }
         var overrideColor = Color.magenta;
         if (!Completed && !Exists())
         {
@@ -486,7 +471,7 @@ public class ResearchNode : Node
                 }
 
                 Text.Font = costString.Length > 7 ? GameFont.Small : GameFont.Tiny;
-
+                // TODO: fix ui display problem. eg: 405/1200  4 does not show.  0 shows half.
                 Widgets.Label(CostLabelRect, costString);
                 GUI.DrawTexture(CostIconRect, !Completed && !Available ? Assets.Lock : Assets.ResearchIcon,
                     ScaleMode.ScaleToFit);
@@ -678,25 +663,26 @@ public class ResearchNode : Node
     private StringBuilder GetResearchTooltipString()
     {
         var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine(Research.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n");
         stringBuilder.AppendLine(Research.description);
 
         stringBuilder.AppendLine();
         if (Queue.IsQueued(this))
         {
-            stringBuilder.AppendLine("Fluffy.ResearchTree.LClickRemoveFromQueue".Translate());
-            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickMoveToFrontOfQueue".Translate());
+            stringBuilder.AppendLine("Fluffy.ResearchTree.LClickRemoveFromQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickMoveToFrontOfQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
         }
         else
         {
-            stringBuilder.AppendLine("Fluffy.ResearchTree.LClickReplaceQueue".Translate());
-            stringBuilder.AppendLine("Fluffy.ResearchTree.SLClickAddToQueue".Translate());
-            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickAddToFrontOfQueue".Translate());
+            stringBuilder.AppendLine("Fluffy.ResearchTree.LClickReplaceQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+            stringBuilder.AppendLine("Fluffy.ResearchTree.SLClickAddToQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickAddToFrontOfQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
         }
 
-        stringBuilder.AppendLine("Fluffy.ResearchTree.SRClickShowInfo".Translate());
+        stringBuilder.AppendLine("Fluffy.ResearchTree.SRClickShowInfo".Translate().Colorize(ColoredText.SubtleGrayColor));
         if (DebugSettings.godMode)
         {
-            stringBuilder.AppendLine("Fluffy.ResearchTree.RClickInstaFinishNew".Translate());
+            stringBuilder.AppendLine("Fluffy.ResearchTree.RClickInstaFinishNew".Translate().Colorize(ColoredText.SubtleGrayColor));
         }
 
         return stringBuilder;
