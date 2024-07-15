@@ -94,6 +94,12 @@ public class Dialog_ResearchInfoCard : Window
                 Widgets.DrawBox(rect.ExpandedBy(0, 1));
             }
 
+            if (MainTabWindow_ResearchTree.Instance.IsQuickSearchWidgetActive() &&
+                MainTabWindow_ResearchTree.Instance.MatchesUnlockedDef(unlockedThing.First))
+            {
+                Widgets.DrawTextHighlight(rect);
+            }
+
             if (Widgets.ButtonInvisible(alternateRect))
             {
                 var itemInfocard = new Dialog_InfoCard(unlockedThing.First);
@@ -106,7 +112,11 @@ public class Dialog_ResearchInfoCard : Window
             var textRect = rect;
             textRect.x += Constants.LargeIconSize.x + 2f;
             textRect.width = scrollContentRect.width - Constants.LargeIconSize.x - 2f;
+            Verse.Text.Anchor = TextAnchor.MiddleLeft;
+            Verse.Text.WordWrap = false;
             Widgets.Label(textRect, unlockedThing.Second);
+            Verse.Text.Anchor = TextAnchor.UpperLeft;
+            Verse.Text.WordWrap = true;
             scrollListing.Gap(1f);
         }
 

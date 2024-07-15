@@ -23,8 +23,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private Vector2 _mousePosition = Vector2.zero;
 
-    private string _query = "";
-
     private Rect _viewRect;
 
     private Rect _viewRect_Inner;
@@ -34,6 +32,11 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     public bool _viewRectDirty = true;
 
     private float _zoomLevel = 1f;
+    
+    private QuickSearchWidget quickSearchWidget = new QuickSearchWidget();
+    private readonly HashSet<ResearchProjectDef> matchingProjects = new HashSet<ResearchProjectDef>();
+    private List<ResearchProjectDef> cachedVisibleResearchProjects;
+    private Dictionary<ResearchProjectDef, List<Pair<ResearchPrerequisitesUtility.UnlockedHeader, List<Def>>>> cachedUnlockedDefsGroupedByPrerequisites;
 
     public MainTabWindow_ResearchTree()
     {
@@ -140,6 +143,11 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         Queue.RefreshQueue();
         _dragging = false;
         closeOnClickedOutside = false;
+        
+        cachedUnlockedDefsGroupedByPrerequisites =  null;
+        cachedVisibleResearchProjects = null;
+        quickSearchWidget.Reset();
+        UpdateSearchResults();
     }
 
     private void SetRects()
@@ -154,7 +162,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         windowRect.x = 0f;
         windowRect.y = 0f;
         windowRect.width = UI.screenWidth;
-        windowRect.height = UI.screenHeight - (35f / Prefs.UIScale) - (Constants.Margin / Prefs.UIScale);
+        windowRect.height = UI.screenHeight - MainButtonDef.ButtonHeight;
     }
 
     public override void DoWindowContents(Rect canvas)
@@ -180,6 +188,12 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         ResetZoomLevel();
         GUI.color = Color.white;
         Text.Anchor = TextAnchor.UpperLeft;
+    }
+    
+    public override void Notify_ClickOutsideWindow()
+    {
+        base.Notify_ClickOutsideWindow();
+        quickSearchWidget.Unfocus();
     }
 
     private void HandleDolly()
@@ -281,55 +295,18 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private void DrawSearchBar(Rect canvas)
     {
-        var position =
-            new Rect(canvas.xMax - Constants.Margin - Constants.HubSize, 0f, Constants.HubSize, Constants.HubSize)
-                .CenteredOnYIn(canvas.TopHalf());
-        var rect = new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.TopHalf());
-        FastGUI.DrawTextureFast(position, Assets.Search);
+        var searchRect = new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.TopHalf());
 
         if (ModsConfig.AnomalyActive && Widgets.ButtonText(
                 new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.BottomHalf()),
                 "Anomaly"))
         {
             Find.MainTabsRoot.ToggleTab(Assets.MainButtonDefOf.ResearchOriginal);
-            ((MainTabWindow_Research)Assets.MainButtonDefOf.ResearchOriginal.TabWindow).CurTab =
-                ResearchTabDefOf.Anomaly;
+            ((MainTabWindow_Research)Assets.MainButtonDefOf.ResearchOriginal.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
             return;
         }
-
-        var query = Widgets.TextField(rect, _query);
-        if (query == _query)
-        {
-            return;
-        }
-
-        _query = query;
-        Find.WindowStack.FloatMenu?.Close(false);
-        if (query.Length <= 2)
-        {
-            return;
-        }
-
-        var list = new List<FloatMenuOption>();
-        foreach (var result2 in Tree.Nodes.OfType<ResearchNode>()
-                     .Select(n => new { node = n, match = n.Matches(query) })
-                     .Where(result => result.match > 0)
-                     .OrderBy(result => result.match))
-        {
-            list.Add(new FloatMenuOption(result2.node.Label, delegate { CenterOn(result2.node); },
-                MenuOptionPriority.Default, delegate
-                {
-                    CenterOn(result2.node);
-                    UI.UnfocusCurrentControl();
-                }));
-        }
-
-        if (!list.Any())
-        {
-            list.Add(new FloatMenuOption("Fluffy.ResearchTree.NoResearchFound".Translate(), null));
-        }
-
-        Find.WindowStack.Add(new FloatMenu_Fixed(list, UI.GUIToScreenPoint(new Vector2(rect.xMin, rect.yMax))));
+        
+        quickSearchWidget.OnGUI(searchRect, UpdateSearchResults);
     }
 
     public void CenterOn(Node node)
@@ -341,5 +318,88 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         scrollPosition.x = Mathf.Clamp(scrollPosition.x, 0f, TreeRect.width - ViewRect.width);
         scrollPosition.y = Mathf.Clamp(scrollPosition.y, 0f, TreeRect.height - ViewRect.height);
         _scrollPosition = scrollPosition;
+    }
+
+    public bool IsHighlighted(ResearchProjectDef research)
+    {
+        return IsQuickSearchWidgetActive() && matchingProjects.Contains(research);
+    }
+    
+    public bool IsQuickSearchWidgetActive()
+    {
+        return quickSearchWidget.filter.Active;
+    }
+
+    private void UpdateSearchResults()
+    {
+        quickSearchWidget.noResultsMatched = false;
+        matchingProjects.Clear();
+
+        if (!IsQuickSearchWidgetActive())
+        {
+            return;
+        }
+
+        foreach (var researchProject in VisibleResearchProjects.Where(researchProject => !researchProject.IsHidden && 
+                     (quickSearchWidget.filter.Matches(researchProject.LabelCap) || MatchesUnlockedDefs(researchProject))))
+        {
+            matchingProjects.Add(researchProject);
+        }
+
+        quickSearchWidget.noResultsMatched = !matchingProjects.Any();
+        var flag = true;
+        foreach (var node in Tree.Nodes.OfType<ResearchNode>()
+                     .Where(n => matchingProjects.Contains(n.Research))
+                     .OrderBy(n => n.Research.ResearchViewX))
+        {
+            node.Highlighted = true;
+            if (!flag)
+            {
+                continue;
+            }
+            CenterOn(node);
+            flag = false;
+        }
+
+        return;
+
+        bool MatchesUnlockedDefs(ResearchProjectDef proj)
+        {
+            return UnlockedDefsGroupedByPrerequisites(proj)
+                .SelectMany(groupedByPrerequisite => groupedByPrerequisite.Second)
+                .Any(MatchesUnlockedDef);
+        }
+    }
+    
+    public bool MatchesUnlockedDef(Def unlocked)
+    {
+        return quickSearchWidget.filter.Matches(unlocked.label);
+    }
+
+    private List<ResearchProjectDef> VisibleResearchProjects
+    {
+        get
+        {
+            return cachedVisibleResearchProjects ??= [
+
+                ..DefDatabase<ResearchProjectDef>.AllDefsListForReading
+                    .Where(d => Find.Storyteller.difficulty.AllowedBy(d.hideWhen) ||
+                                Find.ResearchManager.IsCurrentProject(d))
+            ];
+        }
+    }
+    
+    private List<Pair<ResearchPrerequisitesUtility.UnlockedHeader, List<Def>>> UnlockedDefsGroupedByPrerequisites(ResearchProjectDef project)
+    {
+        cachedUnlockedDefsGroupedByPrerequisites ??=
+            new Dictionary<ResearchProjectDef, List<Pair<ResearchPrerequisitesUtility.UnlockedHeader, List<Def>>>>();
+        List<Pair<ResearchPrerequisitesUtility.UnlockedHeader, List<Def>>> pairList;
+        if (cachedUnlockedDefsGroupedByPrerequisites.TryGetValue(project, out pairList))
+        {
+            return pairList;
+        }
+        pairList = ResearchPrerequisitesUtility.UnlockedDefsGroupedByPrerequisites(project);
+        cachedUnlockedDefsGroupedByPrerequisites.Add(project, pairList);
+        return pairList;
     }
 }
