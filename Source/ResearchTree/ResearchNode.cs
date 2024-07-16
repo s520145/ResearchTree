@@ -588,12 +588,12 @@ public class ResearchNode : Node
             return;
         }
 
-        if (Event.current.button == 0 || Event.current.button == 1)
+        if (Event.current.button == Constants.LeftClick || Event.current.button == Constants.RightClick)
         {
             UI.UnfocusCurrentControl();
         }
 
-        if (Event.current.button == 1 && !Event.current.shift)
+        if (Event.current.button == Constants.RightClick && !Event.current.shift)
         {
             var researchCard = new Dialog_ResearchInfoCard(Research);
             Find.WindowStack.Add(researchCard);
@@ -605,19 +605,18 @@ public class ResearchNode : Node
             return;
         }
 
-        if (Event.current.button == 0 && Event.current.control && !Research.IsFinished)
+        if (Event.current.button == Constants.LeftClick && Event.current.control && !Research.IsFinished)
         {
             Queue.EnqueueRangeFirst(GetMissingRequiredRecursive().Concat(new List<ResearchNode>([this]))
                 .Distinct());
         }
 
-        if (Event.current.button == 0 && !Event.current.control && !Research.IsFinished)
+        if (Event.current.button == Constants.LeftClick && !Event.current.control && !Research.IsFinished)
         {
             if (!Queue.IsQueued(this))
             {
                 Queue.EnqueueRange(
-                    GetMissingRequiredRecursive().Concat(new List<ResearchNode>([this]))
-                        .Distinct(), Event.current.shift);
+                    GetMissingRequiredRecursive().Concat(new List<ResearchNode>([this])).Distinct(), Event.current.shift);
             }
             else
             {
@@ -625,7 +624,12 @@ public class ResearchNode : Node
             }
         }
 
-        if (Event.current.button != 1 && !Event.current.shift)
+        if (Event.current.button != Constants.RightClick && !Event.current.shift)
+        {
+            return;
+        }
+        
+        if (Event.current.button == Constants.LeftClick && Event.current.shift)
         {
             return;
         }
@@ -635,8 +639,8 @@ public class ResearchNode : Node
             return;
         }
 
-        Find.ResearchManager.FinishProject(Research);
-        Queue.Notify_InstantFinished();
+        // Shift + RClick + dev.godMod  finish this and start next
+        Queue.Notify_InstantFinished(this);
     }
 
     public List<ResearchNode> GetMissingRequiredRecursive()
@@ -644,8 +648,8 @@ public class ResearchNode : Node
         var enumerable =
             (Research.prerequisites?.Where(rpd => !rpd.IsFinished) ?? Array.Empty<ResearchProjectDef>())
             .Concat(Research.hiddenPrerequisites?.Where(rpd => !rpd.IsFinished) ?? Array.Empty<ResearchProjectDef>())
-            .Select(rpd =>
-                rpd.ResearchNode());
+            .Select(rpd => rpd.ResearchNode())
+            .ToList();
 
         var list = new List<ResearchNode>(enumerable);
         foreach (var item in enumerable)

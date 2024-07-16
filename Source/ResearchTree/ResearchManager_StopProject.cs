@@ -17,6 +17,6 @@ public class ResearchManager_StopProject
             return;
         }
 
-        Queue.TryDequeue(proj.ResearchNode());
+        Queue.TryStartNext(proj);
     }
 }

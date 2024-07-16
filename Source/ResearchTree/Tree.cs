@@ -106,8 +106,8 @@ public static class Tree
                 MainTabWindow_ResearchTree.Instance.ResetZoomLevel();
             }
 
-            MainTabWindow_ResearchTree.Instance._viewRect_InnerDirty = true;
-            MainTabWindow_ResearchTree.Instance._viewRectDirty = true;
+            MainTabWindow_ResearchTree.Instance.ViewRectInnerDirty = true;
+            MainTabWindow_ResearchTree.Instance.ViewRectDirty = true;
         }
 
         if (FluffyResearchTreeMod.instance.Settings.LoadType == 1)

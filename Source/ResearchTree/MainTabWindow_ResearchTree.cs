@@ -14,13 +14,13 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     internal static Vector2 _scrollPosition = Vector2.zero;
 
     private static Rect _treeRect;
-    private readonly HashSet<ResearchProjectDef> matchingProjects = [];
+    private readonly HashSet<ResearchProjectDef> _matchingProjects = [];
 
-    private readonly QuickSearchWidget quickSearchWidget = new QuickSearchWidget();
+    private readonly QuickSearchWidget _quickSearchWidget = new QuickSearchWidget();
 
     private Rect _baseViewRect;
 
-    private Rect _baseViewRect_Inner;
+    private Rect _baseViewRectInner;
 
     private bool _dragging;
 
@@ -28,18 +28,20 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private Rect _viewRect;
 
-    private Rect _viewRect_Inner;
+    private Rect _viewRectInner;
 
-    public bool _viewRect_InnerDirty = true;
+    public bool ViewRectInnerDirty = true;
 
-    public bool _viewRectDirty = true;
+    public bool ViewRectDirty = true;
+    
+    
 
     private float _zoomLevel = 1f;
 
     private Dictionary<ResearchProjectDef, List<Pair<ResearchPrerequisitesUtility.UnlockedHeader, List<Def>>>>
-        cachedUnlockedDefsGroupedByPrerequisites;
+        _cachedUnlockedDefsGroupedByPrerequisites;
 
-    private List<ResearchProjectDef> cachedVisibleResearchProjects;
+    private List<ResearchProjectDef> _cachedVisibleResearchProjects;
 
     public MainTabWindow_ResearchTree()
     {
@@ -59,8 +61,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         set
         {
             _zoomLevel = Mathf.Clamp(value, 1f, MaxZoomLevel);
-            _viewRectDirty = true;
-            _viewRect_InnerDirty = true;
+            ViewRectDirty = true;
+            ViewRectInnerDirty = true;
         }
     }
 
@@ -68,16 +70,17 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         get
         {
-            if (!_viewRectDirty)
+            if (!ViewRectDirty)
             {
                 return _viewRect;
             }
 
-            _viewRect = new Rect(_baseViewRect.xMin * ZoomLevel,
-                _baseViewRect.yMin * ZoomLevel,
+            _viewRect = new Rect(
+                _baseViewRect.xMin * ZoomLevel,
+                _baseViewRect.yMin * ZoomLevel, 
                 _baseViewRect.width * ZoomLevel,
                 _baseViewRect.height * ZoomLevel);
-            _viewRectDirty = false;
+            ViewRectDirty = false;
 
             return _viewRect;
         }
@@ -87,15 +90,15 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         get
         {
-            if (!_viewRect_InnerDirty)
+            if (!ViewRectInnerDirty)
             {
-                return _viewRect_Inner;
+                return _viewRectInner;
             }
 
-            _viewRect_Inner = _viewRect.ContractedBy(Margin * ZoomLevel);
-            _viewRect_InnerDirty = false;
+            _viewRectInner = _viewRect.ContractedBy(Margin * ZoomLevel);
+            ViewRectInnerDirty = false;
 
-            return _viewRect_Inner;
+            return _viewRectInner;
         }
     }
 
@@ -119,15 +122,21 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     public Rect VisibleRect =>
         new Rect(_scrollPosition.x, _scrollPosition.y, ViewRect_Inner.width, ViewRect_Inner.height);
 
-    internal float MaxZoomLevel =>
-        Mathf.Min(Mathf.Max(TreeRect.width / _baseViewRect_Inner.width, TreeRect.height / _baseViewRect_Inner.height),
-            Constants.AbsoluteMaxZoomLevel);
+    internal float MaxZoomLevel
+    {
+        get
+        {
+            // get the minimum zoom level at which the entire tree fits onto the screen, or a static maximum zoom level.
+            var fitZoomLevel = Mathf.Max(TreeRect.width / _baseViewRectInner.width, TreeRect.height / _baseViewRectInner.height);
+            return Mathf.Min(fitZoomLevel, Constants.AbsoluteMaxZoomLevel);
+        }
+    }
 
     private List<ResearchProjectDef> VisibleResearchProjects
     {
         get
         {
-            return cachedVisibleResearchProjects ??=
+            return _cachedVisibleResearchProjects ??=
             [
                 ..DefDatabase<ResearchProjectDef>.AllDefsListForReading
                     .Where(d => Find.Storyteller.difficulty.AllowedBy(d.hideWhen) ||
@@ -160,9 +169,9 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         _dragging = false;
         closeOnClickedOutside = false;
 
-        cachedUnlockedDefsGroupedByPrerequisites = null;
-        cachedVisibleResearchProjects = null;
-        quickSearchWidget.Reset();
+        _cachedUnlockedDefsGroupedByPrerequisites = null;
+        _cachedVisibleResearchProjects = null;
+        _quickSearchWidget.Reset();
         UpdateSearchResults();
     }
 
@@ -174,7 +183,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             UI.screenHeight - MainButtonDef.ButtonHeight - startPosition.y);
 
         _baseViewRect = new Rect(startPosition, size);
-        _baseViewRect_Inner = _baseViewRect.ContractedBy(Constants.Margin / Prefs.UIScale);
+        _baseViewRectInner = _baseViewRect.ContractedBy(Constants.Margin / Prefs.UIScale);
         windowRect.x = 0f;
         windowRect.y = 0f;
         windowRect.width = UI.screenWidth;
@@ -209,7 +218,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     public override void Notify_ClickOutsideWindow()
     {
         base.Notify_ClickOutsideWindow();
-        quickSearchWidget.Unfocus();
+        _quickSearchWidget.Unfocus();
     }
 
     private void HandleDolly()
@@ -324,7 +333,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        quickSearchWidget.OnGUI(searchRect, () => UpdateSearchResults(canvas));
+        _quickSearchWidget.OnGUI(searchRect, () => UpdateSearchResults(canvas));
     }
 
     public void CenterOn(Node node)
@@ -340,18 +349,18 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public bool IsHighlighted(ResearchProjectDef research)
     {
-        return IsQuickSearchWidgetActive() && matchingProjects.Contains(research);
+        return IsQuickSearchWidgetActive() && _matchingProjects.Contains(research);
     }
 
     public bool IsQuickSearchWidgetActive()
     {
-        return quickSearchWidget.filter.Active;
+        return _quickSearchWidget.filter.Active;
     }
 
     private void UpdateSearchResults(Rect canvas = new Rect())
     {
-        quickSearchWidget.noResultsMatched = false;
-        matchingProjects.Clear();
+        _quickSearchWidget.noResultsMatched = false;
+        _matchingProjects.Clear();
         Find.WindowStack.FloatMenu?.Close(false);
         var rect = new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.TopHalf());
 
@@ -361,22 +370,23 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         }
 
         foreach (var researchProject in VisibleResearchProjects.Where(researchProject => !researchProject.IsHidden &&
-                     (quickSearchWidget.filter.Matches(researchProject.LabelCap) ||
+                     (_quickSearchWidget.filter.Matches(researchProject.LabelCap) ||
                       MatchesUnlockedDefs(researchProject))))
         {
-            matchingProjects.Add(researchProject);
+            _matchingProjects.Add(researchProject);
         }
 
-        quickSearchWidget.noResultsMatched = !matchingProjects.Any();
+        _quickSearchWidget.noResultsMatched = !_matchingProjects.Any();
+
         var somethingHighlighted = true;
 
         var list = new List<FloatMenuOption>();
         foreach (var node in Tree.Nodes.OfType<ResearchNode>()
-                     .Where(n => matchingProjects.Contains(n.Research))
+                     .Where(n => _matchingProjects.Contains(n.Research))
                      .OrderBy(n => n.Research.ResearchViewX))
         {
             list.Add(new FloatMenuOption(node.Label, delegate { CenterOn(node); }, MenuOptionPriority.Default,
-                delegate { quickSearchWidget.filter.Text = node.Label; }, playSelectionSound: false));
+                delegate { _quickSearchWidget.filter.Text = node.Label; }, playSelectionSound: false));
             node.Highlighted = true;
             if (!somethingHighlighted)
             {
@@ -387,7 +397,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             somethingHighlighted = false;
         }
 
-        if (quickSearchWidget.CurrentlyFocused() && quickSearchWidget.filter.searchText.Length > 2 && list.Any())
+        if (_quickSearchWidget.CurrentlyFocused() && _quickSearchWidget.filter.searchText.Length > 2 && list.Any())
         {
             Find.WindowStack.Add(
                 new FloatMenu_Fixed(list, UI.GUIToScreenPoint(new Vector2(rect.xMin, rect.yMax))));
@@ -405,21 +415,21 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public bool MatchesUnlockedDef(Def unlocked)
     {
-        return quickSearchWidget.filter.Matches(unlocked.label);
+        return _quickSearchWidget.filter.Matches(unlocked.label);
     }
 
     private List<Pair<ResearchPrerequisitesUtility.UnlockedHeader, List<Def>>> UnlockedDefsGroupedByPrerequisites(
         ResearchProjectDef project)
     {
-        cachedUnlockedDefsGroupedByPrerequisites ??=
+        _cachedUnlockedDefsGroupedByPrerequisites ??=
             new Dictionary<ResearchProjectDef, List<Pair<ResearchPrerequisitesUtility.UnlockedHeader, List<Def>>>>();
-        if (cachedUnlockedDefsGroupedByPrerequisites.TryGetValue(project, out var pairList))
+        if (_cachedUnlockedDefsGroupedByPrerequisites.TryGetValue(project, out var pairList))
         {
             return pairList;
         }
 
         pairList = ResearchPrerequisitesUtility.UnlockedDefsGroupedByPrerequisites(project);
-        cachedUnlockedDefsGroupedByPrerequisites.Add(project, pairList);
+        _cachedUnlockedDefsGroupedByPrerequisites.Add(project, pairList);
         return pairList;
     }
 }
