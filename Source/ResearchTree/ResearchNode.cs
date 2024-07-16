@@ -375,15 +375,18 @@ public class ResearchNode : Node
         {
             Highlighted = true;
         }
-
         var overrideColor = Color.magenta;
         if (!Completed && !Exists())
         {
             overrideColor = new Color(0.2f, 0.2f, 0.2f);
         }
-
+        
+        var detailedMode = forceDetailedMode ||
+                           MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff;
+        var mouseOver = Mouse.IsOver( Rect );
         if (Event.current.type == EventType.Repaint)
         {
+            // researches that are completed or could be started immediately, and that have the required building(s) available
             //GUI.color = Mouse.IsOver(Rect) ? GenUI.MouseoverColor : Color;
             var color = Mouse.IsOver(Rect) ? GenUI.MouseoverColor : Color;
             if (overrideColor != Color.magenta)
@@ -391,7 +394,7 @@ public class ResearchNode : Node
                 color = overrideColor;
             }
 
-            if (Mouse.IsOver(Rect) || Highlighted)
+            if (mouseOver || Highlighted)
             {
                 FastGUI.DrawTextureFast(Rect, Assets.ButtonActive, color);
             }
@@ -400,6 +403,7 @@ public class ResearchNode : Node
                 FastGUI.DrawTextureFast(Rect, Assets.Button, color);
             }
 
+            // grey out center to create a progress bar effect, completely greying out research not started.
             if (Available)
             {
                 var position = Rect.ContractedBy(3f);
@@ -419,45 +423,23 @@ public class ResearchNode : Node
                 GUI.color = Color.white;
             }
 
-            if (forceDetailedMode || MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
+            if (detailedMode)
             {
-                Text.Anchor = TextAnchor.UpperLeft;
+                Text.Anchor   = TextAnchor.UpperLeft;
                 Text.WordWrap = false;
-                Text.Font = !_largeLabel ? GameFont.Small : GameFont.Tiny;
-
-                if (Text.CalcSize(Research.LabelCap).x > LabelRect.width)
-                {
-                    Text.WordWrap = true;
-                    var newRect = LabelRect;
-                    newRect.height *= 2f;
-                    Widgets.Label(newRect, Research.LabelCap);
-                    Text.WordWrap = false;
-                }
-                else
-                {
-                    Widgets.Label(LabelRect, Research.LabelCap);
-                }
+                Text.Font     = _largeLabel ? GameFont.Tiny : GameFont.Small;
+                Widgets.Label( LabelRect, Research.LabelCap );
             }
             else
             {
-                Text.Anchor = TextAnchor.MiddleCenter;
+                Text.Anchor   = TextAnchor.MiddleCenter;
                 Text.WordWrap = false;
-                Text.Font = GameFont.Medium;
-                if (Text.CalcSize(Label).x > LabelRect.width)
-                {
-                    Text.Font = GameFont.Small;
-                }
-
-                if (Text.CalcSize(Label).x > LabelRect.width)
-                {
-                    Text.Font = GameFont.Tiny;
-                }
-
-                Widgets.Label(Rect, Research.LabelCap);
+                Text.Font     = GameFont.Medium;
+                Widgets.Label( Rect, Research.LabelCap );
             }
 
-            if (forceDetailedMode ||
-                MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
+            // draw research cost and icon
+            if (detailedMode)
             {
                 Text.Anchor = TextAnchor.UpperRight;
                 var costString = $"{Research.CostApparent.ToStringByStyle(ToStringStyle.Integer)}";
@@ -467,11 +449,10 @@ public class ResearchNode : Node
                         $"{Research.ProgressApparent.ToStringByStyle(ToStringStyle.Integer)}/{Research.CostApparent.ToStringByStyle(ToStringStyle.Integer)}";
                 }
 
-                Text.Font = costString.Length > 7 ? GameFont.Small : GameFont.Tiny;
-                // TODO: fix ui display problem. eg: 405/1200  4 does not show.  0 shows half.
+                Text.Font = costString.Length > 6 ? GameFont.Tiny : GameFont.Small;
                 Widgets.Label(CostLabelRect, costString);
-                GUI.DrawTexture(CostIconRect, !Completed && !Available ? Assets.Lock : Assets.ResearchIcon,
-                    ScaleMode.ScaleToFit);
+                var researchIcon = !Completed && !Available ? Assets.Lock : Assets.ResearchIcon;
+                GUI.DrawTexture(CostIconRect, researchIcon, ScaleMode.ScaleToFit);
             }
 
             Text.WordWrap = true;
@@ -533,7 +514,8 @@ public class ResearchNode : Node
 
             TooltipHandler.TipRegion(Rect, tooltipstring.ToString());
 
-            if (forceDetailedMode || MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
+            // draw unlock icons
+            if (detailedMode)
             {
                 var unlockDefsAndDescs = Research.GetUnlockDefsAndDescs();
                 for (var i = 0; i < unlockDefsAndDescs.Count; i++)
@@ -557,7 +539,7 @@ public class ResearchNode : Node
                 }
             }
 
-            if (Mouse.IsOver(Rect))
+            if (mouseOver)
             {
                 if (Completed)
                 {
