@@ -375,7 +375,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                      .Where(n => matchingProjects.Contains(n.Research))
                      .OrderBy(n => n.Research.ResearchViewX))
         {
-            list.Add(new FloatMenuOption(node.Label, null, MenuOptionPriority.Default,
+            list.Add(new FloatMenuOption(node.Label, delegate { CenterOn(node); }, MenuOptionPriority.Default,
                 delegate { quickSearchWidget.filter.Text = node.Label; }, playSelectionSound: false));
             node.Highlighted = true;
             if (!somethingHighlighted)
