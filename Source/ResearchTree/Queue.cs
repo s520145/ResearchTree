@@ -130,7 +130,7 @@ public class Queue : WorldComponent
         AttemptBeginResearch(_instance._queue.First()?.Research);
     }
 
-    private static void Requeue(ResearchNode node)
+    public static void ReEnqueue(ResearchNode node)
     {
         if (!_instance._queue.Contains(node))
         {
@@ -176,7 +176,7 @@ public class Queue : WorldComponent
         researchOrder.Reverse();
         foreach (var item in researchOrder)
         {
-            Requeue(item);
+            ReEnqueue(item);
         }
 
         AttemptBeginResearch(researchOrder.Last()?.Research);
@@ -203,11 +203,15 @@ public class Queue : WorldComponent
 
     public static void TryStartNext(ResearchProjectDef finished)
     {
+        if (!IsQueued(finished))
+        {
+            // Filtered unlocked research that comes with the start
+            return;            
+        }
         TryDequeue(finished.ResearchNode());
         var current = _instance._queue.FirstOrDefault()?.Research;
-        var next = _instance._queue.Skip(1).Take(1).FirstOrDefault()?.Research;
         AttemptBeginResearch(current);
-        AttemptDoCompletionLetter(current, next);
+        AttemptDoCompletionLetter(finished, current);
     }
 
     private static void AttemptDoCompletionLetter(ResearchProjectDef current, ResearchProjectDef next)
