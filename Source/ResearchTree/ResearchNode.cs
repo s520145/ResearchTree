@@ -363,7 +363,7 @@ public class ResearchNode : Node
         return base.IsVisible(visibleRect) && !Assets.IsBlockedBySOS2(Research);
     }
 
-    public override void Draw(Rect visibleRect, bool forceDetailedMode = false, bool forceNonDetailedMode = false)
+    public override void Draw(Rect visibleRect, bool forceDetailedMode = false)
     {
         if (!IsVisible(visibleRect))
         {
@@ -379,7 +379,6 @@ public class ResearchNode : Node
         var overrideColor = Color.magenta;
         if (!Completed && !Exists())
         {
-            forceNonDetailedMode = true;
             overrideColor = new Color(0.2f, 0.2f, 0.2f);
         }
 
@@ -420,9 +419,7 @@ public class ResearchNode : Node
                 GUI.color = Color.white;
             }
 
-            if (forceDetailedMode ||
-                MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff ||
-                forceNonDetailedMode)
+            if (forceDetailedMode || MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
             {
                 Text.Anchor = TextAnchor.UpperLeft;
                 Text.WordWrap = false;
@@ -460,8 +457,7 @@ public class ResearchNode : Node
             }
 
             if (forceDetailedMode ||
-                MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff ||
-                forceNonDetailedMode)
+                MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
             {
                 Text.Anchor = TextAnchor.UpperRight;
                 var costString = $"{Research.CostApparent.ToStringByStyle(ToStringStyle.Integer)}";
@@ -537,9 +533,7 @@ public class ResearchNode : Node
 
             TooltipHandler.TipRegion(Rect, tooltipstring.ToString());
 
-            if ((forceDetailedMode ||
-                 MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
-                && !forceNonDetailedMode)
+            if (forceDetailedMode || MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff)
             {
                 var unlockDefsAndDescs = Research.GetUnlockDefsAndDescs();
                 for (var i = 0; i < unlockDefsAndDescs.Count; i++)
@@ -700,10 +694,10 @@ public class ResearchNode : Node
         return stringBuilder;
     }
 
-    public void DrawAt(Vector2 pos, Rect visibleRect, bool forceDetailedMode = false, bool forceNonDetailedMode = false)
+    public void DrawAt(Vector2 pos, Rect visibleRect, bool forceDetailedMode = false)
     {
         SetRects(pos, visibleRect.size);
-        Draw(visibleRect, forceDetailedMode, forceNonDetailedMode);
+        Draw(visibleRect, forceDetailedMode);
         SetRects();
     }
 }

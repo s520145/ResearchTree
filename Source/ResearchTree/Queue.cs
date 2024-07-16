@@ -281,23 +281,14 @@ public class Queue : WorldComponent
         // ReSharper disable once ForCanBeConvertedToForeach
         for (var index = 0; index < _instance._queue.Count; index++)
         {
+            var rect = new Rect(
+                min.x - Constants.Margin,
+                min.y - Constants.Margin,
+                Constants.NodeSize.x + 2 * Constants.Margin,
+                Constants.NodeSize.y + 2 * Constants.Margin
+            );
             var node = _instance._queue[index];
-
-            var rect = new Rect(min.x - Constants.Margin, min.y - Constants.Margin,
-                Constants.NodeSize.x + (Constants.Margin * 2),
-                Constants.NodeSize.y + 12f);
-            if (rect.height > scrollContentRect.height)
-            {
-                rect = new Rect(min.x - Constants.Margin, min.y - Constants.Margin,
-                    Constants.NodeSize.x + (Constants.Margin * 2),
-                    Math.Min(Constants.NodeSize.y + 12f, scrollContentRect.height));
-                node.DrawAt(min, rect, false, true);
-            }
-            else
-            {
-                node.DrawAt(min, rect, true);
-            }
-
+            node.DrawAt(min, rect, true);
             if (interactible && Mouse.IsOver(rect))
             {
                 MainTabWindow_ResearchTree.Instance.CenterOn(node);
