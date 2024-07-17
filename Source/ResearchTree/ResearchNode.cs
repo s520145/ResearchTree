@@ -583,7 +583,8 @@ public class ResearchNode : Node
 
         if (Event.current.button == Constants.LeftClick && Event.current.control && !Research.IsFinished)
         {
-            Queue.EnqueueRangeFirst(GetMissingRequiredRecursive().Concat(new List<ResearchNode>([this]))
+            Queue.EnqueueRangeFirst(GetMissingRequiredRecursive()
+                .Concat(new List<ResearchNode>([this]))
                 .Distinct());
         }
 

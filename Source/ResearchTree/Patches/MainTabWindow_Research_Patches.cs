@@ -26,10 +26,18 @@ public class MainTabWindow_Research_Patches
             return;
         }
         var researchNode = projectToStart.ResearchNode();
-        if (!Queue.IsQueued(researchNode))
+        var researchNodes = researchNode.GetMissingRequiredRecursive()
+            .Concat(new List<ResearchNode>([researchNode]))
+            .Distinct();
+        
+        // check is same order
+        var enumerable = researchNodes.ToList();
+        if (Queue.IsEnqueueRangeFirstSameOrder(enumerable, false, false))
         {
-            Queue.ReEnqueue(researchNode);
+            return;
         }
+
+        Queue.EnqueueRangeFirst(enumerable);
     }
 
     /// <summary>

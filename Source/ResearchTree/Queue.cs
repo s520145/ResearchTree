@@ -18,10 +18,10 @@ public class Queue : WorldComponent
 
     private static Vector2 _sideScrollPosition = Vector2.zero;
 
-    private static readonly MethodInfo _attemptBeginResearchMethodInfo =
-        AccessTools.Method(typeof(MainTabWindow_Research), "AttemptBeginResearch", [typeof(ResearchProjectDef)]);
+    private static readonly MethodInfo AttemptBeginResearchMethodInfo =
+        AccessTools.Method(typeof(MainTabWindow_Research), nameof(MainTabWindow_Research.AttemptBeginResearch), [typeof(ResearchProjectDef)]);
 
-    private static readonly MainTabWindow_Research _mainTabWindow_ResearchInstance = 
+    private static readonly MainTabWindow_Research MainTabWindowResearchInstance = 
         (MainTabWindow_Research) MainButtonDefOf.Research.TabWindow;
 
     private readonly List<ResearchNode> _queue = [];
@@ -158,7 +158,7 @@ public class Queue : WorldComponent
         Text.Anchor = TextAnchor.UpperLeft;
     }
 
-    public static void Enqueue(ResearchNode node, bool add)
+    private static void Enqueue(ResearchNode node, bool add)
     {
         if (node.Research.IsAnomalyResearch())
         {
@@ -174,11 +174,9 @@ public class Queue : WorldComponent
         {
             _instance._queue.Add(node);
         }
-
-        AttemptBeginResearch(_instance._queue.First()?.Research);
     }
 
-    public static void ReEnqueue(ResearchNode node)
+    private static void ReEnqueue(ResearchNode node)
     {
         if (node.Research.IsAnomalyResearch())
         {
@@ -203,26 +201,9 @@ public class Queue : WorldComponent
     {
         var researchOrder = nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList();
 
-        if (researchOrder.Count <= _instance._queue.Count)
+        if (IsEnqueueRangeFirstSameOrder(researchOrder))
         {
-            var sameOrder = true;
-            for (var i = 0; i < researchOrder.Count; i++)
-            {
-                if (researchOrder[i] == _instance._queue[i])
-                {
-                    continue;
-                }
-
-                sameOrder = false;
-                break;
-            }
-
-            if (sameOrder)
-            {
-                Messages.Message("Fluffy.ResearchTree.CannotMoveMore".Translate(researchOrder.Last().Label), null,
-                    MessageTypeDefOf.RejectInput);
-                return;
-            }
+            return;
         }
 
         researchOrder.Reverse();
@@ -232,6 +213,34 @@ public class Queue : WorldComponent
         }
 
         AttemptBeginResearch(researchOrder.Last()?.Research);
+    }
+
+    public static bool IsEnqueueRangeFirstSameOrder(IEnumerable<ResearchNode> nodes, 
+        bool nodesOrdered = true, bool warning = true)
+    {
+       var researchOrder = !nodesOrdered ? 
+           nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList() : nodes.ToList();
+
+        if (researchOrder.Count > _instance._queue.Count)
+        {
+            return false;
+        }
+        
+        var sameOrder = !researchOrder.Where((t, i) => t != _instance._queue[i]).Any();
+
+        if (!sameOrder)
+        {
+            return false;
+        }
+        
+        if (warning)
+        {
+            Messages.Message("Fluffy.ResearchTree.CannotMoveMore".Translate(researchOrder.Last().Label), null,
+                MessageTypeDefOf.RejectInput);
+        }
+
+        return true;
+
     }
 
     public static void EnqueueRange(IEnumerable<ResearchNode> nodes, bool add)
@@ -246,6 +255,8 @@ public class Queue : WorldComponent
         {
             Enqueue(item, true);
         }
+
+        AttemptBeginResearch(_instance._queue.First()?.Research);
     }
 
     public static bool IsQueued(ResearchNode node)
@@ -379,12 +390,13 @@ public class Queue : WorldComponent
     
     private static void AttemptBeginResearch(ResearchProjectDef projectToStart)
     {
-        if (projectToStart == null)
+        if (projectToStart is not { CanStartNow: true } || projectToStart.IsFinished)
         {
             return;
         }
-
-        _attemptBeginResearchMethodInfo.Invoke(_mainTabWindow_ResearchInstance, [projectToStart]);
+        // focus the start project 
+        MainTabWindowResearchInstance.Select(projectToStart);
+        AttemptBeginResearchMethodInfo.Invoke(MainTabWindowResearchInstance, [projectToStart]);
     }
 
     private static void DoFinishResearchProject(ResearchProjectDef projectToFinish)
