@@ -93,6 +93,10 @@ public class Queue : WorldComponent
     
     public static void DrawLabelForVanillaWindow(Rect rect, ResearchProjectDef projectToStart)
     {
+        if (projectToStart.IsAnomalyResearch())
+        {
+            return;
+        }
         var researchNode = projectToStart.ResearchNode();
         if (!IsQueued(researchNode))
         {
@@ -133,6 +137,10 @@ public class Queue : WorldComponent
 
     public static void Enqueue(ResearchNode node, bool add)
     {
+        if (node.Research.IsAnomalyResearch())
+        {
+            return;
+        }
         if (!add)
         {
             _instance._queue.Clear();
@@ -149,6 +157,10 @@ public class Queue : WorldComponent
 
     public static void ReEnqueue(ResearchNode node)
     {
+        if (node.Research.IsAnomalyResearch())
+        {
+            return;
+        }
         if (!_instance._queue.Contains(node))
         {
             _instance._queue.Insert(0, node);
@@ -215,12 +227,12 @@ public class Queue : WorldComponent
 
     public static bool IsQueued(ResearchNode node)
     {
-        return _instance._queue.Contains(node);
+        return _instance._queue.Contains(node) && !node.Research.IsAnomalyResearch();
     }
 
     public static void TryStartNext(ResearchProjectDef finished)
     {
-        if (!IsQueued(finished))
+        if (!IsQueued(finished.ResearchNode()))
         {
             // Filtered unlocked research that comes with the start
             return;            

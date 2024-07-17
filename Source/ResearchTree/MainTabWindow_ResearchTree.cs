@@ -303,7 +303,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         UI.ApplyUIScale();
         GUI.BeginClip(windowRect);
-        GUI.BeginClip(new Rect(0f, 0f, UI.screenWidth, UI.screenHeight));
+        GUI.BeginClip(new Rect(0f, 0f, UI.screenWidth, UI.screenHeight - MainButtonDef.ButtonHeight));
     }
 
     private void DrawTopBar(Rect canvas)

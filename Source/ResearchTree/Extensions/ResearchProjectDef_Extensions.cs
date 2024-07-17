@@ -146,4 +146,9 @@ public static class ResearchProjectDef_Extensions
 
         return researchNode;
     }
+        
+    public static bool IsAnomalyResearch(this ResearchProjectDef research)
+    {
+        return ModsConfig.AnomalyActive && research.knowledgeCategory != null;
+    }
 }

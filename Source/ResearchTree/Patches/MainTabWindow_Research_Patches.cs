@@ -21,6 +21,10 @@ public class MainTabWindow_Research_Patches
     [HarmonyPatch(nameof(MainTabWindow_Research.DoBeginResearch))]
     private static void Prefix(ResearchProjectDef projectToStart)
     {
+        if (projectToStart.IsAnomalyResearch())
+        {
+            return;
+        }
         var researchNode = projectToStart.ResearchNode();
         if (!Queue.IsQueued(researchNode))
         {

@@ -24,19 +24,19 @@ public class ResearchManager_Patches
     [HarmonyPatch(nameof(ResearchManager.FinishProject))]
     private static void FinishProjectPostfix(ResearchProjectDef proj)
     {
-        if (proj == null)
+        if (proj == null || proj.IsAnomalyResearch())
         {
             return;
         }
 
         Queue.TryStartNext(proj);
     }
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(nameof(ResearchManager.StopProject))]
     private static void StopProjectPostfix(ResearchProjectDef proj)
     {
-        if (proj == null)
+        if (proj == null || proj.IsAnomalyResearch())
         {
             return;
         }
