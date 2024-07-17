@@ -323,13 +323,16 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         var searchRect =
             new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.TopHalf());
 
-        if (ModsConfig.AnomalyActive && Widgets.ButtonText(
-                new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.BottomHalf()),
-                "Anomaly"))
+        var anomalyBtnRect = new Rect(
+            searchRect.x + Constants.SmallQueueLabelSize + Constants.Margin, 
+            searchRect.y, 
+            searchRect.width - Constants.SmallQueueLabelSize - Constants.Margin, 
+            searchRect.height
+        ).CenteredOnYIn(canvas.BottomHalf());
+        if (ModsConfig.AnomalyActive && Widgets.ButtonText(anomalyBtnRect, ResearchTabDefOf.Anomaly.generalTitle))
         {
-            Find.MainTabsRoot.ToggleTab(Assets.MainButtonDefOf.ResearchOriginal);
-            ((MainTabWindow_Research)Assets.MainButtonDefOf.ResearchOriginal.TabWindow).CurTab =
-                ResearchTabDefOf.Anomaly;
+            ((MainTabWindow_Research) MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
+            Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research);
             return;
         }
 

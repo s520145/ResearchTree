@@ -49,4 +49,5 @@ Veuillez utiliser l'option de chargement à la première ouverture si vous renco
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller ne permet pas cette technologie</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>L'environnement médiéval ne permet pas l'utilisation de cette technologie.</Fluffy.ResearchTree.RimedievalDoesNotAllow>
   <ResearchPal.BuildingResearchTreeAsync>Construction d'un arbre de recherche</ResearchPal.BuildingResearchTreeAsync>
+  <Fluffy.ResearchTree.OverrideResearch>Faire de l'arbre de recherche l'onglet de recherche par défaut \n (maintenir la touche Maj enfoncée pour ouvrir Vanilla)</Fluffy.ResearchTree.OverrideResearch>
 </LanguageData>

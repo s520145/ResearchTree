@@ -49,4 +49,5 @@
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>故事讲述人不允许使用这种技术</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Rimedieval 设置不允许使用这种技术。</Fluffy.ResearchTree.RimedievalDoesNotAllow>
   <ResearchPal.BuildingResearchTreeAsync>建立研究树</ResearchPal.BuildingResearchTreeAsync>
+  <Fluffy.ResearchTree.OverrideResearch>将研究树设置为默认研究选项卡\n（按住 Shift 即可打开原版）</Fluffy.ResearchTree.OverrideResearch>
 </LanguageData>

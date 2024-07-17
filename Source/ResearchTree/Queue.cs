@@ -1,7 +1,6 @@
 // Queue.cs
 // Copyright Karel Kroeze, 2020-2020
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -22,8 +21,8 @@ public class Queue : WorldComponent
     private static readonly MethodInfo _attemptBeginResearchMethodInfo =
         AccessTools.Method(typeof(MainTabWindow_Research), "AttemptBeginResearch", [typeof(ResearchProjectDef)]);
 
-    private static readonly MainTabWindow_Research _mainTabWindow_ResearchInstance =
-        (MainTabWindow_Research)Assets.MainButtonDefOf.ResearchOriginal.TabWindow;
+    private static readonly MainTabWindow_Research _mainTabWindow_ResearchInstance = 
+        (MainTabWindow_Research) MainButtonDefOf.Research.TabWindow;
 
     private readonly List<ResearchNode> _queue = [];
 
@@ -90,6 +89,30 @@ public class Queue : WorldComponent
             num++;
         }
     }
+    
+    public static void DrawLabelForMainButton(Rect rect)
+    {
+        var currentStart = rect.xMax - Constants.SmallQueueLabelSize - Constants.Margin;
+        if (!Tree.Initialized && FluffyResearchTreeMod.instance.Settings.LoadType != 2 &&
+            FluffyResearchTreeMod.instance.Settings.OverrideResearch)
+        {
+            DrawLabel(
+                new Rect(currentStart, 0f, Constants.SmallQueueLabelSize, Constants.SmallQueueLabelSize)
+                    .CenteredOnYIn(rect), Color.yellow,
+                Color.grey, "..", "Fluffy.ResearchTree.StillLoading".Translate());
+            return;
+        }
+
+        if (NumQueued <= 0)
+        {
+            return;
+        }
+
+        DrawLabel(
+            new Rect(currentStart, 0f, Constants.SmallQueueLabelSize, Constants.SmallQueueLabelSize)
+                .CenteredOnYIn(rect), Color.white,
+            Color.grey, Queue.NumQueued.ToString());
+    }    
     
     public static void DrawLabelForVanillaWindow(Rect rect, ResearchProjectDef projectToStart)
     {
