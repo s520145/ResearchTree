@@ -648,6 +648,7 @@ public class ResearchNode : Node
         stringBuilder.AppendLine(Research.description);
 
         stringBuilder.AppendLine();
+        // TODO: Add settings so that shortcut key tips can be hidden
         if (Queue.IsQueued(this))
         {
             stringBuilder.AppendLine("Fluffy.ResearchTree.LClickRemoveFromQueue".Translate()

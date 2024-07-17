@@ -90,6 +90,23 @@ public class Queue : WorldComponent
             num++;
         }
     }
+    
+    public static void DrawLabelForVanillaWindow(Rect rect, ResearchProjectDef projectToStart)
+    {
+        var researchNode = projectToStart.ResearchNode();
+        if (!IsQueued(researchNode))
+        {
+            return;
+        }
+        DrawLabel(
+            new Rect(
+                rect.xMax - 10f, 
+                rect.yMin + ((rect.height - Constants.SmallQueueLabelSize) / 2f),
+                Constants.SmallQueueLabelSize, 
+                Constants.SmallQueueLabelSize),  
+            Color.white,
+            Color.grey, _instance._queue.IndexOf(researchNode) + 1 + "");
+    }
 
     public static void DrawLabel(Rect canvas, Color main, Color background, string label)
     {
