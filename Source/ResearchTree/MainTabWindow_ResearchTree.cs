@@ -357,12 +357,11 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         return _quickSearchWidget.filter.Active;
     }
 
-    private void UpdateSearchResults(Rect canvas = new Rect())
+    private void UpdateSearchResults(Rect searchRect = default)
     {
         _quickSearchWidget.noResultsMatched = false;
         _matchingProjects.Clear();
         Find.WindowStack.FloatMenu?.Close(false);
-        var rect = new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.TopHalf());
 
         if (!IsQuickSearchWidgetActive())
         {
@@ -379,14 +378,27 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         _quickSearchWidget.noResultsMatched = !_matchingProjects.Any();
 
         var somethingHighlighted = true;
-
         var list = new List<FloatMenuOption>();
         foreach (var node in Tree.Nodes.OfType<ResearchNode>()
                      .Where(n => _matchingProjects.Contains(n.Research))
                      .OrderBy(n => n.Research.ResearchViewX))
         {
-            list.Add(new FloatMenuOption(node.Label, delegate { CenterOn(node); }, MenuOptionPriority.Default,
-                delegate { _quickSearchWidget.filter.Text = node.Label; }, playSelectionSound: false));
+            list.Add(new FloatMenuOption(
+                node.Label,
+                delegate
+                {
+                    CenterOn(node);
+                }, 
+                MenuOptionPriority.Default,
+                delegate
+                {
+                    _quickSearchWidget.filter.Text = node.Label;
+                    somethingHighlighted = false;
+                    _matchingProjects.Clear();
+                    _matchingProjects.Add(node.Research);
+                }, 
+                playSelectionSound: false)
+            );
             node.Highlighted = true;
             if (!somethingHighlighted)
             {
@@ -397,10 +409,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             somethingHighlighted = false;
         }
 
-        if (_quickSearchWidget.CurrentlyFocused() && _quickSearchWidget.filter.searchText.Length > 2 && list.Any())
+        if (_quickSearchWidget.CurrentlyFocused() && list.Any())
         {
-            Find.WindowStack.Add(
-                new FloatMenu_Fixed(list, UI.GUIToScreenPoint(new Vector2(rect.xMin, rect.yMax))));
+            searchRect.x += QuickSearchWidget.IconSize;
+            Find.WindowStack.Add(new FloatMenu_Fixed(searchRect, list));
         }
 
         return;
