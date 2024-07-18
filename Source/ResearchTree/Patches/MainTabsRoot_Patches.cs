@@ -11,9 +11,10 @@ public class MainTabsRoot_Patches
     [HarmonyPatch(nameof(MainTabsRoot.ToggleTab))]
     public static void ToggleTabPrefix(ref MainButtonDef newTab)
     {
+        // LeftCtrl is the way of Dubs Mint Menus mod
         if (newTab == MainButtonDefOf.Research && 
             FluffyResearchTreeMod.instance.Settings.OverrideResearch &&
-            !Input.GetKey(KeyCode.LeftShift) &&
+            !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.LeftControl) &&
             ((MainTabWindow_Research) MainButtonDefOf.Research.TabWindow).CurTab != ResearchTabDefOf.Anomaly)
         {
             newTab = Assets.MainButtonDefOf.FluffyResearchTree;
@@ -21,7 +22,7 @@ public class MainTabsRoot_Patches
         
         if (newTab == MainButtonDefOf.Research && 
             !FluffyResearchTreeMod.instance.Settings.OverrideResearch &&
-            Input.GetKey(KeyCode.LeftShift) &&
+            Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.LeftControl) &&
             ((MainTabWindow_Research) MainButtonDefOf.Research.TabWindow).CurTab != ResearchTabDefOf.Anomaly)
         {
             newTab = Assets.MainButtonDefOf.FluffyResearchTree;
