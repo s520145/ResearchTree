@@ -19,7 +19,7 @@ public class MainTabWindow_Research_Patches
 
     [HarmonyPrefix]
     [HarmonyPatch(nameof(MainTabWindow_Research.DoBeginResearch))]
-    private static void Prefix(ResearchProjectDef projectToStart)
+    private static void DoBeginResearchPrefix(ResearchProjectDef projectToStart)
     {
         if (projectToStart.IsAnomalyResearch())
         {

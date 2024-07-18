@@ -395,7 +395,9 @@ public class Queue : WorldComponent
             return;
         }
         // focus the start project 
+        Find.ResearchManager.SetCurrentProject(projectToStart);
         MainTabWindowResearchInstance.Select(projectToStart);
+        // to begin
         AttemptBeginResearchMethodInfo.Invoke(MainTabWindowResearchInstance, [projectToStart]);
     }
 

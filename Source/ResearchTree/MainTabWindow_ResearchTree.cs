@@ -153,6 +153,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     public override void PreOpen()
     {
         base.PreOpen();
+        // close vanilla research window
+        Find.WindowStack.TryRemove(MainButtonDefOf.Research.TabWindow, false);
         SetRects();
         Tree.WaitForInitialization();
         Assets.RefreshResearch = true;
