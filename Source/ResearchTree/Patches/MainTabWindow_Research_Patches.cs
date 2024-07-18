@@ -102,7 +102,25 @@ public class MainTabWindow_Research_Patches
         opts.Add(new CodeInstruction(OpCodes.Nop)); // nop
         
         // Color color7 = GUI.color; -> later
-        codes.InsertRange(startIndex - 4 + 18 + 14, opts);
+        var insertIndex = startIndex - 4 + 18 + 14;
+        codes.InsertRange(insertIndex, opts);
+
+        // SoundDefOf.Click.PlayOneShotOnCamera(); -> before
+        insertIndex = startIndex - 4 + 18 + 3 + 3;
+        
+        opts.Clear();
+        opts.Add(codeInstruction1); // ldloc.s
+        opts.Add(codeInstruction2); // ldfld
+        opts.Add(new CodeInstruction(OpCodes.Call,   // call
+            AccessTools.Method(typeof(ResearchProjectDef_Extensions), nameof(ResearchProjectDef_Extensions.ResearchNode))));
+        opts.Add(new CodeInstruction(OpCodes.Stloc_0)); // stloc.0
+        
+        opts.Add(new CodeInstruction(OpCodes.Ldloc_0)); // ldloc.0
+        opts.Add(new CodeInstruction(OpCodes.Call,   // call
+            AccessTools.Method(typeof(ResearchNode), nameof(ResearchNode.HandleVanillaNodeClickEvent))));
+        opts.Add(new CodeInstruction(OpCodes.Nop)); // nop
+        
+        codes.InsertRange(insertIndex, opts);
 
         return codes.AsEnumerable();
     }

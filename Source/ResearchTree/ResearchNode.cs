@@ -581,7 +581,7 @@ public class ResearchNode : Node
             return;
         }
 
-        if (Event.current.button == Constants.LeftClick && Event.current.control && !Research.IsFinished)
+        if (Event.current.button == Constants.LeftClick && Event.current.control && !Research.IsFinished && Research.CanStartNow)
         {
             Queue.EnqueueRangeFirst(GetMissingRequiredRecursive()
                 .Concat(new List<ResearchNode>([this]))
@@ -593,7 +593,8 @@ public class ResearchNode : Node
             if (!Queue.IsQueued(this))
             {
                 Queue.EnqueueRange(
-                    GetMissingRequiredRecursive().Concat(new List<ResearchNode>([this])).Distinct(), Event.current.shift);
+                    GetMissingRequiredRecursive()
+                        .Concat(new List<ResearchNode>([this])).Distinct(), Event.current.shift);
             }
             else
             {
@@ -683,5 +684,37 @@ public class ResearchNode : Node
         SetRects(pos, visibleRect.size);
         Draw(visibleRect, forceDetailedMode);
         SetRects();
+    }
+
+    // TODO: The above code for handling key events should be extracted into a public method,
+    //       so that the consistency of shortcut keys can be maintained.
+    //       However, left-clicking on a node will probably conflict with the original view.
+    //       We will try it out, but that’s it for now.
+    public void HandleVanillaNodeClickEvent()
+    {
+        if (!Available)
+        {
+            return;
+        }
+        if (Input.GetKey(KeyCode.LeftShift) && !Completed)
+        {
+
+            if (!Queue.IsQueued(this))
+            {
+                Queue.EnqueueRange(
+                    GetMissingRequiredRecursive()
+                        .Concat(new List<ResearchNode>([this])).Distinct(), Event.current.shift);
+            }
+            else
+            {
+                Queue.Dequeue(this);
+            }
+        }
+        else if (Input.GetKey(KeyCode.LeftControl) && !Completed)
+        {
+            Queue.EnqueueRangeFirst(GetMissingRequiredRecursive()
+                .Concat(new List<ResearchNode>([this]))
+                .Distinct());
+        }
     }
 }

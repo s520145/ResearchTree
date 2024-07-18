@@ -33,8 +33,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     public bool ViewRectInnerDirty = true;
 
     public bool ViewRectDirty = true;
-    
-    
 
     private float _zoomLevel = 1f;
 
