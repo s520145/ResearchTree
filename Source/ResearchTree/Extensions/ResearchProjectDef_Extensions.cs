@@ -135,6 +135,10 @@ public static class ResearchProjectDef_Extensions
 
     public static ResearchNode ResearchNode(this ResearchProjectDef research)
     {
+        if (IsAnomalyResearch(research))
+        {
+            return null;
+        }
         var researchNode = Tree.Nodes.OfType<ResearchNode>().FirstOrDefault(n => n.Research == research);
         if (researchNode == null)
         {

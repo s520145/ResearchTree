@@ -106,7 +106,7 @@ public class ResearchNode : Node
     {
         get
         {
-            if (Research.IsFinished)
+            if (Research.IsFinished || Research.IsAnomalyResearch())
             {
                 return false;
             }

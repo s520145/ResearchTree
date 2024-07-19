@@ -45,7 +45,7 @@ public class MainTabWindow_Research_Patches
     /// </summary>
     [HarmonyTranspiler]
     [HarmonyPatch(nameof(MainTabWindow_Research.ListProjects))]
-    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr, ILGenerator generator)
     {
         var instructions = instr.ToList();
 
@@ -102,22 +102,30 @@ public class MainTabWindow_Research_Patches
         opts.Add(new CodeInstruction(OpCodes.Nop)); // nop
         
         // Color color7 = GUI.color; -> later
-        var insertIndex = startIndex - 4 + 18 + 14;
+        var insertIndex = startIndex - 4 + 18 + 15;
         codes.InsertRange(insertIndex, opts);
 
         // SoundDefOf.Click.PlayOneShotOnCamera(); -> before
         insertIndex = startIndex - 4 + 18 + 3 + 3;
+
+        var soundDefOf_Click_PlayOneShotOnCamera_Label = generator.DefineLabel();
+        codes[insertIndex].labels.Add(soundDefOf_Click_PlayOneShotOnCamera_Label);
+        
+        var handleVanillaNodeClickEvent_Label = generator.DefineLabel();
+        var handleVanillaNodeClickEvent = new CodeInstruction(OpCodes.Call,   // call
+            AccessTools.Method(typeof(ResearchNode), nameof(ResearchNode.HandleVanillaNodeClickEvent)));
+        handleVanillaNodeClickEvent.labels.Add(handleVanillaNodeClickEvent_Label);
         
         opts.Clear();
         opts.Add(codeInstruction1); // ldloc.s
         opts.Add(codeInstruction2); // ldfld
         opts.Add(new CodeInstruction(OpCodes.Call,   // call
             AccessTools.Method(typeof(ResearchProjectDef_Extensions), nameof(ResearchProjectDef_Extensions.ResearchNode))));
-        opts.Add(new CodeInstruction(OpCodes.Stloc_0)); // stloc.0
-        
-        opts.Add(new CodeInstruction(OpCodes.Ldloc_0)); // ldloc.0
-        opts.Add(new CodeInstruction(OpCodes.Call,   // call
-            AccessTools.Method(typeof(ResearchNode), nameof(ResearchNode.HandleVanillaNodeClickEvent))));
+        opts.Add(new CodeInstruction(OpCodes.Dup)); // dup
+        opts.Add(new CodeInstruction(OpCodes.Brtrue_S, handleVanillaNodeClickEvent_Label)); // brtrue.s label
+        opts.Add(new CodeInstruction(OpCodes.Pop)); // pop
+        opts.Add(new CodeInstruction(OpCodes.Br_S, soundDefOf_Click_PlayOneShotOnCamera_Label));
+        opts.Add(handleVanillaNodeClickEvent);
         opts.Add(new CodeInstruction(OpCodes.Nop)); // nop
         
         codes.InsertRange(insertIndex, opts);
