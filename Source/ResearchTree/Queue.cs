@@ -1,6 +1,7 @@
 // Queue.cs
 // Copyright Karel Kroeze, 2020-2020
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -67,11 +68,14 @@ public class Queue : WorldComponent
             _instance._queue.Remove(item);
         }
 
-        if (Find.ResearchManager.currentProj == node.Research)
+        if (Find.ResearchManager.currentProj == node?.Research)
         {
-            // try get from _queue
-            Find.ResearchManager.currentProj = _instance._queue.FirstOrDefault()?.Research;
+            Find.ResearchManager.currentProj = null;
         }
+
+        // try to remove duplicate confirmation window
+        Find.WindowStack.TryRemoveAssignableFromType(typeof(Dialog_MessageBox), false);
+        AttemptBeginResearch(_instance._queue.FirstOrDefault());
     }
 
     public static void DrawLabels(Rect visibleRect)
@@ -211,15 +215,38 @@ public class Queue : WorldComponent
         {
             ReEnqueue(item);
         }
+        
+        AttemptBeginResearch(researchOrder.LastOrDefault());
+    }
+    
+    public static void EnqueueFirst(IEnumerable<ResearchNode> nodes)
+    {
+        var researchOrder = nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList();
 
-        AttemptBeginResearch(researchOrder.Last()?.Research);
+        if (IsEnqueueRangeFirstSameOrder(researchOrder))
+        {
+            return;
+        }
+
+        researchOrder.Reverse();
+        foreach (var item in researchOrder)
+        {
+            ReEnqueue(item);
+        }
+        
+        FocusStartedProject(researchOrder.LastOrDefault()?.Research);
     }
 
     public static bool IsEnqueueRangeFirstSameOrder(IEnumerable<ResearchNode> nodes, 
         bool nodesOrdered = true, bool warning = true)
     {
-       var researchOrder = !nodesOrdered ? 
-           nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList() : nodes.ToList();
+        if (nodes == null)
+        {
+            return false;
+        }
+        
+        var researchOrder = !nodesOrdered ? 
+            nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList() : nodes.ToList();
 
         if (researchOrder.Count > _instance._queue.Count)
         {
@@ -256,7 +283,7 @@ public class Queue : WorldComponent
             Enqueue(item, true);
         }
 
-        AttemptBeginResearch(_instance._queue.First()?.Research);
+        AttemptBeginResearch(_instance._queue.FirstOrDefault());
     }
 
     public static bool IsQueued(ResearchNode node)
@@ -272,9 +299,9 @@ public class Queue : WorldComponent
             return;            
         }
         TryDequeue(finished.ResearchNode());
-        var current = _instance._queue.FirstOrDefault()?.Research;
+        var current = _instance._queue.FirstOrDefault();
         AttemptBeginResearch(current);
-        AttemptDoCompletionLetter(finished, current);
+        AttemptDoCompletionLetter(finished, current?.Research);
     }
 
     private static void AttemptDoCompletionLetter(ResearchProjectDef current, ResearchProjectDef next)
@@ -388,18 +415,25 @@ public class Queue : WorldComponent
         }
     }
     
-    private static void AttemptBeginResearch(ResearchProjectDef projectToStart)
+    private static void AttemptBeginResearch(ResearchNode node)
     {
+        var projectToStart = node?.Research;
         if (projectToStart is not { CanStartNow: true } || projectToStart.IsFinished)
         {
             return;
         }
+
+        // to begin
+        AttemptBeginResearchMethodInfo.Invoke(MainTabWindowResearchInstance, [projectToStart]);
+        FocusStartedProject(projectToStart);
+    }
+
+    private static void FocusStartedProject(ResearchProjectDef projectToStart)
+    {
         // focus the start project 
         Find.ResearchManager.SetCurrentProject(projectToStart);
         MainTabWindowResearchInstance.Select(projectToStart);
-        // to begin
-        AttemptBeginResearchMethodInfo.Invoke(MainTabWindowResearchInstance, [projectToStart]);
-    }
+    } 
 
     private static void DoFinishResearchProject(ResearchProjectDef projectToFinish)
     {
@@ -409,5 +443,16 @@ public class Queue : WorldComponent
         }
         // just FinishProject. next will execute TryStartNext.
         Find.ResearchManager.FinishProject(projectToFinish);
+    }
+    
+    public static Dialog_MessageBox CreateConfirmation(ResearchProjectDef project,
+        TaggedString text,
+        Action confirmedAct,
+        bool destructive = false,
+        string title = null,
+        WindowLayer layer = WindowLayer.Dialog)
+    {
+        return Dialog_MessageBox.CreateConfirmation(text, confirmedAct, 
+            () => Dequeue(project.ResearchNode()), destructive, title, layer);
     }
 }

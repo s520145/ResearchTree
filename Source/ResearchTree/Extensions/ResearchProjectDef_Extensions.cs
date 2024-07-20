@@ -139,7 +139,7 @@ public static class ResearchProjectDef_Extensions
         {
             return null;
         }
-        var researchNode = Tree.Nodes.OfType<ResearchNode>().FirstOrDefault(n => n.Research == research);
+        var researchNode = Tree.ResearchToNodesCache[research] as ResearchNode;
         if (researchNode == null)
         {
             // It would be better to use warning instead of error. This is just a reminder.

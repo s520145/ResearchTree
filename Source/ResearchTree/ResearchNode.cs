@@ -583,18 +583,14 @@ public class ResearchNode : Node
 
         if (Event.current.button == Constants.LeftClick && Event.current.control && !Research.IsFinished && Research.CanStartNow)
         {
-            Queue.EnqueueRangeFirst(GetMissingRequiredRecursive()
-                .Concat(new List<ResearchNode>([this]))
-                .Distinct());
+            Queue.EnqueueRangeFirst(GetMissingRequired());
         }
 
         if (Event.current.button == Constants.LeftClick && !Event.current.control && !Research.IsFinished)
         {
             if (!Queue.IsQueued(this))
             {
-                Queue.EnqueueRange(
-                    GetMissingRequiredRecursive()
-                        .Concat(new List<ResearchNode>([this])).Distinct(), Event.current.shift);
+                Queue.EnqueueRange(GetMissingRequired(), Event.current.shift);
             }
             else
             {
@@ -621,6 +617,14 @@ public class ResearchNode : Node
         Queue.Notify_InstantFinished(this);
     }
 
+    public List<ResearchNode> GetMissingRequired()
+    {
+        return GetMissingRequiredRecursive()
+                .Concat(new List<ResearchNode>([this]))
+                .Distinct()
+                .ToList();
+    }
+    
     public List<ResearchNode> GetMissingRequiredRecursive()
     {
         var enumerable =
@@ -701,9 +705,7 @@ public class ResearchNode : Node
 
             if (!Queue.IsQueued(this))
             {
-                Queue.EnqueueRange(
-                    GetMissingRequiredRecursive()
-                        .Concat(new List<ResearchNode>([this])).Distinct(), Event.current.shift);
+                Queue.EnqueueRange(GetMissingRequired(), Event.current.shift);
             }
             else
             {
@@ -712,9 +714,7 @@ public class ResearchNode : Node
         }
         else if (Input.GetKey(KeyCode.LeftControl) && !Completed)
         {
-            Queue.EnqueueRangeFirst(GetMissingRequiredRecursive()
-                .Concat(new List<ResearchNode>([this]))
-                .Distinct());
+            Queue.EnqueueRangeFirst(GetMissingRequired());
         }
     }
 }

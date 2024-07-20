@@ -31,6 +31,8 @@ public static class Tree
     public static bool OrderDirty;
 
     public static bool FirstLoadDone;
+    
+    public static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache = new();
 
     public static Dictionary<TechLevel, IntRange> TechLevelBounds
     {
@@ -92,6 +94,7 @@ public static class Tree
 
         Size = IntVec2.Zero;
         _nodes = null;
+        ResearchToNodesCache.Clear();
         _edges = null;
         _relevantTechLevels = null;
         _techLevelBounds = null;
@@ -624,7 +627,9 @@ public static class Tree
         var iterator = 0;
         foreach (var def in researchList)
         {
-            _nodes.Add(new ResearchNode(def, iterator));
+            var researchNode = new ResearchNode(def, iterator);
+            _nodes.Add(researchNode);
+            ResearchToNodesCache[def] = researchNode;
             iterator++;
         }
     }
