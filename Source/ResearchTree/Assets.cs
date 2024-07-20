@@ -37,8 +37,6 @@ public static class Assets
 
     public static readonly Texture2D SlightlyDarkBackground;
 
-    public static readonly Texture2D Search;
-
     public static bool RefreshResearch;
 
     public static int TotalAmountOfResearch;
@@ -94,7 +92,6 @@ public static class Assets
         ColorUnavailable = new Dictionary<TechLevel, Color>();
         TechLevelColor = new Color(1f, 1f, 1f, 0.2f);
         SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture(0f, 0f, 0f, 0.1f);
-        Search = ContentFinder<Texture2D>.Get("Icons/magnifying-glass");
         AllowedResearchDefs = [];
 
         UsingRimedieval =
@@ -123,8 +120,7 @@ public static class Assets
                     AllowedResearchDefs =
                         (List<ResearchProjectDef>)GetAllowedProjectDefsMethod.Invoke(null,
                         [
-                            DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def =>
-                                def.knowledgeCategory == null)
+                            DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def => !def.IsAnomalyResearch())
                         ]);
                 }
             }

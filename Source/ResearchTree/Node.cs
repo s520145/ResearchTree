@@ -34,8 +34,6 @@ public class Node
 
     protected Vector2 _pos = Vector2.zero;
 
-    protected Rect _queueRect;
-
     protected Rect _rect;
 
     protected bool _rectsSet;
@@ -127,18 +125,7 @@ public class Node
         }
     }
 
-    public Rect QueueRect
-    {
-        get
-        {
-            if (!_rectsSet)
-            {
-                SetRects();
-            }
-
-            return _queueRect;
-        }
-    }
+    public Rect QueueRect { get; set; }
 
     public Rect LockRect
     {
@@ -153,7 +140,7 @@ public class Node
         }
     }
 
-    protected Rect Rect
+    protected internal Rect Rect
     {
         get
         {
@@ -311,12 +298,6 @@ public class Node
         // left and right edges
         _left = new Vector2(_rect.xMin, _rect.yMin + (_rect.height / 2f));
         _right = new Vector2(_rect.xMax, _left.y);
-
-        // queue rect
-        _queueRect = new Rect(_rect.xMax - (Constants.QueueLabelSize / 2f),
-            _rect.yMin + ((_rect.height - Constants.QueueLabelSize) / 2f),
-            Constants.QueueLabelSize,
-            Constants.QueueLabelSize);
 
         // label rect
         _labelRect = new Rect(_rect.xMin + 6f,

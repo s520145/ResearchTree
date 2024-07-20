@@ -264,6 +264,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private void HandleDragging()
     {
+        if (Queue._draggedNode != null)
+        {
+            return;
+        }
         if (Event.current.type == EventType.MouseDown)
         {
             _dragging = true;
