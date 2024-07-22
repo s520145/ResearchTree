@@ -61,6 +61,7 @@ public static class Assets
 
     public static Thread initializeWorker;
 
+
     static Assets()
     {
         Button = ContentFinder<Texture2D>.Get("Buttons/button");

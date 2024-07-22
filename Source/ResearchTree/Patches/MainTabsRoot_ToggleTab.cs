@@ -5,19 +5,18 @@ using Verse;
 
 namespace FluffyResearchTree;
 
-[HarmonyPatch(typeof(MainTabsRoot))]
-public class MainTabsRoot_Patches
+[HarmonyPatch(typeof(MainTabsRoot), nameof(MainTabsRoot.ToggleTab))]
+public class MainTabsRoot_ToggleTab
 {
-    [HarmonyPrefix]
-    [HarmonyPatch(nameof(MainTabsRoot.ToggleTab))]
-    public static void ToggleTabPrefix(ref MainButtonDef newTab)
+    public static void Prefix(ref MainButtonDef newTab)
     {
         if (newTab == null || newTab != MainButtonDefOf.Research)
         {
             return;
         }
 
-        if (ModsConfig.AnomalyActive && ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab == ResearchTabDefOf.Anomaly)
+        if (ModsConfig.AnomalyActive && ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab ==
+            ResearchTabDefOf.Anomaly)
         {
             return;
         }

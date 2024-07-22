@@ -31,8 +31,9 @@ public static class Tree
     public static bool OrderDirty;
 
     public static bool FirstLoadDone;
-    
-    public static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache = new();
+
+    public static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache =
+        new Dictionary<ResearchProjectDef, Node>();
 
     public static Dictionary<TechLevel, IntRange> TechLevelBounds
     {

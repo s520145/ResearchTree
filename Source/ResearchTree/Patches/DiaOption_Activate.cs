@@ -1,7 +1,5 @@
-using System;
 using HarmonyLib;
 using RimWorld;
-using UnityEngine;
 using Verse;
 
 namespace FluffyResearchTree;
@@ -15,10 +13,11 @@ public class DiaOption_Activate
         {
             return;
         }
+
         // fixed Void Monolith view jump to Anomaly research window wrong(jumped to research tree view)
         // Because in the original code, the research window is jumped first and then the tab of the window is changed.
         // This patch just changes the tab in advance, and subsequent patch files will be able to correctly judge
-        // see: MainTabsRoot_Patches
-        ((MainTabWindow_Research) MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
+        // see: MainTabsRoot_ToggleTab
+        ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
     }
 }

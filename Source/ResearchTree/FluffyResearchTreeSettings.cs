@@ -9,10 +9,10 @@ internal class FluffyResearchTreeSettings : ModSettings
 {
     public bool CtrlFunction = true;
     public int LoadType = 1;
+    public bool OverrideResearch = true;
     public bool PauseOnOpen = true;
     public bool ShowCompletion;
     public bool VanillaGraphics;
-    public bool OverrideResearch = true;
 
     /// <summary>
     ///     Saving and loading the values

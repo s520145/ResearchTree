@@ -1,5 +1,15 @@
 # Changelog for ResearchTree
 
+1.5.8 - Optimized interaction with the vanilla research window
+Adjust the UI of nodes in the queue.
+Fixed research cost ui display problem.
+Support vanilla research window to display research order.
+Added compatibility for Dubs Mint Menus mod and UI Not Included mod.
+
+All done by JiaRG, thanks!
+Used DeepL to update translations for German
+
+
 1.5.7 - Fixed the autocomplete dialog, sort of
 
 

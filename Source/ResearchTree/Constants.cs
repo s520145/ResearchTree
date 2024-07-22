@@ -22,9 +22,9 @@ public static class Constants
     public const float AbsoluteMaxZoomLevel = 2.9f;
 
     public const float ZoomStep = 0.05f;
-    
+
     public const int LeftClick = 0;
-    
+
     public const int RightClick = 1;
 
     public static readonly Vector2 IconSize = new Vector2(18f, 18f);

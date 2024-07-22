@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
   <Fluffy.ResearchTree.AllowsBuildingX>Ermöglicht die Konstruktion {0}</Fluffy.ResearchTree.AllowsBuildingX>
   <Fluffy.ResearchTree.AllowsCraftingX>Aktiviert das Rezept {0}</Fluffy.ResearchTree.AllowsCraftingX>
@@ -50,4 +50,5 @@ Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Prob
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller erlaubt diese Technik nicht</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Die mittelalterlichen Einstellungen erlauben diese Technik nicht</Fluffy.ResearchTree.RimedievalDoesNotAllow>
   <ResearchPal.BuildingResearchTreeAsync>Aufbau eines Forschungsbaums</ResearchPal.BuildingResearchTreeAsync>
+  <Fluffy.ResearchTree.OverrideResearch>Den Forschungsbaum als Standard-Forschungsregisterkarte einrichten \n (Umschalttaste zum Öffnen von Vanille gedrückt halten)</Fluffy.ResearchTree.OverrideResearch>
 </LanguageData>

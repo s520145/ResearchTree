@@ -1,17 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Analyzer>
-    <FluffyResearchTree>
-        <Types>
-            <li>FluffyResearchTree.MainTabWindow_ResearchTree</li>
-            <li>FluffyResearchTree.Tree</li>
-            <li>FluffyResearchTree.ResearchNode</li>
-            <li>FluffyResearchTree.Node</li>
-            <li>FluffyResearchTree.Queue</li>
-        </Types>
-        <Methods>
-            <li>FluffyResearchTree.ResearchProjectDef_Extensions:ResearchNode</li>
-            <li>FluffyResearchTree.ResearchProjectDef_Extensions:IsAnomalyResearch</li>
-            <li>FluffyResearchTree.Queue:DrawLabelForVanillaWindow</li>
-            <li>FluffyResearchTree.ResearchNode:HandleVanillaNodeClickEvent</li>
-        </Methods>
-    </FluffyResearchTree>
+  <FluffyResearchTree>
+    <Types>
+      <li>FluffyResearchTree.MainTabWindow_ResearchTree</li>
+      <li>FluffyResearchTree.Tree</li>
+      <li>FluffyResearchTree.ResearchNode</li>
+      <li>FluffyResearchTree.Node</li>
+      <li>FluffyResearchTree.Queue</li>
+    </Types>
+    <Methods>
+      <li>FluffyResearchTree.ResearchProjectDef_Extensions:ResearchNode</li>
+      <li>FluffyResearchTree.ResearchProjectDef_Extensions:IsAnomalyResearch</li>
+      <li>FluffyResearchTree.Queue:DrawLabelForVanillaWindow</li>
+      <li>FluffyResearchTree.ResearchNode:HandleVanillaNodeClickEvent</li>
+    </Methods>
+  </FluffyResearchTree>
 </Analyzer>

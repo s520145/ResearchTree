@@ -105,10 +105,12 @@ internal class FluffyResearchTreeMod : Mod
         }
 
         listing_Standard.Gap();
-        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.OverrideResearch".Translate(), ref Settings.OverrideResearch);
+        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.OverrideResearch".Translate(),
+            ref Settings.OverrideResearch);
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.PauseOnOpen".Translate(), ref Settings.PauseOnOpen);
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.ShowCompletion".Translate(), ref Settings.ShowCompletion);
-        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VanillaGraphics".Translate(), ref Settings.VanillaGraphics);
+        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VanillaGraphics".Translate(),
+            ref Settings.VanillaGraphics);
 
         if (currentVersion != null)
         {

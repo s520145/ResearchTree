@@ -12,13 +12,15 @@ public class FloatMenu_Fixed : FloatMenu
     private readonly Rect _screenLocation;
 
     /// <summary>
-    /// Constructor
+    ///     Constructor
     /// </summary>
     /// <param name="location">Menu location in screen coordinates</param>
     /// <param name="options">menu items</param>
-    /// <remarks> Menu will be shown at the edge of provided rect. Default edge is the right one, but it will be shown at the left if there is not enough space at the right.
-    /// 
-    /// To obtain screen coordinates use GUIUtility.GUIToScreenRect method</remarks>
+    /// <remarks>
+    ///     Menu will be shown at the edge of provided rect. Default edge is the right one, but it will be shown at the left if
+    ///     there is not enough space at the right.
+    ///     To obtain screen coordinates use GUIUtility.GUIToScreenRect method
+    /// </remarks>
     public FloatMenu_Fixed(Rect location, List<FloatMenuOption> options) : base(options)
     {
         _screenLocation = location;
@@ -29,21 +31,21 @@ public class FloatMenu_Fixed : FloatMenu
 
     public override void SetInitialSizeAndPosition()
     {
-        var menuSize = this.InitialSize;
+        var menuSize = InitialSize;
 
         // trying to show menu at the right of provided rect
         var vector = new Vector2(_screenLocation.xMax, _screenLocation.yMin);
-        if (vector.x + this.InitialSize.x > (float)UI.screenWidth)
+        if (vector.x + InitialSize.x > UI.screenWidth)
         {
             // but showing at the left if there is not enough space
             vector.x = _screenLocation.xMin - menuSize.x;
         }
 
-        if (vector.y + this.InitialSize.y > (float)UI.screenHeight)
+        if (vector.y + InitialSize.y > UI.screenHeight)
         {
-            vector.y = (float)UI.screenHeight - menuSize.y;
+            vector.y = UI.screenHeight - menuSize.y;
         }
 
-        this.windowRect = new Rect(vector.x, vector.y, menuSize.x, menuSize.y);
+        windowRect = new Rect(vector.x, vector.y, menuSize.x, menuSize.y);
     }
 }

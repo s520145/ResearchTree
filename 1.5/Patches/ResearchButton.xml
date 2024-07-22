@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <Operation Class="PatchOperationReplace">
+    <xpath>Defs/MainButtonDef[defName="Research"]/description</xpath>
+    <value>
+      <description>Examine and decide on research projects.\n\nShift+click to open the original tree.</description>
+    </value>
+  </Operation>
+</Patch>

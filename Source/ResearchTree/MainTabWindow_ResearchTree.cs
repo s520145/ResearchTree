@@ -22,6 +22,11 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private Rect _baseViewRectInner;
 
+    private Dictionary<ResearchProjectDef, List<Pair<ResearchPrerequisitesUtility.UnlockedHeader, List<Def>>>>
+        _cachedUnlockedDefsGroupedByPrerequisites;
+
+    private List<ResearchProjectDef> _cachedVisibleResearchProjects;
+
     private bool _dragging;
 
     private Vector2 _mousePosition = Vector2.zero;
@@ -30,16 +35,11 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private Rect _viewRectInner;
 
-    public bool ViewRectInnerDirty = true;
+    private float _zoomLevel = 1f;
 
     public bool ViewRectDirty = true;
 
-    private float _zoomLevel = 1f;
-
-    private Dictionary<ResearchProjectDef, List<Pair<ResearchPrerequisitesUtility.UnlockedHeader, List<Def>>>>
-        _cachedUnlockedDefsGroupedByPrerequisites;
-
-    private List<ResearchProjectDef> _cachedVisibleResearchProjects;
+    public bool ViewRectInnerDirty = true;
 
     public MainTabWindow_ResearchTree()
     {
@@ -75,7 +75,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
             _viewRect = new Rect(
                 _baseViewRect.xMin * ZoomLevel,
-                _baseViewRect.yMin * ZoomLevel, 
+                _baseViewRect.yMin * ZoomLevel,
                 _baseViewRect.width * ZoomLevel,
                 _baseViewRect.height * ZoomLevel);
             ViewRectDirty = false;
@@ -125,7 +125,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         get
         {
             // get the minimum zoom level at which the entire tree fits onto the screen, or a static maximum zoom level.
-            var fitZoomLevel = Mathf.Max(TreeRect.width / _baseViewRectInner.width, TreeRect.height / _baseViewRectInner.height);
+            var fitZoomLevel = Mathf.Max(TreeRect.width / _baseViewRectInner.width,
+                TreeRect.height / _baseViewRectInner.height);
             return Mathf.Min(fitZoomLevel, Constants.AbsoluteMaxZoomLevel);
         }
     }
@@ -322,14 +323,14 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.TopHalf());
 
         var anomalyBtnRect = new Rect(
-            searchRect.x + Constants.SmallQueueLabelSize + Constants.Margin, 
-            searchRect.y, 
-            searchRect.width - Constants.SmallQueueLabelSize - Constants.Margin, 
+            searchRect.x + Constants.SmallQueueLabelSize + Constants.Margin,
+            searchRect.y,
+            searchRect.width - Constants.SmallQueueLabelSize - Constants.Margin,
             searchRect.height
         ).CenteredOnYIn(canvas.BottomHalf());
         if (ModsConfig.AnomalyActive && Widgets.ButtonText(anomalyBtnRect, ResearchTabDefOf.Anomaly.generalTitle))
         {
-            ((MainTabWindow_Research) MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
+            ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
             Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research);
             return;
         }
@@ -386,10 +387,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         {
             list.Add(new FloatMenuOption(
                 node.Label,
-                delegate
-                {
-                    CenterOn(node);
-                }, 
+                delegate { CenterOn(node); },
                 MenuOptionPriority.Default,
                 delegate
                 {
@@ -397,7 +395,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                     somethingHighlighted = false;
                     _matchingProjects.Clear();
                     _matchingProjects.Add(node.Research);
-                }, 
+                },
                 playSelectionSound: false)
             );
             node.Highlighted = true;
@@ -410,11 +408,13 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             somethingHighlighted = false;
         }
 
-        if (_quickSearchWidget.CurrentlyFocused() && list.Any())
+        if (!_quickSearchWidget.CurrentlyFocused() || !list.Any())
         {
-            searchRect.x += QuickSearchWidget.IconSize;
-            Find.WindowStack.Add(new FloatMenu_Fixed(searchRect, list));
+            return;
         }
+
+        searchRect.x += QuickSearchWidget.IconSize;
+        Find.WindowStack.Add(new FloatMenu_Fixed(searchRect, list));
 
         return;
 

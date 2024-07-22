@@ -375,15 +375,16 @@ public class ResearchNode : Node
         {
             Highlighted = true;
         }
+
         var overrideColor = Color.magenta;
         if (!Completed && !Exists())
         {
             overrideColor = new Color(0.2f, 0.2f, 0.2f);
         }
-        
+
         var detailedMode = forceDetailedMode ||
                            MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff;
-        var mouseOver = Mouse.IsOver( Rect );
+        var mouseOver = Mouse.IsOver(Rect);
         if (Event.current.type == EventType.Repaint)
         {
             // researches that are completed or could be started immediately, and that have the required building(s) available
@@ -425,17 +426,17 @@ public class ResearchNode : Node
 
             if (detailedMode)
             {
-                Text.Anchor   = TextAnchor.UpperLeft;
+                Text.Anchor = TextAnchor.UpperLeft;
                 Text.WordWrap = false;
-                Text.Font     = _largeLabel ? GameFont.Tiny : GameFont.Small;
-                Widgets.Label( LabelRect, Research.LabelCap );
+                Text.Font = _largeLabel ? GameFont.Tiny : GameFont.Small;
+                Widgets.Label(LabelRect, Research.LabelCap);
             }
             else
             {
-                Text.Anchor   = TextAnchor.MiddleCenter;
+                Text.Anchor = TextAnchor.MiddleCenter;
                 Text.WordWrap = false;
-                Text.Font     = GameFont.Medium;
-                Widgets.Label( Rect, Research.LabelCap );
+                Text.Font = GameFont.Medium;
+                Widgets.Label(Rect, Research.LabelCap);
             }
 
             // draw research cost and icon
@@ -581,7 +582,8 @@ public class ResearchNode : Node
             return;
         }
 
-        if (Event.current.button == Constants.LeftClick && Event.current.control && !Research.IsFinished && Research.CanStartNow)
+        if (Event.current.button == Constants.LeftClick && Event.current.control && !Research.IsFinished &&
+            Research.CanStartNow)
         {
             Queue.EnqueueRangeFirst(GetMissingRequired());
         }
@@ -602,7 +604,7 @@ public class ResearchNode : Node
         {
             return;
         }
-        
+
         if (Event.current.button == Constants.LeftClick && Event.current.shift)
         {
             return;
@@ -620,11 +622,11 @@ public class ResearchNode : Node
     public List<ResearchNode> GetMissingRequired()
     {
         return GetMissingRequiredRecursive()
-                .Concat(new List<ResearchNode>([this]))
-                .Distinct()
-                .ToList();
+            .Concat(new List<ResearchNode>([this]))
+            .Distinct()
+            .ToList();
     }
-    
+
     public List<ResearchNode> GetMissingRequiredRecursive()
     {
         var enumerable =
@@ -700,9 +702,9 @@ public class ResearchNode : Node
         {
             return;
         }
+
         if (Input.GetKey(KeyCode.LeftShift) && !Completed)
         {
-
             if (!Queue.IsQueued(this))
             {
                 Queue.EnqueueRange(GetMissingRequired(), Event.current.shift);

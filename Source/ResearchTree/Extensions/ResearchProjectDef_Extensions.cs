@@ -139,6 +139,7 @@ public static class ResearchProjectDef_Extensions
         {
             return null;
         }
+
         var researchNode = Tree.ResearchToNodesCache.TryGetValue(research) as ResearchNode;
         if (researchNode == null)
         {
@@ -150,7 +151,7 @@ public static class ResearchProjectDef_Extensions
 
         return researchNode;
     }
-        
+
     public static bool IsAnomalyResearch(this ResearchProjectDef research)
     {
         return ModsConfig.AnomalyActive && research.knowledgeCategory != null;
