@@ -21,4 +21,5 @@
   <Fluffy.ResearchTree.PreparingTree.CrossingReduction>겹침 줄이기</Fluffy.ResearchTree.PreparingTree.CrossingReduction>
   <Fluffy.ResearchTree.PreparingTree.Layout>레이아웃 다듬기</Fluffy.ResearchTree.PreparingTree.Layout>
   <Fluffy.ResearchTree.RestoreQueue>대기열 복원</Fluffy.ResearchTree.RestoreQueue>
+  <Fluffy.ResearchTree.OverrideResearch>연구 트리를 기본 연구 탭으로 만듭니다.\n(바닐라를 열려면 Shift 키를 누르세요)</Fluffy.ResearchTree.OverrideResearch>
 </LanguageData>

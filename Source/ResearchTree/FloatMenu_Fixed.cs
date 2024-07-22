@@ -9,29 +9,41 @@ namespace FluffyResearchTree;
 
 public class FloatMenu_Fixed : FloatMenu
 {
-    private readonly Vector2 _position;
+    private readonly Rect _screenLocation;
 
-    public FloatMenu_Fixed(List<FloatMenuOption> options, Vector2 position, bool focus = false)
-        : base(options)
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="location">Menu location in screen coordinates</param>
+    /// <param name="options">menu items</param>
+    /// <remarks> Menu will be shown at the edge of provided rect. Default edge is the right one, but it will be shown at the left if there is not enough space at the right.
+    /// 
+    /// To obtain screen coordinates use GUIUtility.GUIToScreenRect method</remarks>
+    public FloatMenu_Fixed(Rect location, List<FloatMenuOption> options) : base(options)
     {
-        _position = position;
+        _screenLocation = location;
         vanishIfMouseDistant = false;
-        focusWhenOpened = focus;
+        onlyOneOfTypeAllowed = false;
+        focusWhenOpened = false;
     }
 
     public override void SetInitialSizeAndPosition()
     {
-        var position = _position;
-        if (position.x + InitialSize.x > UI.screenWidth)
+        var menuSize = this.InitialSize;
+
+        // trying to show menu at the right of provided rect
+        var vector = new Vector2(_screenLocation.xMax, _screenLocation.yMin);
+        if (vector.x + this.InitialSize.x > (float)UI.screenWidth)
         {
-            position.x = UI.screenWidth - InitialSize.x;
+            // but showing at the left if there is not enough space
+            vector.x = _screenLocation.xMin - menuSize.x;
         }
 
-        if (position.y + InitialSize.y > UI.screenHeight)
+        if (vector.y + this.InitialSize.y > (float)UI.screenHeight)
         {
-            position.y = UI.screenHeight - InitialSize.y;
+            vector.y = (float)UI.screenHeight - menuSize.y;
         }
 
-        windowRect = new Rect(position.x, position.y, InitialSize.x, InitialSize.y);
+        this.windowRect = new Rect(vector.x, vector.y, menuSize.x, menuSize.y);
     }
 }

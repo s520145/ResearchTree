@@ -336,7 +336,7 @@ public class Node
         return false;
     }
 
-    public virtual void Draw(Rect visibleRect, bool forceDetailedMode = false, bool forceNonDetailedMode = false)
+    public virtual void Draw(Rect visibleRect, bool forceDetailedMode = false)
     {
     }
 }

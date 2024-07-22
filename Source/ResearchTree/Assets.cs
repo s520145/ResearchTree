@@ -235,19 +235,6 @@ public static class Assets
         return !unlocks.Contains("ArchotechUplink");
     }
 
-    public static void OpenResearchWindow()
-    {
-        if (!Event.current.shift && !Tree.Initialized && FluffyResearchTreeMod.instance.Settings.LoadType != 2)
-        {
-            Messages.Message("Fluffy.ResearchTree.StillLoading".Translate(), MessageTypeDefOf.RejectInput);
-            return;
-        }
-
-        Find.MainTabsRoot.ToggleTab(Event.current.shift
-            ? MainButtonDefOf.ResearchOriginal
-            : RimWorld.MainButtonDefOf.Research);
-    }
-
     public static void StartLoadingWorker()
     {
         initializeWorker = new Thread(Tree.Initialize);
@@ -271,6 +258,6 @@ public static class Assets
     [DefOf]
     public static class MainButtonDefOf
     {
-        public static MainButtonDef ResearchOriginal;
+        public static MainButtonDef FluffyResearchTree;
     }
 }

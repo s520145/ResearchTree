@@ -50,4 +50,5 @@ Si esto ocurre, utilice la opción de carga la primera vez que abra la aplicaci�
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller no permite esta tecnología</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>La configuración medieval no permite esta tecnología</Fluffy.ResearchTree.RimedievalDoesNotAllow>
   <ResearchPal.BuildingResearchTreeAsync>Construir un árbol de investigación</ResearchPal.BuildingResearchTreeAsync>
+  <Fluffy.ResearchTree.OverrideResearch>Haga que el árbol de investigación sea la pestaña de investigación predeterminada \n (mantenga presionada la tecla Mayús para abrir Vanilla)</Fluffy.ResearchTree.OverrideResearch>
 </LanguageData>

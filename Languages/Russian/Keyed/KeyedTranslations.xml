@@ -49,4 +49,5 @@
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller не позволяет использовать эту технику</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Средневековая обстановка не позволяет использовать эту технику</Fluffy.ResearchTree.RimedievalDoesNotAllow>
   <ResearchPal.BuildingResearchTreeAsync>Построение дерева исследований</ResearchPal.BuildingResearchTreeAsync>
+  <Fluffy.ResearchTree.OverrideResearch>Сделать дерево исследований вкладкой исследований по умолчанию \n (удерживайте клавишу Shift, чтобы открыть ванильный вариант)</Fluffy.ResearchTree.OverrideResearch>
 </LanguageData>
