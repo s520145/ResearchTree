@@ -34,7 +34,7 @@ public class FloatMenu_Fixed : FloatMenu
         var menuSize = InitialSize;
 
         // trying to show menu at the right of provided rect
-        var vector = new Vector2(_screenLocation.xMax, _screenLocation.yMin);
+        var vector = new Vector2(_screenLocation.xMax, _screenLocation.yMin + Constants.SmallQueueLabelSize);
         if (vector.x + InitialSize.x > UI.screenWidth)
         {
             // but showing at the left if there is not enough space
