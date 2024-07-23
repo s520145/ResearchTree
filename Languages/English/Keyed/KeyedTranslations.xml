@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
+  <Fluffy.ResearchTree.HoldForClassic>Hold SHIFT to open the vanilla research window</Fluffy.ResearchTree.HoldForClassic>
+  <Fluffy.ResearchTree.HoldForNew>Hold SHIFT to open the new research window</Fluffy.ResearchTree.HoldForNew>
   <Fluffy.ResearchTree.AllowsBuildingX>Enables construction {0}</Fluffy.ResearchTree.AllowsBuildingX>
   <Fluffy.ResearchTree.AllowsCraftingX>Enables recipe {0}</Fluffy.ResearchTree.AllowsCraftingX>
   <Fluffy.ResearchTree.AllowsSowingXinY>Enables planting {0} in {1}</Fluffy.ResearchTree.AllowsSowingXinY>

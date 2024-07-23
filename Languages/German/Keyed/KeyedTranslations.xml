@@ -51,4 +51,6 @@ Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Prob
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Die mittelalterlichen Einstellungen erlauben diese Technik nicht</Fluffy.ResearchTree.RimedievalDoesNotAllow>
   <ResearchPal.BuildingResearchTreeAsync>Aufbau eines Forschungsbaums</ResearchPal.BuildingResearchTreeAsync>
   <Fluffy.ResearchTree.OverrideResearch>Den Forschungsbaum als Standard-Forschungsregisterkarte einrichten \n (Umschalttaste zum Öffnen von Vanille gedrückt halten)</Fluffy.ResearchTree.OverrideResearch>
+  <Fluffy.ResearchTree.HoldForClassic>Halten Sie die SHIFT-Taste gedrückt, um das Vanille-Forschungsfenster zu öffnen.</Fluffy.ResearchTree.HoldForClassic>
+  <Fluffy.ResearchTree.HoldForNew>Halten Sie SHIFT gedrückt, um das neue Recherchefenster zu öffnen</Fluffy.ResearchTree.HoldForNew>
 </LanguageData>

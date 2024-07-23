@@ -61,9 +61,28 @@ public static class Assets
 
     public static Thread initializeWorker;
 
+    public static readonly bool BetterResearchTabLoaded;
+
+    public static readonly MainButtonDef BetterResearchTab;
+
+    public static readonly bool OrganizedResearchTabLoaded;
+
+    public static readonly MainButtonDef OrganizedResearchTab;
 
     static Assets()
     {
+        if (ModLister.GetActiveModWithIdentifier("andery233xj.mod.BetterResearchTabs", true) != null)
+        {
+            BetterResearchTab = DefDatabase<MainButtonDef>.GetNamed("BetterResearchTab");
+            BetterResearchTabLoaded = true;
+        }
+
+        if (ModLister.GetActiveModWithIdentifier("Mlie.OrganizedResearchTab", true) != null)
+        {
+            OrganizedResearchTab = DefDatabase<MainButtonDef>.GetNamed("OrganizedResearchTab");
+            OrganizedResearchTabLoaded = true;
+        }
+
         Button = ContentFinder<Texture2D>.Get("Buttons/button");
         ButtonActive = ContentFinder<Texture2D>.Get("Buttons/button-active");
         ResearchIcon = ContentFinder<Texture2D>.Get("Icons/Research");

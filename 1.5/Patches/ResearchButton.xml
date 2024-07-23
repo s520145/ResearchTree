@@ -1,9 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Patch>
   <Operation Class="PatchOperationReplace">
-    <xpath>Defs/MainButtonDef[defName="Research"]/description</xpath>
+    <xpath>Defs/MainButtonDef[defName="Research"]/tabWindowClass</xpath>
     <value>
-      <description>Examine and decide on research projects.\n\nShift+click to open the original tree.</description>
+      <tabWindowClass>MainTabWindow_Research</tabWindowClass>
     </value>
+  </Operation>
+  <Operation Class="PatchOperationSequence">
+    <operations>
+      <li Class="PatchOperationAdd" MayRequire="andery233xj.mod.BetterResearchTabs">
+        <xpath>Defs</xpath>
+        <value>
+          <MainButtonDef>
+            <defName>BetterResearchTab</defName>
+            <label>research</label>
+            <description>Examine and decide on research projects.</description>
+            <workerClass>MainButtonWorker_ToggleResearchTab</workerClass>
+            <tabWindowClass>TowersBetterResearchTabs.MainTabWindow_Research</tabWindowClass>
+          </MainButtonDef>
+        </value>
+      </li>
+      <li Class="PatchOperationAdd" MayRequire="Mlie.OrganizedResearchTab">
+        <xpath>Defs</xpath>
+        <value>
+          <MainButtonDef>
+            <defName>OrganizedResearchTab</defName>
+            <label>research</label>
+            <description>Examine and decide on research projects.</description>
+            <workerClass>MainButtonWorker_ToggleResearchTab</workerClass>
+            <tabWindowClass>OrganizedResearch.OrganizedResearch</tabWindowClass>
+          </MainButtonDef>
+        </value>
+      </li>
+    </operations>
   </Operation>
 </Patch>

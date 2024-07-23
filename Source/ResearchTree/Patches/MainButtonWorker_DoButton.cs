@@ -1,6 +1,7 @@
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
+using Verse;
 
 namespace FluffyResearchTree;
 
@@ -15,5 +16,10 @@ public class MainButtonWorker_DoButton
         }
 
         Queue.DrawLabelForMainButton(rect);
+
+        TooltipHandler.TipRegion(rect,
+            FluffyResearchTreeMod.instance.Settings.OverrideResearch
+                ? "Fluffy.ResearchTree.HoldForClassic".Translate()
+                : "Fluffy.ResearchTree.HoldForNew".Translate());
     }
 }

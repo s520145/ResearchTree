@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
   <Fluffy.ResearchTree.AllowsBuildingX>Позволяет строить {0}</Fluffy.ResearchTree.AllowsBuildingX>
   <Fluffy.ResearchTree.AllowsCraftingX>Позволяет {0}</Fluffy.ResearchTree.AllowsCraftingX>
@@ -50,4 +50,6 @@
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Средневековая обстановка не позволяет использовать эту технику</Fluffy.ResearchTree.RimedievalDoesNotAllow>
   <ResearchPal.BuildingResearchTreeAsync>Построение дерева исследований</ResearchPal.BuildingResearchTreeAsync>
   <Fluffy.ResearchTree.OverrideResearch>Сделать дерево исследований вкладкой исследований по умолчанию \n (удерживайте клавишу Shift, чтобы открыть ванильный вариант)</Fluffy.ResearchTree.OverrideResearch>
+  <Fluffy.ResearchTree.HoldForClassic>Удерживайте SHIFT, чтобы открыть окно исследования ванили</Fluffy.ResearchTree.HoldForClassic>
+  <Fluffy.ResearchTree.HoldForNew>Удерживайте SHIFT, чтобы открыть новое окно исследования</Fluffy.ResearchTree.HoldForNew>
 </LanguageData>
