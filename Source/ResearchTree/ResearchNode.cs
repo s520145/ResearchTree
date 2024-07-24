@@ -60,12 +60,18 @@ public class ResearchNode : Node
                 return GenUI.MouseoverColor;
             }
 
-            if (Completed)
+            Color color;
+
+            if (Completed || Available)
             {
-                return Assets.ColorCompleted[Research.techLevel];
+                return Assets.ColorCompleted.TryGetValue(Research.techLevel, out color)
+                    ? color
+                    : Assets.ColorCompleted[0];
             }
 
-            return Available ? Assets.ColorCompleted[Research.techLevel] : Assets.ColorUnavailable[Research.techLevel];
+            return Assets.ColorUnavailable.TryGetValue(Research.techLevel, out color)
+                ? color
+                : Assets.ColorUnavailable[0];
         }
     }
 
@@ -80,10 +86,23 @@ public class ResearchNode : Node
 
             if (Completed)
             {
-                return Assets.ColorCompleted[Research.techLevel];
+                return Assets.ColorCompleted.TryGetValue(Research.techLevel, out var color)
+                    ? color
+                    : Assets.ColorCompleted[0];
             }
 
-            return Available ? Assets.ColorAvailable[Research.techLevel] : Assets.ColorUnavailable[Research.techLevel];
+            if (Available)
+            {
+                return Assets.ColorAvailable.TryGetValue(Research.techLevel, out var color)
+                    ? color
+                    : Assets.ColorAvailable[0];
+            }
+            else
+            {
+                return Assets.ColorUnavailable.TryGetValue(Research.techLevel, out var color)
+                    ? color
+                    : Assets.ColorUnavailable[0];
+            }
         }
     }
 
