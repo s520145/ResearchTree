@@ -27,17 +27,6 @@ internal class FluffyResearchTreeMod : Mod
         new Harmony("Fluffy.ResearchTree").PatchAll(Assembly.GetExecutingAssembly());
         Settings = GetSettings<FluffyResearchTreeSettings>();
         currentVersion = VersionFromManifest.GetVersionFromModMetaData(content.ModMetaData);
-
-        //switch (Settings.LoadType)
-        //{
-        //    //case 0: // No point really
-        //    //    LongEventHandler.QueueLongEvent(Tree.Initialize, "ResearchPal.BuildingResearchTree", false, null);
-        //    //    return;
-        //    case 1:
-        //        LongEventHandler.QueueLongEvent(StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true,
-        //            null);
-        //        break;
-        //}
     }
 
     /// <summary>
@@ -45,17 +34,6 @@ internal class FluffyResearchTreeMod : Mod
     /// </summary>
     internal FluffyResearchTreeSettings Settings { get; }
 
-    //private static void StartLoadingWorker()
-    //{
-    //    initializeWorker = new Thread(Tree.Initialize);
-    //    Log.Message("[ResearchTree]: Initialization start in background");
-    //    initializeWorker.Start();
-    //}
-
-    /// <summary>
-    ///     The title for the mod-settings
-    /// </summary>
-    /// <returns></returns>
     public override string SettingsCategory()
     {
         return "Research Tree";
@@ -72,10 +50,6 @@ internal class FluffyResearchTreeMod : Mod
         listing_Standard.Begin(rect);
         listing_Standard.Gap();
         listing_Standard.Label("Fluffy.ResearchTree.LoadType".Translate());
-        //if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeOne".Translate(), Settings.LoadType == 0))
-        //{
-        //    Settings.LoadType = 0;
-        //}
 
         if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeTwo".Translate(), Settings.LoadType == 1))
         {
@@ -109,8 +83,8 @@ internal class FluffyResearchTreeMod : Mod
             ref Settings.OverrideResearch);
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.PauseOnOpen".Translate(), ref Settings.PauseOnOpen);
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.ShowCompletion".Translate(), ref Settings.ShowCompletion);
-        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VanillaGraphics".Translate(),
-            ref Settings.VanillaGraphics);
+        //listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VanillaGraphics".Translate(),
+        //    ref Settings.VanillaGraphics);
 
         if (currentVersion != null)
         {

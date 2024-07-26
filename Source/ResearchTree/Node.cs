@@ -309,36 +309,36 @@ public class Node
             Constants.NodeSize.y);
 
         // left and right edges
-        _left = new Vector2(_rect.xMin, _rect.yMin + _rect.height / 2f);
+        _left = new Vector2(_rect.xMin, _rect.yMin + (_rect.height / 2f));
         _right = new Vector2(_rect.xMax, _left.y);
 
         // queue rect
-        _queueRect = new Rect(_rect.xMax - Constants.QueueLabelSize / 2f,
-            _rect.yMin + (_rect.height - Constants.QueueLabelSize) / 2f,
+        _queueRect = new Rect(_rect.xMax - (Constants.QueueLabelSize / 2f),
+            _rect.yMin + ((_rect.height - Constants.QueueLabelSize) / 2f),
             Constants.QueueLabelSize,
             Constants.QueueLabelSize);
 
         // label rect
         _labelRect = new Rect(_rect.xMin + 6f,
             _rect.yMin + 3f,
-            _rect.width * 2f / 3f - 6f,
-            _rect.height * .5f - 3f);
+            (_rect.width * 2f / 3f) - 6f,
+            (_rect.height * .5f) - 3f);
 
         // research cost rect
-        _costLabelRect = new Rect(_rect.xMin + _rect.width * 2f / 3f,
+        _costLabelRect = new Rect(_rect.xMin + (_rect.width * 2f / 3f),
             _rect.yMin + 3f,
-            _rect.width * 1f / 3f - 16f - 3f,
-            _rect.height * .5f - 3f);
+            (_rect.width * 1f / 3f) - 16f - 3f,
+            (_rect.height * .5f) - 3f);
 
         // research icon rect
         _costIconRect = new Rect(_costLabelRect.xMax,
-            _rect.yMin + (_costLabelRect.height - 16f) / 2,
+            _rect.yMin + ((_costLabelRect.height - 16f) / 2),
             16f,
             16f);
 
         // icon container rect
         _iconsRect = new Rect(_rect.xMin,
-            _rect.yMin + _rect.height * .5f,
+            _rect.yMin + (_rect.height * .5f),
             _rect.width,
             _rect.height * .5f);
 

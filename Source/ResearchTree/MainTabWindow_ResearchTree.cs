@@ -178,7 +178,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         var startPosition = new Vector2(StandardMargin / Prefs.UIScale,
             Constants.TopBarHeight + Constants.Margin + (StandardMargin / Prefs.UIScale));
-        var size = new Vector2((Screen.width - StandardMargin * 2f) / Prefs.UIScale,
+        var size = new Vector2((Screen.width - (StandardMargin * 2f)) / Prefs.UIScale,
             UI.screenHeight - MainButtonDef.ButtonHeight - startPosition.y);
 
         _baseViewRect = new Rect(startPosition, size);
@@ -299,7 +299,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         UI.ApplyUIScale();
         GUI.BeginClip(windowRect);
-        GUI.BeginClip(new Rect(0f, UI.screenHeight - Constants.TopBarHeight, 
+        GUI.BeginClip(new Rect(0f, UI.screenHeight - Constants.TopBarHeight,
             UI.screenWidth, UI.screenHeight - MainButtonDef.ButtonHeight - Constants.TopBarHeight));
     }
 
