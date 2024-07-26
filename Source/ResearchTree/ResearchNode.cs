@@ -403,7 +403,7 @@ public class ResearchNode : Node
 
         var detailedMode = forceDetailedMode ||
                            MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff;
-        var mouseOver = Mouse.IsOver(Rect);
+        var mouseOver = Mouse.IsOver(Rect) || Rect.Contains(Event.current.mousePosition);
         if (Event.current.type == EventType.Repaint)
         {
             // researches that are completed or could be started immediately, and that have the required building(s) available
@@ -532,7 +532,7 @@ public class ResearchNode : Node
                 tooltipstring.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
             }
 
-            TooltipHandler.TipRegion(Rect, tooltipstring.ToString());
+            TooltipHandler_Modified.TipRegion(Rect, tooltipstring.ToString());
 
             // draw unlock icons
             if (detailedMode)
@@ -555,7 +555,7 @@ public class ResearchNode : Node
                     }
 
                     Widgets.DefIcon(rect, unlockDefsAndDescs[i].First);
-                    TooltipHandler.TipRegion(rect, unlockDefsAndDescs[i].Second);
+                    TooltipHandler_Modified.TipRegion(rect, unlockDefsAndDescs[i].Second);
                 }
             }
 
@@ -706,7 +706,7 @@ public class ResearchNode : Node
 
     public void DrawAt(Vector2 pos, Rect visibleRect, bool forceDetailedMode = false)
     {
-        SetRects(pos, visibleRect.size);
+        SetRects(pos);
         Draw(visibleRect, forceDetailedMode);
         SetRects();
     }

@@ -8,7 +8,7 @@ using Verse;
 namespace FluffyResearchTree;
 
 [HarmonyPatch(typeof(MainTabWindow_Research), nameof(MainTabWindow_Research.DoBeginResearch))]
-public class MainTabWindow_Research_Patches
+public class MainTabWindow_Research_DoBeginResearch
 {
     private static void Prefix(ResearchProjectDef projectToStart)
     {

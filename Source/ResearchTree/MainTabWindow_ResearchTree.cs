@@ -176,9 +176,9 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private void SetRects()
     {
-        var startPosition = new Vector2(18f / Prefs.UIScale,
-            Constants.TopBarHeight + Constants.Margin + (18f / Prefs.UIScale));
-        var size = new Vector2((Screen.width - 36f) / Prefs.UIScale,
+        var startPosition = new Vector2(StandardMargin / Prefs.UIScale,
+            Constants.TopBarHeight + Constants.Margin + (StandardMargin / Prefs.UIScale));
+        var size = new Vector2((Screen.width - StandardMargin * 2f) / Prefs.UIScale,
             UI.screenHeight - MainButtonDef.ButtonHeight - startPosition.y);
 
         _baseViewRect = new Rect(startPosition, size);
@@ -196,16 +196,13 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        DrawTopBar(new Rect(canvas.xMin, canvas.yMin + 10f, canvas.width, Constants.TopBarHeight));
+        FastGUI.DrawTextureFast(windowRect, Assets.SlightlyDarkBackground);
+        DrawTopBar(new Rect(canvas.xMin, canvas.yMin, canvas.width, Constants.TopBarHeight));
         ApplyZoomLevel();
-        FastGUI.DrawTextureFast(ViewRect, Assets.SlightlyDarkBackground);
         _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect);
-        GUI.BeginGroup(new Rect(ScaledMargin, ScaledMargin, TreeRect.width + (ScaledMargin * 2f),
-            TreeRect.height + (ScaledMargin * 2f)));
         Tree.Draw(VisibleRect);
         Queue.DrawLabels(VisibleRect);
         HandleZoom();
-        GUI.EndGroup();
         GUI.EndScrollView(false);
         HandleDragging();
         HandleDolly();
@@ -220,6 +217,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         _quickSearchWidget.Unfocus();
     }
 
+    // default W A S D move
     private void HandleDolly()
     {
         var num = 10f;
@@ -268,7 +266,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         if (Event.current.type == EventType.MouseDown)
         {
-            UI.UnfocusCurrentControl();
             _dragging = true;
             _mousePosition = Event.current.mousePosition;
             Event.current.Use();
@@ -302,7 +299,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         UI.ApplyUIScale();
         GUI.BeginClip(windowRect);
-        GUI.BeginClip(new Rect(0f, 0f, UI.screenWidth, UI.screenHeight - MainButtonDef.ButtonHeight));
+        GUI.BeginClip(new Rect(0f, UI.screenHeight - Constants.TopBarHeight, 
+            UI.screenWidth, UI.screenHeight - MainButtonDef.ButtonHeight - Constants.TopBarHeight));
     }
 
     private void DrawTopBar(Rect canvas)
@@ -311,8 +309,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         var rect2 = canvas;
         rect.width = 200f;
         rect2.xMin += 206f;
-        FastGUI.DrawTextureFast(rect, Assets.SlightlyDarkBackground);
-        FastGUI.DrawTextureFast(rect2, Assets.SlightlyDarkBackground);
         DrawSearchBar(rect.ContractedBy(Constants.Margin));
         Queue.DrawQueue(rect2.ContractedBy(Constants.Margin), !_dragging);
     }

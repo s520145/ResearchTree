@@ -292,37 +292,65 @@ public class Node
 
     protected void SetRects()
     {
-        _topLeft = new Vector2((X - 1) * (Constants.NodeSize.x + Constants.NodeMargins.x),
-            (Yf - 1f) * (Constants.NodeSize.y + Constants.NodeMargins.y));
+        // origin
+        _topLeft = new Vector2(
+            (X - 1) * (Constants.NodeSize.x + Constants.NodeMargins.x),
+            (Yf - 1) * (Constants.NodeSize.y + Constants.NodeMargins.y));
+
         SetRects(_topLeft);
     }
 
-    protected void SetRects(Vector2 topLeft, Vector2 limitingDimensions = default)
+    protected void SetRects(Vector2 topLeft)
     {
-        if (limitingDimensions == default)
-        {
-            limitingDimensions = Vector2.positiveInfinity;
-        }
+        // main rect
+        _rect = new Rect(topLeft.x,
+            topLeft.y,
+            Constants.NodeSize.x,
+            Constants.NodeSize.y);
 
-        _rect = new Rect(topLeft.x, topLeft.y, Math.Min(Constants.NodeSize.x, limitingDimensions.x),
-            Math.Min(Constants.NodeSize.y, limitingDimensions.y));
-        _left = new Vector2(_rect.xMin, _rect.yMin + (_rect.height / Offset));
+        // left and right edges
+        _left = new Vector2(_rect.xMin, _rect.yMin + _rect.height / 2f);
         _right = new Vector2(_rect.xMax, _left.y);
-        _queueRect = new Rect(_rect.xMax - 15f, _rect.yMin + ((_rect.height - Constants.QueueLabelSize) / Offset), 30f,
+
+        // queue rect
+        _queueRect = new Rect(_rect.xMax - Constants.QueueLabelSize / 2f,
+            _rect.yMin + (_rect.height - Constants.QueueLabelSize) / 2f,
+            Constants.QueueLabelSize,
             Constants.QueueLabelSize);
-        _labelRect = new Rect(_rect.xMin + Constants.Margin, _rect.yMin + 3f,
-            (_rect.width * Offset / 3f) - Constants.Margin,
-            (_rect.height * 0.5f) - 3f);
-        _costLabelRect = new Rect(_rect.xMin + (_rect.width * Offset / 3f), _rect.yMin + 3f,
-            (_rect.width * 1f / 3f) - Constants.HubSize - 3f, (_rect.height * 0.5f) - 3f);
+
+        // label rect
+        _labelRect = new Rect(_rect.xMin + 6f,
+            _rect.yMin + 3f,
+            _rect.width * 2f / 3f - 6f,
+            _rect.height * .5f - 3f);
+
+        // research cost rect
+        _costLabelRect = new Rect(_rect.xMin + _rect.width * 2f / 3f,
+            _rect.yMin + 3f,
+            _rect.width * 1f / 3f - 16f - 3f,
+            _rect.height * .5f - 3f);
+
+        // research icon rect
         _costIconRect = new Rect(_costLabelRect.xMax,
-            _rect.yMin + ((_costLabelRect.height - Constants.HubSize) / Offset),
-            Constants.HubSize, Constants.HubSize);
-        _iconsRect = new Rect(_rect.xMin, _rect.yMin + (_rect.height * 0.5f), _rect.width, _rect.height * 0.5f);
+            _rect.yMin + (_costLabelRect.height - 16f) / 2,
+            16f,
+            16f);
+
+        // icon container rect
+        _iconsRect = new Rect(_rect.xMin,
+            _rect.yMin + _rect.height * .5f,
+            _rect.width,
+            _rect.height * .5f);
+
+        // lock icon rect
         _lockRect = new Rect(0f, 0f, 32f, 32f);
         _lockRect = _lockRect.CenteredOnXIn(_rect);
         _lockRect = _lockRect.CenteredOnYIn(_rect);
+
+        // see if the label is too big
         _largeLabel = Text.CalcHeight(Label, _labelRect.width) > _labelRect.height;
+
+        // done
         _rectsSet = true;
     }
 
