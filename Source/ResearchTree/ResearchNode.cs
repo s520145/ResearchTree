@@ -59,19 +59,14 @@ public class ResearchNode : Node
             {
                 return GenUI.MouseoverColor;
             }
-
-            Color color;
-
-            if (Completed || Available)
+            
+            if (Completed)
             {
-                return Assets.ColorCompleted.TryGetValue(Research.techLevel, out color)
-                    ? color
-                    : Assets.ColorCompleted[0];
+                return Assets.ColorCompleted.TryGetValue(Research.techLevel);
             }
 
-            return Assets.ColorUnavailable.TryGetValue(Research.techLevel, out color)
-                ? color
-                : Assets.ColorUnavailable[0];
+            return Available ? 
+                Assets.ColorCompleted.TryGetValue(Research.techLevel) : Assets.ColorUnavailable.TryGetValue(Research.techLevel);
         }
     }
 
@@ -86,23 +81,11 @@ public class ResearchNode : Node
 
             if (Completed)
             {
-                return Assets.ColorCompleted.TryGetValue(Research.techLevel, out var color)
-                    ? color
-                    : Assets.ColorCompleted[0];
+                return Assets.ColorCompleted.TryGetValue(Research.techLevel);
             }
 
-            if (Available)
-            {
-                return Assets.ColorAvailable.TryGetValue(Research.techLevel, out var color)
-                    ? color
-                    : Assets.ColorAvailable[0];
-            }
-            else
-            {
-                return Assets.ColorUnavailable.TryGetValue(Research.techLevel, out var color)
-                    ? color
-                    : Assets.ColorUnavailable[0];
-            }
+            return Available ? 
+                Assets.ColorAvailable.TryGetValue(Research.techLevel) : Assets.ColorUnavailable.TryGetValue(Research.techLevel);
         }
     }
 
@@ -394,13 +377,7 @@ public class ResearchNode : Node
         {
             Highlighted = true;
         }
-
-        var overrideColor = Color.magenta;
-        if (!Completed && !Exists())
-        {
-            overrideColor = new Color(0.2f, 0.2f, 0.2f);
-        }
-
+        
         var detailedMode = forceDetailedMode ||
                            MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff;
         var mouseOver = Mouse.IsOver(Rect) || Rect.Contains(Event.current.mousePosition);
@@ -408,11 +385,7 @@ public class ResearchNode : Node
         {
             // researches that are completed or could be started immediately, and that have the required building(s) available
             //GUI.color = Mouse.IsOver(Rect) ? GenUI.MouseoverColor : Color;
-            var color = Mouse.IsOver(Rect) ? GenUI.MouseoverColor : Color;
-            if (overrideColor != Color.magenta)
-            {
-                color = overrideColor;
-            }
+            var color = mouseOver ? GenUI.MouseoverColor : Color;
 
             if (mouseOver || Highlighted)
             {
@@ -474,65 +447,9 @@ public class ResearchNode : Node
                 var researchIcon = !Completed && !Available ? Assets.Lock : Assets.ResearchIcon;
                 GUI.DrawTexture(CostIconRect, researchIcon, ScaleMode.ScaleToFit);
             }
-
+            
             Text.WordWrap = true;
-            var tooltipstring = GetResearchTooltipString();
-            if (!BuildingPresent())
-            {
-                var missingFacilities = MissingFacilities();
-
-                if (missingFacilities?.Any() == true)
-                {
-                    tooltipstring.AppendLine();
-                    tooltipstring.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
-                        MissingFacilities().Select(td => td.LabelCap).ToArray())));
-                }
-            }
-
-            if (!Research.TechprintRequirementMet)
-            {
-                tooltipstring.AppendLine();
-                tooltipstring.AppendLine("Fluffy.ResearchTree.MissingTechprints".Translate(Research.TechprintsApplied,
-                    Research.techprintCount));
-            }
-
-            if (!Research.AnalyzedThingsRequirementsMet)
-            {
-                tooltipstring.AppendLine();
-                tooltipstring.AppendLine("Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
-                    Research.requiredAnalyzed.Select(def => def.LabelCap))));
-            }
-
-            if (!Research.PlayerMechanitorRequirementMet)
-            {
-                tooltipstring.AppendLine();
-                tooltipstring.AppendLine("Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
-            }
-
-            if (Assets.UsingVanillaVehiclesExpanded)
-            {
-                var valueArray = new object[] { Research, null };
-                var boolResult = (bool)Assets.IsDisabledMethod.Invoke(null, valueArray);
-
-                if (boolResult)
-                {
-                    tooltipstring.AppendLine();
-                    var wreck = (ThingDef)valueArray[1];
-                    if (wreck != null)
-                    {
-                        tooltipstring.AppendLine();
-                        tooltipstring.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
-                    }
-                }
-            }
-
-            if (Assets.UsingRimedieval && !Assets.AllowedResearchDefs.Contains(Research))
-            {
-                tooltipstring.AppendLine();
-                tooltipstring.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
-            }
-
-            TooltipHandler_Modified.TipRegion(Rect, tooltipstring.ToString());
+            BuildTips();
 
             // draw unlock icons
             if (detailedMode)
@@ -555,7 +472,10 @@ public class ResearchNode : Node
                     }
 
                     Widgets.DefIcon(rect, unlockDefsAndDescs[i].First);
-                    TooltipHandler_Modified.TipRegion(rect, unlockDefsAndDescs[i].Second);
+                    if (Queue._draggedNode == null)
+                    {
+                        TooltipHandler_Modified.TipRegion(rect, unlockDefsAndDescs[i].Second);
+                    }
                 }
             }
 
@@ -601,8 +521,7 @@ public class ResearchNode : Node
             return;
         }
 
-        if (Event.current.button == Constants.LeftClick && Event.current.control && !Research.IsFinished &&
-            Research.CanStartNow)
+        if (Event.current.button == Constants.LeftClick && Event.current.control && !Research.IsFinished)
         {
             Queue.EnqueueRangeFirst(GetMissingRequired());
         }
@@ -615,7 +534,7 @@ public class ResearchNode : Node
             }
             else
             {
-                Queue.Dequeue(this);
+                Queue.TryDequeue(this);
             }
         }
 
@@ -668,6 +587,71 @@ public class ResearchNode : Node
         return MissingFacilities(Research);
     }
 
+    private void BuildTips()
+    {
+        if (Queue._draggedNode != null)
+        {
+            return;
+        }
+        var tooltipstring = GetResearchTooltipString();
+        if (!BuildingPresent())
+        {
+            var missingFacilities = MissingFacilities();
+
+            if (missingFacilities?.Any() == true)
+            {
+                tooltipstring.AppendLine();
+                tooltipstring.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
+                    MissingFacilities().Select(td => td.LabelCap).ToArray())));
+            }
+        }
+
+        if (!Research.TechprintRequirementMet)
+        {
+            tooltipstring.AppendLine();
+            tooltipstring.AppendLine("Fluffy.ResearchTree.MissingTechprints".Translate(Research.TechprintsApplied,
+                Research.techprintCount));
+        }
+
+        if (!Research.AnalyzedThingsRequirementsMet)
+        {
+            tooltipstring.AppendLine();
+            tooltipstring.AppendLine("Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
+                Research.requiredAnalyzed.Select(def => def.LabelCap))));
+        }
+
+        if (!Research.PlayerMechanitorRequirementMet)
+        {
+            tooltipstring.AppendLine();
+            tooltipstring.AppendLine("Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
+        }
+
+        if (Assets.UsingVanillaVehiclesExpanded)
+        {
+            var valueArray = new object[] { Research, null };
+            var boolResult = (bool)Assets.IsDisabledMethod.Invoke(null, valueArray);
+
+            if (boolResult)
+            {
+                tooltipstring.AppendLine();
+                var wreck = (ThingDef)valueArray[1];
+                if (wreck != null)
+                {
+                    tooltipstring.AppendLine();
+                    tooltipstring.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
+                }
+            }
+        }
+
+        if (Assets.UsingRimedieval && !Assets.AllowedResearchDefs.Contains(Research))
+        {
+            tooltipstring.AppendLine();
+            tooltipstring.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
+        }
+
+        TooltipHandler_Modified.TipRegion(Rect, tooltipstring.ToString());
+    }
+    
     private StringBuilder GetResearchTooltipString()
     {
         var stringBuilder = new StringBuilder();
@@ -730,7 +714,7 @@ public class ResearchNode : Node
             }
             else
             {
-                Queue.Dequeue(this);
+                Queue.TryDequeue(this);
             }
         }
         else if (Input.GetKey(KeyCode.LeftControl) && !Completed)

@@ -56,7 +56,7 @@ public static class Tree
             {
                 _relevantTechLevels = (from TechLevel tl in Enum.GetValues(typeof(TechLevel))
                     where DefDatabase<ResearchProjectDef>.AllDefsListForReading.Any(rp => rp.techLevel == tl)
-                    select tl).ToList();
+                    select tl).OrderBy(tl => tl).ToList();
             }
 
             return _relevantTechLevels;

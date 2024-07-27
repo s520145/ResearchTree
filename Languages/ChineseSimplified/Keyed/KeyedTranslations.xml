@@ -50,6 +50,6 @@
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Rimedieval 设置不允许使用这种技术。</Fluffy.ResearchTree.RimedievalDoesNotAllow>
   <ResearchPal.BuildingResearchTreeAsync>建立研究树</ResearchPal.BuildingResearchTreeAsync>
   <Fluffy.ResearchTree.OverrideResearch>将研究树设置为默认研究选项卡\n（按住 Shift 即可打开原版）</Fluffy.ResearchTree.OverrideResearch>
-  <Fluffy.ResearchTree.HoldForClassic>按住 SHIFT 键打开香草研究窗口</Fluffy.ResearchTree.HoldForClassic>
+  <Fluffy.ResearchTree.HoldForClassic>按住 SHIFT 键打开原版研究窗口</Fluffy.ResearchTree.HoldForClassic>
   <Fluffy.ResearchTree.HoldForNew>按住 SHIFT 键打开新的研究窗口</Fluffy.ResearchTree.HoldForNew>
 </LanguageData>
