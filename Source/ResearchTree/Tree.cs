@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -39,12 +37,13 @@ public static class Tree
     {
         get
         {
-            if (_techLevelBounds == null)
+            if (_techLevelBounds != null)
             {
-                throw new Exception("TechLevelBounds called before they are set.");
+                return _techLevelBounds;
             }
 
-            return _techLevelBounds;
+            Logging.Error("TechLevelBounds called before they are set.");
+            return null;
         }
     }
 
@@ -80,12 +79,13 @@ public static class Tree
     {
         get
         {
-            if (_edges == null)
+            if (_edges != null)
             {
-                throw new Exception("Trying to access edges before they are initialized.");
+                return _edges;
             }
 
-            return _edges;
+            Logging.Error("Trying to access edges before they are initialized.");
+            return null;
         }
     }
 
@@ -134,29 +134,29 @@ public static class Tree
         {
             try
             {
-                Log.Message("[ResearchTree]: CheckPrerequisites");
+                Logging.Message("CheckPrerequisites");
                 CheckPrerequisites();
-                Log.Message("[ResearchTree]: CreateEdges");
+                Logging.Message("CreateEdges");
                 CreateEdges();
-                Log.Message("[ResearchTree]: HorizontalPositions");
+                Logging.Message("HorizontalPositions");
                 HorizontalPositions();
-                Log.Message("[ResearchTree]: NormalizeEdges");
+                Logging.Message("NormalizeEdges");
                 NormalizeEdges();
-                Log.Message("[ResearchTree]: Collapse");
+                Logging.Message("Collapse");
                 Collapse();
-                Log.Message("[ResearchTree]: MinimizeCrossings");
+                Logging.Message("MinimizeCrossings");
                 MinimizeCrossings();
-                Log.Message("[ResearchTree]: MinimizeEdgeLength");
+                Logging.Message("MinimizeEdgeLength");
                 MinimizeEdgeLength();
-                Log.Message("[ResearchTree]: RemoveEmptyRows");
+                Logging.Message("RemoveEmptyRows");
                 RemoveEmptyRows();
                 Initialized = true;
-                Log.Message("[ResearchTree]: Done");
+                Logging.Message("Done");
                 return;
             }
             catch (Exception)
             {
-                Log.Message("[ResearchTree]: Error initializing research tree, will retry.", true);
+                Logging.Warning("Error initializing research tree, will retry.", true);
             }
 
             return;
@@ -348,7 +348,7 @@ public static class Tree
                 var node = @in ? item2.In : item2.Out;
                 if (node.X != num)
                 {
-                    Log.Warning("{0} is not at layer {1}", node, num);
+                    Logging.Warning($"{node} is not at layer {num}");
                 }
 
                 var num4 = Mathf.Min(item.Y, node.Y);
@@ -536,7 +536,7 @@ public static class Tree
                 continue;
             }
 
-            Verse.Log.Message("Tried fixing research prerequisite issues for 10 iterations, aborting.");
+            Logging.Warning("Tried fixing research prerequisite issues for 10 iterations, aborting.");
             keepIterating = false;
         }
     }
@@ -561,8 +561,8 @@ public static class Tree
                 continue;
             }
 
-            Log.Warning("\tredundant prerequisites for {0}: {1}. Removing.", researchNode.Research.LabelCap,
-                string.Join(", ", enumerable.Select(r => r.LabelCap).ToArray()));
+            Logging.Warning(
+                $"\tredundant prerequisites for {researchNode.Research.LabelCap}: {string.Join(", \n", enumerable.Select(r => r.LabelCap)).ToArray()}. Removing.");
             foreach (var item in enumerable)
             {
                 researchNode.Research.prerequisites.Remove(item);
@@ -581,8 +581,8 @@ public static class Tree
                 continue;
             }
 
-            Log.Warning("\t{0} has a lower techlevel than (one of) it's prerequisites, increasing.",
-                node.Research.defName);
+            Logging.Warning(
+                $"\t{node.Research.defName} has a lower techlevel than (one of) it's prerequisites, increasing.");
             node.Research.techLevel = node.Research.prerequisites.Max(r => r.techLevel);
             returnValue = false;
             foreach (var researchNode in node.Children)
@@ -592,7 +592,7 @@ public static class Tree
                     continue;
                 }
 
-                Log.Warning(
+                Logging.Warning(
                     $"Re-evaluating {researchNode.Research.defName} since one of its parents has changed tech-level.");
                 queue.Enqueue(researchNode);
             }
@@ -604,7 +604,7 @@ public static class Tree
                     continue;
                 }
 
-                Log.Warning(
+                Logging.Warning(
                     $"Re-evaluating {researchNode.Research.defName} since one of its children has changed tech-level.");
                 queue.Enqueue(researchNode);
             }
@@ -656,18 +656,6 @@ public static class Tree
             if (node is ResearchNode researchNode)
             {
                 researchNode.ClearInstanceCaches();
-            }
-        }
-    }
-
-    [Conditional("DEBUG")]
-    internal static void DebugDraw()
-    {
-        foreach (var node in Nodes)
-        {
-            foreach (var outNode in node.OutNodes)
-            {
-                Widgets.DrawLine(node.Right, outNode.Left, Color.white, 1f);
             }
         }
     }
@@ -833,7 +821,7 @@ public static class Tree
     {
         if (A.X != B.X)
         {
-            Verse.Log.Warning($"Can't swap {A} and {B}, nodes on different layers");
+            Logging.Warning($"Can't swap {A} and {B}, nodes on different layers");
             return false;
         }
 
@@ -941,21 +929,6 @@ public static class Tree
         return Crossings(layer, true) + Crossings(layer, false);
     }
 
-    private static float EdgeLength(int layer)
-    {
-        if (layer == 0)
-        {
-            return EdgeLength(layer, false);
-        }
-
-        if (layer == Size.x)
-        {
-            return EdgeLength(layer, true);
-        }
-
-        return EdgeLength(layer, true) * EdgeLength(layer, false);
-    }
-
     private static int Crossings(int layer, bool @in)
     {
         var list = (from e in Layer(layer).SelectMany(n => !@in ? n.OutEdges : n.InEdges)
@@ -1012,35 +985,6 @@ public static class Tree
     public static List<Node> Row(int Y)
     {
         return Nodes.Where(n => n.Y == Y).ToList();
-    }
-
-    public new static string ToString()
-    {
-        var stringBuilder = new StringBuilder();
-        for (var i = 1; i <= Nodes.Max(n => n.X); i++)
-        {
-            stringBuilder.AppendLine($"Layer {i}:");
-            foreach (var item in Layer(i, true))
-            {
-                stringBuilder.AppendLine($"\t{item}");
-                stringBuilder.AppendLine(
-                    $"\t\tAbove: {string.Join(", ", item.InNodes.Select(a => a.ToString()).ToArray())}");
-                stringBuilder.AppendLine(
-                    $"\t\tBelow: {string.Join(", ", item.OutNodes.Select(b => b.ToString()).ToArray())}");
-            }
-        }
-
-        return stringBuilder.ToString();
-    }
-
-    public static void DebugStatus()
-    {
-        Log.Message($"duplicated positions:\n {string.Join("\n", (from n in Nodes
-            where Nodes.Any(n2 => n != n2 && n.X == n2.X && n.Y == n2.Y)
-            select $"{n.X}, {n.Y}: {n.Label}").ToArray())}");
-        Log.Message($"out-of-bounds nodes:\n{string.Join("\n", (from n in Nodes
-            where n.X < 1 || n.Y < 1
-            select n.ToString()).ToArray())}");
     }
 
     public static void WaitForInitialization()

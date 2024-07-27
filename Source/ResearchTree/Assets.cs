@@ -101,8 +101,8 @@ public static class Assets
             var defCleanerType = AccessTools.TypeByName("Rimedieval.DefCleaner");
             if (defCleanerType == null)
             {
-                Log.Warning(
-                    "[ResearchTree]: Failed to find the DefCleaner-type in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
+                Logging.Warning(
+                    "Failed to find the DefCleaner-type in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
                 UsingRimedieval = false;
             }
             else
@@ -111,8 +111,8 @@ public static class Assets
                     [typeof(List<ResearchProjectDef>)]);
                 if (GetAllowedProjectDefsMethod == null)
                 {
-                    Log.Warning(
-                        "[ResearchTree]: Failed to find method GetAllowedProjectDefs in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
+                    Logging.Warning(
+                        "Failed to find method GetAllowedProjectDefs in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
                     UsingRimedieval = false;
                 }
                 else
@@ -133,8 +133,8 @@ public static class Assets
             var utilsType = AccessTools.TypeByName("VanillaVehiclesExpanded.Utils");
             if (utilsType == null)
             {
-                Log.Warning(
-                    "[ResearchTree]: Failed to find the Utils-type in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
+                Logging.Warning(
+                    "Failed to find the Utils-type in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
                 UsingVanillaVehiclesExpanded = false;
             }
             else
@@ -142,8 +142,8 @@ public static class Assets
                 var utilsMethods = AccessTools.GetDeclaredMethods(utilsType);
                 if (utilsMethods == null || !utilsMethods.Any())
                 {
-                    Log.Warning(
-                        "[ResearchTree]: Failed to find any methods in Utils in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
+                    Logging.Warning(
+                        "Failed to find any methods in Utils in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
                     UsingVanillaVehiclesExpanded = false;
                 }
                 else
@@ -152,8 +152,8 @@ public static class Assets
                         utilsMethods.FirstOrDefault(methodInfo => methodInfo.GetParameters().Length == 2);
                     if (IsDisabledMethod == null)
                     {
-                        Log.Warning(
-                            "[ResearchTree]: Failed to find any methods in Utils in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
+                        Logging.Warning(
+                            "Failed to find any methods in Utils in VanillaVehiclesExpanded. Will not be able to show or block research based on non-restored vehicles.");
                         UsingVanillaVehiclesExpanded = false;
                     }
                 }
@@ -168,8 +168,8 @@ public static class Assets
             var shipInteriorType = AccessTools.TypeByName("SaveOurShip2.ShipInteriorMod2");
             if (shipInteriorType == null)
             {
-                Log.Warning(
-                    "[ResearchTree]: Failed to find the ShipInteriorType-type in SOS2. Will not be able to show or block research based on ArchotechSpore.");
+                Logging.Warning(
+                    "Failed to find the ShipInteriorType-type in SOS2. Will not be able to show or block research based on ArchotechSpore.");
                 UsingSOS2 = false;
             }
             else
@@ -177,8 +177,8 @@ public static class Assets
                 Sos2WorldCompPropertyInfo = AccessTools.Property(shipInteriorType, "WorldComp");
                 if (Sos2WorldCompPropertyInfo == null)
                 {
-                    Log.Warning(
-                        "[ResearchTree]: Failed to find method ShipWorldComp in ShipInteriorMod2 in SOS2. Will not be able to show or block research based on ArchotechSpore.");
+                    Logging.Warning(
+                        "Failed to find method ShipWorldComp in ShipInteriorMod2 in SOS2. Will not be able to show or block research based on ArchotechSpore.");
                     UsingSOS2 = false;
                 }
                 else
@@ -186,8 +186,8 @@ public static class Assets
                     var shipWorldCompType = AccessTools.TypeByName("SaveOurShip2.ShipWorldComp");
                     if (shipWorldCompType == null)
                     {
-                        Log.Warning(
-                            "[ResearchTree]: Failed to find type shipWorldCompType in ShipInteriorMod2 in SOS2. Will not be able to show or block research based on ArchotechSpore.");
+                        Logging.Warning(
+                            "Failed to find type shipWorldCompType in ShipInteriorMod2 in SOS2. Will not be able to show or block research based on ArchotechSpore.");
                         UsingSOS2 = false;
                     }
                     else
@@ -195,8 +195,8 @@ public static class Assets
                         Sos2UlocksFieldInfo = AccessTools.Field(shipWorldCompType, "Unlocks");
                         if (Sos2UlocksFieldInfo == null)
                         {
-                            Log.Warning(
-                                "[ResearchTree]: Failed to find field Sos2UlocksFieldInfo in ShipInteriorMod2 in SOS2. Will not be able to show or block research based on ArchotechSpore.");
+                            Logging.Warning(
+                                "Failed to find field Sos2UlocksFieldInfo in ShipInteriorMod2 in SOS2. Will not be able to show or block research based on ArchotechSpore.");
                             UsingSOS2 = false;
                         }
                     }
@@ -254,9 +254,10 @@ public static class Assets
     public static void StartLoadingWorker()
     {
         initializeWorker = new Thread(Tree.Initialize);
-        Log.Message("[ResearchTree]: Initialization start in background");
+        Logging.Message("Initialization start in background");
         initializeWorker.Start();
     }
+
 
     [StaticConstructorOnStartup]
     public static class Lines

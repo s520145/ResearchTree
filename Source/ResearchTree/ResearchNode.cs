@@ -59,14 +59,15 @@ public class ResearchNode : Node
             {
                 return GenUI.MouseoverColor;
             }
-            
+
             if (Completed)
             {
                 return Assets.ColorCompleted.TryGetValue(Research.techLevel);
             }
 
-            return Available ? 
-                Assets.ColorCompleted.TryGetValue(Research.techLevel) : Assets.ColorUnavailable.TryGetValue(Research.techLevel);
+            return Available
+                ? Assets.ColorCompleted.TryGetValue(Research.techLevel)
+                : Assets.ColorUnavailable.TryGetValue(Research.techLevel);
         }
     }
 
@@ -84,8 +85,9 @@ public class ResearchNode : Node
                 return Assets.ColorCompleted.TryGetValue(Research.techLevel);
             }
 
-            return Available ? 
-                Assets.ColorAvailable.TryGetValue(Research.techLevel) : Assets.ColorUnavailable.TryGetValue(Research.techLevel);
+            return Available
+                ? Assets.ColorAvailable.TryGetValue(Research.techLevel)
+                : Assets.ColorUnavailable.TryGetValue(Research.techLevel);
         }
     }
 
@@ -377,7 +379,7 @@ public class ResearchNode : Node
         {
             Highlighted = true;
         }
-        
+
         var detailedMode = forceDetailedMode ||
                            MainTabWindow_ResearchTree.Instance.ZoomLevel < Constants.DetailedModeZoomLevelCutoff;
         var mouseOver = Mouse.IsOver(Rect) || Rect.Contains(Event.current.mousePosition);
@@ -447,7 +449,7 @@ public class ResearchNode : Node
                 var researchIcon = !Completed && !Available ? Assets.Lock : Assets.ResearchIcon;
                 GUI.DrawTexture(CostIconRect, researchIcon, ScaleMode.ScaleToFit);
             }
-            
+
             Text.WordWrap = true;
             BuildTips();
 
@@ -593,6 +595,7 @@ public class ResearchNode : Node
         {
             return;
         }
+
         var tooltipstring = GetResearchTooltipString();
         if (!BuildingPresent())
         {
@@ -651,7 +654,7 @@ public class ResearchNode : Node
 
         TooltipHandler_Modified.TipRegion(Rect, tooltipstring.ToString());
     }
-    
+
     private StringBuilder GetResearchTooltipString()
     {
         var stringBuilder = new StringBuilder();

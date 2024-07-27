@@ -267,7 +267,7 @@ public class Node
         }
 
         stringBuilder.AppendLine("");
-        Log.Message(stringBuilder.ToString());
+        Logging.Message(stringBuilder.ToString());
     }
 
     public override string ToString()

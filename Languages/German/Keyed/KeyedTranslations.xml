@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
   <Fluffy.ResearchTree.AllowsBuildingX>Ermöglicht die Konstruktion {0}</Fluffy.ResearchTree.AllowsBuildingX>
   <Fluffy.ResearchTree.AllowsCraftingX>Aktiviert das Rezept {0}</Fluffy.ResearchTree.AllowsCraftingX>
@@ -53,4 +53,7 @@ Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Prob
   <Fluffy.ResearchTree.OverrideResearch>Den Forschungsbaum als Standard-Forschungsregisterkarte einrichten \n (Umschalttaste zum Öffnen von Vanille gedrückt halten)</Fluffy.ResearchTree.OverrideResearch>
   <Fluffy.ResearchTree.HoldForClassic>Halten Sie die SHIFT-Taste gedrückt, um das Vanille-Forschungsfenster zu öffnen.</Fluffy.ResearchTree.HoldForClassic>
   <Fluffy.ResearchTree.HoldForNew>Halten Sie SHIFT gedrückt, um das neue Recherchefenster zu öffnen</Fluffy.ResearchTree.HoldForNew>
+  <Fluffy.ResearchTree.VerboseLogging>Ausführliche Protokollierung</Fluffy.ResearchTree.VerboseLogging>
+  <Fluffy.ResearchTree.NoIdeologyPopup>Fehlende Meme-Warnung nicht anzeigen</Fluffy.ResearchTree.NoIdeologyPopup>
+  <Fluffy.ResearchTree.NoIdeologyPopupTT>Wenn Sie eine Forschung auswählen, wird die Popup-Warnung, dass sie Gegenstände freischaltet, die Ihre aktuelle Ideologie nicht zulässt, nicht angezeigt</Fluffy.ResearchTree.NoIdeologyPopupTT>
 </LanguageData>

@@ -26,11 +26,11 @@ public class Queue : WorldComponent
     private static readonly MainTabWindow_Research MainTabWindowResearchInstance =
         (MainTabWindow_Research)MainButtonDefOf.Research.TabWindow;
 
+    public static ResearchNode _draggedNode;
+
     private readonly List<ResearchNode> _queue = [];
 
     private List<ResearchProjectDef> _saveableQueue;
-
-    public static ResearchNode _draggedNode;
 
     public Queue(World world) : base(world)
     {
@@ -71,6 +71,7 @@ public class Queue : WorldComponent
             _instance._queue.RemoveAt(indexOf);
             removeFirst = indexOf == 0;
         }
+
         node.QueueRect = Rect.zero;
         foreach (var item in _instance._queue.Where(n => n.GetMissingRequiredRecursive().Contains(node)).ToList())
         {
@@ -79,6 +80,7 @@ public class Queue : WorldComponent
             {
                 continue;
             }
+
             item.QueueRect = Rect.zero;
             _instance._queue.RemoveAt(indexOf);
             if (!removeFirst && indexOf == 0)
@@ -94,7 +96,7 @@ public class Queue : WorldComponent
 
         // try to remove duplicate confirmation window
         Find.WindowStack.TryRemoveAssignableFromType(typeof(Dialog_MessageBox), false);
-        
+
         if (removeFirst)
         {
             AttemptBeginResearch();
@@ -162,6 +164,7 @@ public class Queue : WorldComponent
         {
             AttemptBeginResearch();
         }
+
         UpdateNodeQueueRect();
     }
 
@@ -235,6 +238,7 @@ public class Queue : WorldComponent
         {
             AttemptBeginResearch();
         }
+
         UpdateNodeQueueRect();
     }
 
@@ -298,14 +302,14 @@ public class Queue : WorldComponent
             Enqueue(researchNode, true);
         }
     }
-    
+
     public static void DrawLabels(Rect visibleRect)
     {
         var num = 1;
         foreach (var item in _instance._queue)
         {
-            var rect = new Rect(item.Rect.xMax - Constants.QueueLabelSize / 2f,
-                item.Rect.yMin + (item.Rect.height - Constants.QueueLabelSize) / 2f,
+            var rect = new Rect(item.Rect.xMax - (Constants.QueueLabelSize / 2f),
+                item.Rect.yMin + ((item.Rect.height - Constants.QueueLabelSize) / 2f),
                 Constants.QueueLabelSize,
                 Constants.QueueLabelSize);
             if (item.IsVisible(visibleRect))
@@ -388,7 +392,7 @@ public class Queue : WorldComponent
 
         Text.Anchor = TextAnchor.UpperLeft;
     }
-    
+
     public static void DrawQueue(Rect canvas, bool interactible)
     {
         if (!_instance._queue.Any())
@@ -541,7 +545,7 @@ public class Queue : WorldComponent
         {
             _instance._queue.Insert(index, researchNode);
         }
-        
+
         if (index < originIndex)
         {
             _instance._queue.RemoveAt(originIndex + 1);
@@ -550,12 +554,13 @@ public class Queue : WorldComponent
         {
             _instance._queue.RemoveAt(originIndex);
         }
-        
+
         SortRequiredRecursive(researchNode);
         var researchProjectDefList = researchNode.Research.Descendants();
         if (!researchProjectDefList.NullOrEmpty())
         {
-            foreach (var research in researchProjectDefList.Where(def => !def.IsFinished && IsQueued(def.ResearchNode())).ToList())
+            foreach (var research in researchProjectDefList
+                         .Where(def => !def.IsFinished && IsQueued(def.ResearchNode())).ToList())
             {
                 SortRequiredRecursive(research.ResearchNode());
             }
@@ -601,15 +606,17 @@ public class Queue : WorldComponent
             vector2.x += Constants.NodeSize.x + Constants.Margin;
         }
     }
-    
+
     private static void HandleMouseDown()
     {
-        if (Event.current.type != EventType.MouseDown || Event.current.button != 0 
-                                                      || Event.current.control|| Event.current.shift)
+        if (Event.current.type != EventType.MouseDown || Event.current.button != 0
+                                                      || Event.current.control || Event.current.shift)
         {
             return;
         }
-        _draggedNode = Enumerable.FirstOrDefault(_instance._queue, node => node.QueueRect.Contains(Event.current.mousePosition));
+
+        _draggedNode = Enumerable.FirstOrDefault(_instance._queue,
+            node => node.QueueRect.Contains(Event.current.mousePosition));
     }
 
     private static void HandleDragging()
@@ -641,6 +648,7 @@ public class Queue : WorldComponent
         {
             return;
         }
+
         _draggedNode = null;
     }
 }

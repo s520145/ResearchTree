@@ -146,7 +146,7 @@ public static class ResearchProjectDef_Extensions
             // It would be better to use warning instead of error. This is just a reminder.
             // eg: RimFridge_PowerFactorSetting def is hidden, but it is also finished.
             // So the patch of "ResearchManager.FinishProject" method will be executed to jump here.
-            Log.Warning("Node for {0} not found. Was it intentionally hidden or locked?", true, research.LabelCap);
+            Logging.Warning($"Node for {research.LabelCap} not found. Was it intentionally hidden or locked?", true);
         }
 
         return researchNode;

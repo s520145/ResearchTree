@@ -16,6 +16,9 @@
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
   <Fluffy.ResearchTree.RClickInstaFinish>(DEBUG) Right-Click to finish instantly</Fluffy.ResearchTree.RClickInstaFinish>
   <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift-Rightclick to finish instantly</Fluffy.ResearchTree.RClickInstaFinishNew>
+  <Fluffy.ResearchTree.VerboseLogging>Verbose logging</Fluffy.ResearchTree.VerboseLogging>
+  <Fluffy.ResearchTree.NoIdeologyPopup>Do not show missing meme-warning</Fluffy.ResearchTree.NoIdeologyPopup>
+  <Fluffy.ResearchTree.NoIdeologyPopupTT>When selecting a research, the popup warning that it will unlock items that your current Ideology does not allow will not be shown</Fluffy.ResearchTree.NoIdeologyPopupTT>
   <Fluffy.ResearchTree.Requires>Requires</Fluffy.ResearchTree.Requires>
   <Fluffy.ResearchTree.NotStarted>Not started, costs {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>In progress, {0} of {1} done</Fluffy.ResearchTree.InProgress>

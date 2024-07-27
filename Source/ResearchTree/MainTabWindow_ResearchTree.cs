@@ -268,6 +268,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         {
             return;
         }
+
         if (Event.current.type == EventType.MouseDown)
         {
             _dragging = true;

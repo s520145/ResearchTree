@@ -60,7 +60,7 @@ public class MainTabWindow_Research_ListProjects
 
         if (codeInstruction1 == null || codes.Count < 30)
         {
-            Log.Error("ResearchTree: Can not find code instruction position. Maybe RimWorld tweaked the source code.",
+            Logging.Error("Can not find code instruction position. Maybe RimWorld tweaked the source code.",
                 true);
             return codes.AsEnumerable();
         }

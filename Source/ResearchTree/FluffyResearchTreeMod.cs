@@ -83,8 +83,17 @@ internal class FluffyResearchTreeMod : Mod
             ref Settings.OverrideResearch);
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.PauseOnOpen".Translate(), ref Settings.PauseOnOpen);
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.ShowCompletion".Translate(), ref Settings.ShowCompletion);
-        //listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VanillaGraphics".Translate(),
-        //    ref Settings.VanillaGraphics);
+        if (ModsConfig.IdeologyActive)
+        {
+            listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.NoIdeologyPopup".Translate(),
+                ref Settings.NoIdeologyPopup, "Fluffy.ResearchTree.NoIdeologyPopupTT".Translate());
+        }
+        else
+        {
+            Settings.NoIdeologyPopup = false;
+        }
+
+        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VerboseLogging".Translate(), ref Settings.VerboseLogging);
 
         if (currentVersion != null)
         {
