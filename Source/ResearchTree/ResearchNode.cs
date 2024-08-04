@@ -147,6 +147,12 @@ public class ResearchNode : Node
 
         hasRefreshedAvailability = true;
 
+        if (Assets.SemiRandomResearchLoaded)
+        {
+            availableCache = false;
+            return availableCache;
+        }
+
         if (Assets.UsingRimedieval && !Assets.AllowedResearchDefs.Contains(Research))
         {
             availableCache = false;
@@ -644,6 +650,12 @@ public class ResearchNode : Node
                     tooltipstring.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
                 }
             }
+        }
+
+        if (Assets.SemiRandomResearchLoaded)
+        {
+            tooltipstring.AppendLine();
+            tooltipstring.AppendLine("Fluffy.ResearchTree.SemiRandomResearchLoaded".Translate());
         }
 
         if (Assets.UsingRimedieval && !Assets.AllowedResearchDefs.Contains(Research))

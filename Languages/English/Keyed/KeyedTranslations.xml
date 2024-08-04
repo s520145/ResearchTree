@@ -25,6 +25,7 @@
   <Fluffy.ResearchTree.LeadsTo>Leads to</Fluffy.ResearchTree.LeadsTo>
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller does not allow this tech</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Rimedieval settings does not allow this tech</Fluffy.ResearchTree.RimedievalDoesNotAllow>
+  <Fluffy.ResearchTree.SemiRandomResearchLoaded>Semi Random Research does not allow choosing research freely</Fluffy.ResearchTree.SemiRandomResearchLoaded>
   <Fluffy.ResearchTree.None>none</Fluffy.ResearchTree.None>
   <Fluffy.ResearchTree.ShowCompletion>Show completion message for finished research</Fluffy.ResearchTree.ShowCompletion>
   <Fluffy.ResearchTree.StillLoading>Tree is loading for the first time, this can take a while</Fluffy.ResearchTree.StillLoading>

@@ -4,26 +4,38 @@
 
 Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=1266570759
 
-- Added research-infocard, visible by Rightclick
-- Research can now be added/moved to the front of the queue with Ctrl+Leftclick
-- Added the current progress values on not finished projects
-- Locked camera when opening the research-window
-- Original research-window can be opened by holding shift
-- Added mod-option for when the tree should be generated, the default is now during game start
-- Added mod-option to pause the game when the tree is open
-- Added some caching of the research-nodes to avoid stuttering with large research-trees
-- Added scroll-wheel scrolling when holding Ctrl
-- Adapted some of the graphical tricks in [ResearchPowl](https://steamcommunity.com/sharedfiles/filedetails/?id=2877856030)
-- Added a scroll-bar for the research-queue to be able to see all queued projects
-- Fixed compatibility with Biotech
-- Fixed check for hiddenRequirements
-- Fixed compatibility with [Research Reinvented](https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160)
-- Fixed compatibility with [Research Whatever](https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060)
-- Added support for the custom research requirements in [Vanilla Vehicles Expanded](https://steamcommunity.com/workshop/filedetails/?id=3014906877)
-- Added compatibility with the tech-hiding from [Save Our Ship 2](https://steamcommunity.com/sharedfiles/filedetails/?id=1909914131)
-- Added compatibility with the tech-limiting in [Rimedieval](https://steamcommunity.com/sharedfiles/filedetails/?id=2516523040). Needs a reload if the settings in Rimedieval are changed.
-- Added compatibility with [Better Research Tabs](https://steamcommunity.com/sharedfiles/filedetails/?id=3236847079)
-- Added compatibility with [Organized Research Tab](https://steamcommunity.com/sharedfiles/filedetails/?id=2606510510)
+**Added features**
+
+
+-  Added research-infocard, visible by Rightclick
+-  Research can now be added/moved to the front of the queue with Ctrl+Leftclick
+-  Added the current progress values on not finished projects
+-  Locked camera when opening the research-window
+-  Original research-window can be opened by holding shift
+-  Added mod-option for when the tree should be generated, the default is now during game start
+-  Added mod-option to pause the game when the tree is open
+-  Added some caching of the research-nodes to avoid stuttering with large research-trees
+-  Added scroll-wheel scrolling when holding Ctrl
+-  Adapted some of the graphical tricks in [ResearchPowl](https://steamcommunity.com/sharedfiles/filedetails/?id=2877856030)
+-  Added a scroll-bar for the research-queue to be able to see all queued projects
+-  Added dragging to reorder the search-queue, thanks to JiaRG
+-  Added option to hide the "Missing Meme"-warning when selecting research
+-  Fixed check for hiddenRequirements
+
+
+
+**Compatibilities**
+
+
+-  Fixed compatibility with Biotech
+-  Updated compatibility with [Research Reinvented](https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160)
+-  Updated compatibility with [Research Whatever](https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060)
+-  Added support for the custom research requirements in [Vanilla Vehicles Expanded](https://steamcommunity.com/workshop/filedetails/?id=3014906877)
+-  Added compatibility with the tech-hiding from [Save Our Ship 2](https://steamcommunity.com/sharedfiles/filedetails/?id=1909914131)
+-  Added compatibility with the tech-limiting in [Rimedieval](https://steamcommunity.com/sharedfiles/filedetails/?id=2516523040). Needs a reload if the settings in Rimedieval are changed.
+-  Added compatibility with [Better Research Tabs](https://steamcommunity.com/sharedfiles/filedetails/?id=3236847079)
+-  Added compatibility with [Organized Research Tab](https://steamcommunity.com/sharedfiles/filedetails/?id=2606510510)
+
 
 ![Image](https://i.imgur.com/pufA0kM.png)
 	

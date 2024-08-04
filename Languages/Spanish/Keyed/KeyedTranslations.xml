@@ -56,4 +56,5 @@ Si esto ocurre, utilice la opción de carga la primera vez que abra la aplicaci�
   <Fluffy.ResearchTree.VerboseLogging>Registro detallado</Fluffy.ResearchTree.VerboseLogging>
   <Fluffy.ResearchTree.NoIdeologyPopup>No mostrar aviso de meme perdido</Fluffy.ResearchTree.NoIdeologyPopup>
   <Fluffy.ResearchTree.NoIdeologyPopupTT>Al seleccionar una investigación, no se mostrará la ventana emergente que avisa de que desbloqueará elementos que tu Ideología actual no permite.</Fluffy.ResearchTree.NoIdeologyPopupTT>
+  <Fluffy.ResearchTree.SemiRandomResearchLoaded>La investigación semi-aleatoria no permite elegir libremente la investigación</Fluffy.ResearchTree.SemiRandomResearchLoaded>
 </LanguageData>

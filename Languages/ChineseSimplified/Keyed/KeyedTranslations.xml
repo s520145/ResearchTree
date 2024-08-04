@@ -55,4 +55,5 @@
   <Fluffy.ResearchTree.VerboseLogging>冗长日志记录</Fluffy.ResearchTree.VerboseLogging>
   <Fluffy.ResearchTree.NoIdeologyPopup>不要显示遗失备忘录警告</Fluffy.ResearchTree.NoIdeologyPopup>
   <Fluffy.ResearchTree.NoIdeologyPopupTT>选择一项研究时，不会弹出 "将解锁当前意识形态不允许的项目 "的警告提示</Fluffy.ResearchTree.NoIdeologyPopupTT>
+  <Fluffy.ResearchTree.SemiRandomResearchLoaded>半随机研究不允许自由选择研究内容</Fluffy.ResearchTree.SemiRandomResearchLoaded>
 </LanguageData>

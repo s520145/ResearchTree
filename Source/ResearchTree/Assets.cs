@@ -61,11 +61,15 @@ public static class Assets
 
     public static readonly bool BetterResearchTabLoaded;
 
+    public static readonly bool SemiRandomResearchLoaded;
+
     public static readonly MainButtonDef BetterResearchTab;
 
     public static readonly bool OrganizedResearchTabLoaded;
 
     public static readonly MainButtonDef OrganizedResearchTab;
+
+    public static readonly Texture2D SemiRandomTexture2D;
 
     static Assets()
     {
@@ -79,6 +83,16 @@ public static class Assets
         {
             OrganizedResearchTab = DefDatabase<MainButtonDef>.GetNamed("OrganizedResearchTab");
             OrganizedResearchTabLoaded = true;
+        }
+
+        if (ModLister.GetActiveModWithIdentifier("CaptainMuscles.SemiRandomResearch.unofficial", true) != null)
+        {
+            SemiRandomTexture2D =
+                ContentFinder<Texture2D>.Get("UI/Buttons/MainButtons/CM_Semi_Random_Research_ResearchTree");
+            new Harmony("Mlie.ResearchTree").Patch(
+                AccessTools.Method("CM_Semi_Random_Research.MainTabWindow_NextResearch:DrawGoToTechTreeButton"),
+                new HarmonyMethod(SemiRandomResearch_DrawGoToTechTreeButton.Prefix));
+            SemiRandomResearchLoaded = true;
         }
 
         Button = ContentFinder<Texture2D>.Get("Buttons/button");
