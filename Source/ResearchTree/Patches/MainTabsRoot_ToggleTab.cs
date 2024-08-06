@@ -10,7 +10,8 @@ public class MainTabsRoot_ToggleTab
 {
     public static void Prefix(ref MainButtonDef newTab)
     {
-        if (newTab == null || newTab != MainButtonDefOf.Research)
+        if (newTab == null || newTab != MainButtonDefOf.Research ||
+            Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
         {
             return;
         }

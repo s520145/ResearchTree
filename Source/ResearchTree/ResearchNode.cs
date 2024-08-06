@@ -147,7 +147,7 @@ public class ResearchNode : Node
 
         hasRefreshedAvailability = true;
 
-        if (Assets.SemiRandomResearchLoaded)
+        if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
         {
             availableCache = false;
             return availableCache;
@@ -652,7 +652,7 @@ public class ResearchNode : Node
             }
         }
 
-        if (Assets.SemiRandomResearchLoaded)
+        if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
         {
             tooltipstring.AppendLine();
             tooltipstring.AppendLine("Fluffy.ResearchTree.SemiRandomResearchLoaded".Translate());

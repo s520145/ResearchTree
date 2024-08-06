@@ -71,6 +71,10 @@ public static class Assets
 
     public static readonly Texture2D SemiRandomTexture2D;
 
+    public static readonly object SettingsInstance;
+
+    public static bool SemiResearchEnabled;
+
     static Assets()
     {
         if (ModLister.GetActiveModWithIdentifier("andery233xj.mod.BetterResearchTabs", true) != null)
@@ -93,6 +97,11 @@ public static class Assets
                 AccessTools.Method("CM_Semi_Random_Research.MainTabWindow_NextResearch:DrawGoToTechTreeButton"),
                 new HarmonyMethod(SemiRandomResearch_DrawGoToTechTreeButton.Prefix));
             SemiRandomResearchLoaded = true;
+            SettingsInstance = AccessTools.Field("CM_Semi_Random_Research.SemiRandomResearchMod:settings")
+                .GetValue(null);
+            SemiResearchEnabled = (bool)AccessTools
+                .Field("CM_Semi_Random_Research.SemiRandomResearchModSettings:featureEnabled")
+                .GetValue(SettingsInstance);
         }
 
         Button = ContentFinder<Texture2D>.Get("Buttons/button");

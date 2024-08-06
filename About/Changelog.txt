@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.5.14 - Fixed semi random research compatibility when its blocking feature is disabled
+
+
 1.5.13 - Fixed compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2879094186]Semi Random Research[/url]
 Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
 

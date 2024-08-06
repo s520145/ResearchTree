@@ -35,6 +35,7 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 -  Added compatibility with the tech-limiting in [Rimedieval](https://steamcommunity.com/sharedfiles/filedetails/?id=2516523040). Needs a reload if the settings in Rimedieval are changed.
 -  Added compatibility with [Better Research Tabs](https://steamcommunity.com/sharedfiles/filedetails/?id=3236847079)
 -  Added compatibility with [Organized Research Tab](https://steamcommunity.com/sharedfiles/filedetails/?id=2606510510)
+-  Added compatibility with [Semi Random Research](https://steamcommunity.com/sharedfiles/filedetails/?id=2879094186)
 
 
 ![Image](https://i.imgur.com/pufA0kM.png)

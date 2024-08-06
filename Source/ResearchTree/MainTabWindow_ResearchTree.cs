@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using HarmonyLib;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -152,6 +153,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     public override void PreOpen()
     {
         base.PreOpen();
+
         SetRects();
         Tree.WaitForInitialization();
         Assets.RefreshResearch = true;
@@ -162,6 +164,18 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         else
         {
             Tree.FirstLoadDone = true;
+        }
+
+        if (Assets.SemiRandomResearchLoaded)
+        {
+            var preValue = Assets.SemiResearchEnabled;
+            Assets.SemiResearchEnabled = (bool)AccessTools
+                .Field("CM_Semi_Random_Research.SemiRandomResearchModSettings:featureEnabled")
+                .GetValue(Assets.SettingsInstance);
+            if (preValue != Assets.SemiResearchEnabled)
+            {
+                Tree.ResetNodeAvailabilityCache();
+            }
         }
 
         Queue.RefreshQueue();

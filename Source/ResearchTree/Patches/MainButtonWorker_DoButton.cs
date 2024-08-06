@@ -10,7 +10,7 @@ public class MainButtonWorker_DoButton
 {
     private static void Postfix(Rect rect, MainButtonDef ___def)
     {
-        if (___def != MainButtonDefOf.Research)
+        if (___def != MainButtonDefOf.Research || Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
         {
             return;
         }
