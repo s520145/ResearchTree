@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.5.15 - Updated spanish translation, thanks Ferchu
+
+
 1.5.14 - Fixed semi random research compatibility when its blocking feature is disabled
 
 
