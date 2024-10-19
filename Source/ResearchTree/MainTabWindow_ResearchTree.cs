@@ -44,6 +44,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public MainTabWindow_ResearchTree()
     {
+        doWindowBackground = false;
         closeOnClickedOutside = false;
         Instance = this;
         preventCameraMotion = true;
@@ -207,10 +208,11 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         if (!Tree.Initialized)
         {
+            Close();
             return;
         }
 
-        FastGUI.DrawTextureFast(windowRect, Assets.SlightlyDarkBackground);
+        Assets.DrawWindowBackground(windowRect.AtZero(), FluffyResearchTreeMod.instance.Settings.BackgroundColor);
         DrawTopBar(new Rect(canvas.xMin, canvas.yMin, canvas.width, Constants.TopBarHeight));
         ApplyZoomLevel();
         _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect);
@@ -224,6 +226,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         GUI.color = Color.white;
         Text.Anchor = TextAnchor.UpperLeft;
     }
+
 
     public override void Notify_ClickOutsideWindow()
     {

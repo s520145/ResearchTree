@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using ColourPicker;
 using HarmonyLib;
 using Mlie;
 using UnityEngine;
@@ -91,6 +92,23 @@ internal class FluffyResearchTreeMod : Mod
         else
         {
             Settings.NoIdeologyPopup = false;
+        }
+
+        var colorRect = listing_Standard.GetRect(30f);
+        Widgets.Label(colorRect.LeftHalf(), "Fluffy.ResearchTree.BackgroundColor".Translate());
+        Widgets.DrawBoxSolidWithOutline(colorRect.RightHalf().RightHalf(), Settings.BackgroundColor,
+            Widgets.WindowBGBorderColor, 2);
+        if (Widgets.ButtonInvisible(colorRect.RightHalf().RightHalf()))
+        {
+            Find.WindowStack.Add(new Dialog_ColourPicker(Settings.BackgroundColor,
+                color => { Settings.BackgroundColor = color; }));
+        }
+
+        listing_Standard.GapLine();
+        if (listing_Standard.ButtonTextLabeledPct("Fluffy.ResearchTree.ResetLabel".Translate(),
+                "Fluffy.ResearchTree.Reset".Translate(), 0.75f))
+        {
+            Settings.Reset();
         }
 
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VerboseLogging".Translate(), ref Settings.VerboseLogging);

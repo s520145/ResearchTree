@@ -1,4 +1,5 @@
-﻿using Verse;
+﻿using UnityEngine;
+using Verse;
 
 namespace FluffyResearchTree;
 
@@ -7,6 +8,7 @@ namespace FluffyResearchTree;
 /// </summary>
 internal class FluffyResearchTreeSettings : ModSettings
 {
+    public Color BackgroundColor = new Color(0f, 0f, 0f, 0.1f);
     public bool CtrlFunction = true;
     public int LoadType = 1;
     public bool NoIdeologyPopup;
@@ -30,5 +32,18 @@ internal class FluffyResearchTreeSettings : ModSettings
         Scribe_Values.Look(ref NoIdeologyPopup, "NoIdeologyPopup");
         Scribe_Values.Look(ref VerboseLogging, "VerboseLogging");
         Scribe_Values.Look(ref LoadType, "LoadType", 1);
+        Scribe_Values.Look(ref BackgroundColor, "BackgroundColor", new Color(0f, 0f, 0f, 0.1f));
+    }
+
+    public void Reset()
+    {
+        PauseOnOpen = true;
+        CtrlFunction = true;
+        OverrideResearch = true;
+        ShowCompletion = false;
+        NoIdeologyPopup = false;
+        VerboseLogging = false;
+        LoadType = 1;
+        BackgroundColor = new Color(0f, 0f, 0f, 0.1f);
     }
 }

@@ -35,8 +35,6 @@ public static class Assets
 
     public static Color TechLevelColor;
 
-    public static readonly Texture2D SlightlyDarkBackground;
-
     public static bool RefreshResearch;
 
     public static int TotalAmountOfResearch;
@@ -114,7 +112,6 @@ public static class Assets
         ColorAvailable = new Dictionary<TechLevel, Color>();
         ColorUnavailable = new Dictionary<TechLevel, Color>();
         TechLevelColor = new Color(1f, 1f, 1f, 0.2f);
-        SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture(0f, 0f, 0f, 0.1f);
         AllowedResearchDefs = [];
 
         UsingRimedieval =
@@ -279,6 +276,17 @@ public static class Assets
         initializeWorker = new Thread(Tree.Initialize);
         Logging.Message("Initialization start in background");
         initializeWorker.Start();
+    }
+
+    public static void DrawWindowBackground(Rect rect, Color bgColor)
+    {
+        GUI.color = Widgets.WindowBGFillColor;
+        GUI.DrawTexture(rect, BaseContent.WhiteTex);
+        GUI.color = bgColor;
+        GUI.DrawTexture(rect, BaseContent.WhiteTex);
+        GUI.color = Widgets.WindowBGBorderColor;
+        Widgets.DrawBox(rect);
+        GUI.color = Color.white;
     }
 
 

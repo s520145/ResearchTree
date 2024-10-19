@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
   <Fluffy.ResearchTree.AllowsBuildingX>Позволяет строить {0}</Fluffy.ResearchTree.AllowsBuildingX>
   <Fluffy.ResearchTree.AllowsCraftingX>Позволяет {0}</Fluffy.ResearchTree.AllowsCraftingX>
@@ -56,4 +56,7 @@
   <Fluffy.ResearchTree.NoIdeologyPopup>Не показывать отсутствующий мем-предупреждение</Fluffy.ResearchTree.NoIdeologyPopup>
   <Fluffy.ResearchTree.NoIdeologyPopupTT>При выборе исследования всплывающее предупреждение о том, что оно разблокирует предметы, которые ваша текущая идеология не разрешает, не будет отображаться</Fluffy.ResearchTree.NoIdeologyPopupTT>
   <Fluffy.ResearchTree.SemiRandomResearchLoaded>Полуслучайные исследования не позволяют свободно выбирать исследования</Fluffy.ResearchTree.SemiRandomResearchLoaded>
+  <Fluffy.ResearchTree.Reset>Сброс</Fluffy.ResearchTree.Reset>
+  <Fluffy.ResearchTree.ResetLabel>Сброс всех настроек</Fluffy.ResearchTree.ResetLabel>
+  <Fluffy.ResearchTree.BackgroundColor>Цвет фона</Fluffy.ResearchTree.BackgroundColor>
 </LanguageData>
