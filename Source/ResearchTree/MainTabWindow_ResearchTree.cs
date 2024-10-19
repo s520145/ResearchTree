@@ -189,6 +189,12 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         UpdateSearchResults();
     }
 
+    public override void WindowOnGUI()
+    {
+        base.WindowOnGUI();
+        Assets.DrawWindowBackground(windowRect, FluffyResearchTreeMod.instance.Settings.BackgroundColor);
+    }
+
     private void SetRects()
     {
         var startPosition = new Vector2(StandardMargin / Prefs.UIScale,
@@ -212,7 +218,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        Assets.DrawWindowBackground(windowRect.AtZero(), FluffyResearchTreeMod.instance.Settings.BackgroundColor);
         DrawTopBar(new Rect(canvas.xMin, canvas.yMin, canvas.width, Constants.TopBarHeight));
         ApplyZoomLevel();
         _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect);

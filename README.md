@@ -21,6 +21,7 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 -  Added dragging to reorder the search-queue, thanks to JiaRG
 -  Added option to hide the "Missing Meme"-warning when selecting research
 -  Fixed check for hiddenRequirements
+-  Added selectable background color
 
 
 
