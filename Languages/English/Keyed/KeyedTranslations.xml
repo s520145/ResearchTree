@@ -7,7 +7,7 @@
   <Fluffy.ResearchTree.AllowsSowingXinY>Enables planting {0} in {1}</Fluffy.ResearchTree.AllowsSowingXinY>
   <Fluffy.ResearchTree.AllowsPlantingX>Enables growing {0}</Fluffy.ResearchTree.AllowsPlantingX>
   <Fluffy.ResearchTree.LClickReplaceQueue>Left-Click to replace queue</Fluffy.ResearchTree.LClickReplaceQueue>
-  <Fluffy.ResearchTree.LClickRemoveFromQueue>Left-Click to remove from queue</Fluffy.ResearchTree.LClickRemoveFromQueue>
+  <Fluffy.ResearchTree.LClickRemoveFromQueue>Shift-Click to remove from queue</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-Left-Click to move to front of queue</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.SLClickAddToQueue>Shift-Left-Click to add to queue</Fluffy.ResearchTree.SLClickAddToQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-Left-Click to add to front of queue</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>

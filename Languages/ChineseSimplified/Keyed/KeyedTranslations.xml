@@ -5,7 +5,6 @@
   <Fluffy.ResearchTree.AllowsSowingXinY>{1} 中可种植作物：{0}</Fluffy.ResearchTree.AllowsSowingXinY>
   <Fluffy.ResearchTree.AllowsPlantingX>解锁作物：{0}</Fluffy.ResearchTree.AllowsPlantingX>
   <Fluffy.ResearchTree.LClickReplaceQueue>左键：替换队列</Fluffy.ResearchTree.LClickReplaceQueue>
-  <Fluffy.ResearchTree.LClickRemoveFromQueue>左键：从队列中移除</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.SLClickAddToQueue>Shift+左键：添加到队列</Fluffy.ResearchTree.SLClickAddToQueue>
   <Fluffy.ResearchTree.RClickInstaFinish>(DEBUG) 右键：立即完成</Fluffy.ResearchTree.RClickInstaFinish>
   <Fluffy.ResearchTree.Requires>需要</Fluffy.ResearchTree.Requires>
@@ -59,4 +58,5 @@
   <Fluffy.ResearchTree.Reset>重置</Fluffy.ResearchTree.Reset>
   <Fluffy.ResearchTree.ResetLabel>重置所有设置</Fluffy.ResearchTree.ResetLabel>
   <Fluffy.ResearchTree.BackgroundColor>背景颜色</Fluffy.ResearchTree.BackgroundColor>
+  <Fluffy.ResearchTree.LClickRemoveFromQueue>按住 Shift 键从队列中删除</Fluffy.ResearchTree.LClickRemoveFromQueue>
 </LanguageData>

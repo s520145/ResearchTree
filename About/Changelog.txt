@@ -1,5 +1,9 @@
 # Changelog for ResearchTree
 
+1.5.18 - Fixed tooltip for removing items from the queue
+Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
+
+
 1.5.17 - Window-position was slightly off
 
 

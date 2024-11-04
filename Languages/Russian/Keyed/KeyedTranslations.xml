@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
   <Fluffy.ResearchTree.AllowsBuildingX>Позволяет строить {0}</Fluffy.ResearchTree.AllowsBuildingX>
   <Fluffy.ResearchTree.AllowsCraftingX>Позволяет {0}</Fluffy.ResearchTree.AllowsCraftingX>
   <Fluffy.ResearchTree.AllowsSowingXinY>Позволяет высаживать {0} in {1}</Fluffy.ResearchTree.AllowsSowingXinY>
   <Fluffy.ResearchTree.AllowsPlantingX>Позволяет выращивать {0}</Fluffy.ResearchTree.AllowsPlantingX>
   <Fluffy.ResearchTree.LClickReplaceQueue>ЛКМ для замены в очереди</Fluffy.ResearchTree.LClickReplaceQueue>
-  <Fluffy.ResearchTree.LClickRemoveFromQueue>ЛКМ для удаления из очереди</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-ЛКМ для перемещения в начало очереди</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.SLClickAddToQueue>Shift-ЛКМ для добавления в очередь</Fluffy.ResearchTree.SLClickAddToQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-ЛКМ, чтобы добавить в начало очереди</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
@@ -59,4 +58,5 @@
   <Fluffy.ResearchTree.Reset>Сброс</Fluffy.ResearchTree.Reset>
   <Fluffy.ResearchTree.ResetLabel>Сброс всех настроек</Fluffy.ResearchTree.ResetLabel>
   <Fluffy.ResearchTree.BackgroundColor>Цвет фона</Fluffy.ResearchTree.BackgroundColor>
+  <Fluffy.ResearchTree.LClickRemoveFromQueue>Нажмите Shift, чтобы удалить из очереди</Fluffy.ResearchTree.LClickRemoveFromQueue>
 </LanguageData>
