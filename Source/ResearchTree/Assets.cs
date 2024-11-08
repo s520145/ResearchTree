@@ -137,11 +137,22 @@ public static class Assets
                 }
                 else
                 {
-                    AllowedResearchDefs =
-                        (List<ResearchProjectDef>)GetAllowedProjectDefsMethod.Invoke(null,
-                        [
-                            DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def => !def.IsAnomalyResearch())
-                        ]);
+                    try
+                    {
+                        AllowedResearchDefs =
+                            (List<ResearchProjectDef>)GetAllowedProjectDefsMethod.Invoke(null,
+                            [
+                                DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def =>
+                                    !def.IsAnomalyResearch()).ToList()
+                            ]);
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        Logging.Warning(
+                            "Failed to get allowed research defs from Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
+                        Logging.Warning(e.InnerException?.Message);
+                        UsingRimedieval = false;
+                    }
                 }
             }
         }
