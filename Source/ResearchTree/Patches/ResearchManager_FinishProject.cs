@@ -10,9 +10,9 @@ namespace FluffyResearchTree;
 [HarmonyPatch(typeof(ResearchManager), nameof(ResearchManager.FinishProject))]
 public class ResearchManager_FinishProject
 {
-    private static void Prefix(ref bool doCompletionDialog)
+    private static void Prefix(ResearchProjectDef proj, ref bool doCompletionDialog)
     {
-        if (doCompletionDialog)
+        if (doCompletionDialog && !proj.IsAnomalyResearch())
         {
             doCompletionDialog = FluffyResearchTreeMod.instance.Settings.ShowCompletion;
         }
