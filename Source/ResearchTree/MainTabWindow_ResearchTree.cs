@@ -44,7 +44,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public MainTabWindow_ResearchTree()
     {
-        doWindowBackground = false;
+        doWindowBackground = Assets.UsingMinimap;
         closeOnClickedOutside = false;
         Instance = this;
         preventCameraMotion = true;

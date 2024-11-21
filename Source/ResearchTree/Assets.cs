@@ -45,6 +45,8 @@ public static class Assets
 
     public static readonly bool UsingSOS2;
 
+    public static readonly bool UsingMinimap;
+
     public static readonly MethodInfo IsDisabledMethod;
 
     public static readonly MethodInfo GetAllowedProjectDefsMethod;
@@ -191,6 +193,9 @@ public static class Assets
             }
         }
 
+
+        UsingMinimap =
+            ModLister.GetActiveModWithIdentifier("dubwise.dubsmintminimap") != null;
 
         UsingSOS2 =
             ModLister.GetActiveModWithIdentifier("kentington.saveourship2") != null;

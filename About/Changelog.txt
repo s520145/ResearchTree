@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.5.21 - Fixed compatibility with Dubs Mint Minimap
+
+
 1.5.20 - Anomaly research completion windows should now always show
 
 
