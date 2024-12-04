@@ -54,6 +54,12 @@ public class Dialog_ResearchInfoCard : Window
         }
 
         listing_Standard.Label(researchProjectDef.description);
+
+        if (Assets.IsBlockedByGrimworld(researchProjectDef))
+        {
+            Assets.GrimworldInfoMethod.Invoke(null, [null, listing_Standard.GetRect(110f), 1f, researchProjectDef]);
+        }
+
         listing_Standard.GapLine();
         listing_Standard.End();
 
@@ -76,6 +82,7 @@ public class Dialog_ResearchInfoCard : Window
         var scrollListing = new Listing_Standard();
         Widgets.BeginScrollView(borderRect, ref scrollPosition, scrollContentRect);
         scrollListing.Begin(scrollContentRect);
+
         var alternate = true;
         foreach (var unlockedThing in unlockDefsAndDescs.OrderBy(pair => pair.Second))
         {

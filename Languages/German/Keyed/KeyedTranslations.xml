@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
   <Fluffy.ResearchTree.AllowsBuildingX>Ermöglicht die Konstruktion {0}</Fluffy.ResearchTree.AllowsBuildingX>
   <Fluffy.ResearchTree.AllowsCraftingX>Aktiviert das Rezept {0}</Fluffy.ResearchTree.AllowsCraftingX>
@@ -60,4 +60,5 @@ Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Prob
   <Fluffy.ResearchTree.ResetLabel>Alle Einstellungen zurücksetzen</Fluffy.ResearchTree.ResetLabel>
   <Fluffy.ResearchTree.BackgroundColor>Hintergrundfarbe</Fluffy.ResearchTree.BackgroundColor>
   <Fluffy.ResearchTree.LClickRemoveFromQueue>Umschalt-Klick zum Entfernen aus der Warteschlange</Fluffy.ResearchTree.LClickRemoveFromQueue>
+  <Fluffy.ResearchTree.GrimworldDoesNotAllow>Grimworld-Studienanforderung nicht erfüllt, Rechtsklick zur Anzeige detaillierter Informationen</Fluffy.ResearchTree.GrimworldDoesNotAllow>
 </LanguageData>

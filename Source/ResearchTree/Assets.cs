@@ -47,6 +47,12 @@ public static class Assets
 
     public static readonly bool UsingMinimap;
 
+    public static readonly bool UsingGrimworld;
+
+    public static readonly MethodInfo GrimworldPostfixMethod;
+
+    public static readonly MethodInfo GrimworldInfoMethod;
+
     public static readonly MethodInfo IsDisabledMethod;
 
     public static readonly MethodInfo GetAllowedProjectDefsMethod;
@@ -197,6 +203,30 @@ public static class Assets
         UsingMinimap =
             ModLister.GetActiveModWithIdentifier("dubwise.dubsmintminimap") != null;
 
+        UsingGrimworld =
+            ModLister.GetActiveModWithIdentifier("Grimworld.Framework") != null;
+
+        if (UsingGrimworld)
+        {
+            GrimworldPostfixMethod =
+                AccessTools.Method("GW_Frame.HarmonyPatches:PrerequisitesCompletedPostFix");
+            if (GrimworldPostfixMethod == null)
+            {
+                Logging.Warning(
+                    "Failed to find the PrerequisitesCompletedPostFix-method in Grimworld 40K. Will not be able to show or block research based on their extra requirements.");
+                UsingGrimworld = false;
+            }
+
+            GrimworldInfoMethod =
+                AccessTools.Method("GW_Frame.HarmonyPatches:DrawResearchPrerequisitesPrefix");
+            if (GrimworldInfoMethod == null)
+            {
+                Logging.Warning(
+                    "Failed to find the DrawResearchPrerequisitesPrefix-method in Grimworld 40K. Will not be able to show or block research based on their extra requirements.");
+                UsingGrimworld = false;
+            }
+        }
+
         UsingSOS2 =
             ModLister.GetActiveModWithIdentifier("kentington.saveourship2") != null;
         if (UsingSOS2)
@@ -253,6 +283,27 @@ public static class Assets
         {
             LongEventHandler.QueueLongEvent(StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true, null);
         }
+    }
+
+    public static bool IsBlockedByGrimworld(ResearchProjectDef researchProject)
+    {
+        if (!UsingGrimworld)
+        {
+            return false;
+        }
+
+        if (researchProject.modExtensions?.Any() == false)
+        {
+            return false;
+        }
+
+        var canStart = true;
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse, will be updated by the postfix method
+        var parameters = new object[] { canStart, researchProject };
+
+        GrimworldPostfixMethod.Invoke(null, parameters);
+
+        return !(bool)parameters[0];
     }
 
     public static bool IsBlockedBySOS2(ResearchProjectDef researchProject)

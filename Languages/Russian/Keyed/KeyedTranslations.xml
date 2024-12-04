@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
   <Fluffy.ResearchTree.AllowsBuildingX>Позволяет строить {0}</Fluffy.ResearchTree.AllowsBuildingX>
   <Fluffy.ResearchTree.AllowsCraftingX>Позволяет {0}</Fluffy.ResearchTree.AllowsCraftingX>
@@ -59,4 +59,5 @@
   <Fluffy.ResearchTree.ResetLabel>Сброс всех настроек</Fluffy.ResearchTree.ResetLabel>
   <Fluffy.ResearchTree.BackgroundColor>Цвет фона</Fluffy.ResearchTree.BackgroundColor>
   <Fluffy.ResearchTree.LClickRemoveFromQueue>Нажмите Shift, чтобы удалить из очереди</Fluffy.ResearchTree.LClickRemoveFromQueue>
+  <Fluffy.ResearchTree.GrimworldDoesNotAllow>Требование изучения Grimworld не выполнено, щелкните правой кнопкой мыши, чтобы показать подробную информацию</Fluffy.ResearchTree.GrimworldDoesNotAllow>
 </LanguageData>

@@ -200,6 +200,12 @@ public class ResearchNode : Node
             }
         }
 
+        if (Assets.UsingGrimworld && Assets.IsBlockedByGrimworld(Research))
+        {
+            availableCache = false;
+            return availableCache;
+        }
+
         if (Research.prerequisites?.Any() != true && Research.hiddenPrerequisites?.Any() != true)
         {
             availableCache = true;
@@ -650,6 +656,12 @@ public class ResearchNode : Node
                     tooltipstring.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
                 }
             }
+        }
+
+        if (Assets.IsBlockedByGrimworld(Research))
+        {
+            tooltipstring.AppendLine();
+            tooltipstring.AppendLine("Fluffy.ResearchTree.GrimworldDoesNotAllow".Translate());
         }
 
         if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)

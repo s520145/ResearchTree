@@ -1,5 +1,9 @@
 # Changelog for ResearchTree
 
+1.5.22 - Now supports the research-requirements in [url=https://steamcommunity.com/workshop/filedetails/?id=3119805903]GrimWorld 40,000 - Framework[/url]
+Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
+
+
 1.5.21 - Fixed compatibility with Dubs Mint Minimap
 
 
