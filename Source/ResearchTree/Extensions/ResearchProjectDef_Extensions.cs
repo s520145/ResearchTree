@@ -13,6 +13,39 @@ public static class ResearchProjectDef_Extensions
     private static readonly Dictionary<Def, List<Pair<Def, string>>> _unlocksCache =
         new Dictionary<Def, List<Pair<Def, string>>>();
 
+    private static Dictionary<Def, List<ResearchProjectDef>> _unlockedByCache =
+        new Dictionary<Def, List<ResearchProjectDef>>();
+
+    public static Dictionary<Def, List<ResearchProjectDef>> unlockedByCache
+    {
+        get
+        {
+            if (_unlockedByCache.Any())
+            {
+                return _unlockedByCache;
+            }
+
+            var dictionary = new Dictionary<Def, List<ResearchProjectDef>>();
+            foreach (var allDef in DefDatabase<ResearchProjectDef>.AllDefs)
+            {
+                foreach (var unlockedDef in allDef.UnlockedDefs)
+                {
+                    if (!dictionary.TryGetValue(unlockedDef, out var value))
+                    {
+                        value = [];
+                        dictionary.Add(unlockedDef, value);
+                    }
+
+                    value.Add(allDef);
+                }
+            }
+
+            _unlockedByCache = dictionary;
+            return _unlockedByCache;
+        }
+    }
+
+
     public static List<ResearchProjectDef> Descendants(this ResearchProjectDef research)
     {
         var hashSet = new HashSet<ResearchProjectDef>();
@@ -36,7 +69,7 @@ public static class ResearchProjectDef_Extensions
     public static IEnumerable<ThingDef> GetPlantsUnlocked(this ResearchProjectDef research)
     {
         return DefDatabase<ThingDef>.AllDefsListForReading.Where(td =>
-            (td.plant?.sowResearchPrerequisites?.Contains(research)).GetValueOrDefault());
+            (td.plant?.sowResearchPrerequisites?.Contains(research)).GetValueOrDefault()).OrderBy(def => def.label);
     }
 
     public static List<ResearchProjectDef> Ancestors(this ResearchProjectDef research)
@@ -80,19 +113,21 @@ public static class ResearchProjectDef_Extensions
             }).SelectMany(td => td.AllRecipes)
             where rd.researchPrerequisite == null
             select rd;
-        return first.Concat(second).Distinct();
+        return first.Concat(second).Distinct().OrderBy(def => def.label);
     }
 
     public static IEnumerable<TerrainDef> GetTerrainUnlocked(this ResearchProjectDef research)
     {
         return DefDatabase<TerrainDef>.AllDefsListForReading.Where(td =>
-            td.researchPrerequisites?.Contains(research) ?? false);
+                unlockedByCache.TryGetValue(td, out var researchList) && researchList.Contains(research))
+            .OrderBy(def => def.label);
     }
 
     public static IEnumerable<ThingDef> GetThingsUnlocked(this ResearchProjectDef research)
     {
         return DefDatabase<ThingDef>.AllDefsListForReading.Where(td =>
-            td.researchPrerequisites?.Contains(research) ?? false);
+                unlockedByCache.TryGetValue(td, out var researchList) && researchList.Contains(research))
+            .OrderBy(def => def.label);
     }
 
     public static List<Pair<Def, string>> GetUnlockDefsAndDescs(this ResearchProjectDef research, bool dedupe = true)

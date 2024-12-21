@@ -32,6 +32,7 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 -  Updated compatibility with [Research Reinvented](https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160)
 -  Updated compatibility with [Research Whatever](https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060)
 -  Added support for the custom research requirements in [Vanilla Vehicles Expanded](https://steamcommunity.com/workshop/filedetails/?id=3014906877)
+-  Added support for the extra research requirements in [GrimWorld 40,000 - Framework](https://steamcommunity.com/workshop/filedetails/?id=3119805903)
 -  Added compatibility with the tech-hiding from [Save Our Ship 2](https://steamcommunity.com/sharedfiles/filedetails/?id=1909914131)
 -  Added compatibility with the tech-limiting in [Rimedieval](https://steamcommunity.com/sharedfiles/filedetails/?id=2516523040). Needs a reload if the settings in Rimedieval are changed.
 -  Added compatibility with [Better Research Tabs](https://steamcommunity.com/sharedfiles/filedetails/?id=3236847079)
