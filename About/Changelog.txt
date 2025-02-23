@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.5.24 - Fixed missing facilities code, was not working at all
+
+
 1.5.23 - Fixed the info about unlocked defs not including all items
 
 

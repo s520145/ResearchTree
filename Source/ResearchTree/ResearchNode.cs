@@ -147,6 +147,12 @@ public class ResearchNode : Node
 
         hasRefreshedAvailability = true;
 
+        if (MissingFacilities(Research).Any())
+        {
+            availableCache = false;
+            return availableCache;
+        }
+
         if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
         {
             availableCache = false;
@@ -254,11 +260,6 @@ public class ResearchNode : Node
         return availableCache;
     }
 
-    public bool Exists()
-    {
-        return !Assets.UsingRimedieval || Assets.AllowedResearchDefs.Contains(Research);
-    }
-
     public bool BuildingPresent(ResearchProjectDef research)
     {
         if (DebugSettings.godMode && Prefs.DevMode)
@@ -298,18 +299,12 @@ public class ResearchNode : Node
         return value;
     }
 
-    public static void ClearCaches()
-    {
-        //_buildingPresentCache.Clear();
-        //_missingFacilitiesCache.Clear();
-    }
-
     public static implicit operator ResearchNode(ResearchProjectDef def)
     {
         return def.ResearchNode();
     }
 
-    public List<ThingDef> MissingFacilities(ResearchProjectDef research, bool refresh = false)
+    public List<ThingDef> MissingFacilities(ResearchProjectDef research)
     {
         var hasCache = _missingFacilitiesCache.TryGetValue(research, out var value);
 
@@ -340,14 +335,12 @@ public class ResearchNode : Node
         value = [];
         foreach (var item in list)
         {
-            if (item.requiredResearchBuilding == null)
+            if (item.requiredResearchBuilding != null)
             {
-                continue;
-            }
-
-            if (!distinctBenches.Contains(item.requiredResearchBuilding))
-            {
-                value.Add(item.requiredResearchBuilding);
+                if (!distinctBenches.Contains(item.requiredResearchBuilding))
+                {
+                    value.Add(item.requiredResearchBuilding);
+                }
             }
 
             if (item.requiredResearchFacilities.NullOrEmpty())
@@ -609,16 +602,12 @@ public class ResearchNode : Node
         }
 
         var tooltipstring = GetResearchTooltipString();
-        if (!BuildingPresent())
+        var missingFacilities = MissingFacilities();
+        if (missingFacilities?.Any() == true)
         {
-            var missingFacilities = MissingFacilities();
-
-            if (missingFacilities?.Any() == true)
-            {
-                tooltipstring.AppendLine();
-                tooltipstring.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
-                    MissingFacilities().Select(td => td.LabelCap).ToArray())));
-            }
+            tooltipstring.AppendLine();
+            tooltipstring.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
+                missingFacilities.Select(td => td.LabelCap).ToArray())));
         }
 
         if (!Research.TechprintRequirementMet)
