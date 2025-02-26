@@ -47,7 +47,21 @@ public static class Assets
 
     public static readonly bool UsingMinimap;
 
+    public static readonly bool UsingMedievalOverhaul;
+
+    public static readonly bool UsingWorldTechLevel;
+
     public static readonly bool UsingGrimworld;
+
+    public static TechLevel CachedWorldTechLevel;
+
+    public static readonly MethodInfo WorldTechLevelEnabledMethod;
+
+    public static readonly MethodInfo WorldTechLevelFilterLevelMethod;
+
+    public static readonly MethodInfo MedievalOverhaulPostfixMethod;
+
+    public static readonly FieldInfo MedievalOverhaulSchematicDefField;
 
     public static readonly MethodInfo GrimworldPostfixMethod;
 
@@ -199,9 +213,60 @@ public static class Assets
             }
         }
 
-
         UsingMinimap =
             ModLister.GetActiveModWithIdentifier("dubwise.dubsmintminimap") != null;
+
+        UsingWorldTechLevel =
+            ModLister.GetActiveModWithIdentifier("m00nl1ght.WorldTechLevel") != null;
+
+        if (UsingWorldTechLevel)
+        {
+            WorldTechLevelEnabledMethod =
+                AccessTools.Method("WorldTechLevel.Patches.Patch_MainTabWindow_Research:IsFilterEnabled");
+            if (WorldTechLevelEnabledMethod == null)
+            {
+                Logging.Warning(
+                    "Failed to find the Patch_MainTabWindow_Research-IsFilterEnabled-method in WorldTechLevel. Will not be able to show or block research based on their extra requirements.");
+                UsingWorldTechLevel = false;
+            }
+            else
+            {
+                WorldTechLevelFilterLevelMethod =
+                    AccessTools.Method("WorldTechLevel.TechLevelUtility:PlayerResearchFilterLevel");
+                if (WorldTechLevelFilterLevelMethod == null)
+                {
+                    Logging.Warning(
+                        "Failed to find the TechLevelUtility-PlayerResearchFilterLevel-method in WorldTechLevel. Will not be able to show or block research based on their extra requirements.");
+                    UsingWorldTechLevel = false;
+                }
+            }
+        }
+
+        UsingMedievalOverhaul =
+            ModLister.GetActiveModWithIdentifier("DankPyon.Medieval.Overhaul") != null;
+
+        if (UsingMedievalOverhaul)
+        {
+            MedievalOverhaulPostfixMethod =
+                AccessTools.Method("ResearchProjectDef_CanStartNow:Postfix");
+            if (MedievalOverhaulPostfixMethod == null)
+            {
+                Logging.Warning(
+                    "Failed to find the ResearchProjectDef_CanStartNow-PostFix-method in MedievalOverhaul. Will not be able to show or block research based on their extra requirements.");
+                UsingMedievalOverhaul = false;
+            }
+            else
+            {
+                MedievalOverhaulSchematicDefField =
+                    AccessTools.Field("MedievalOverhaul.RequiredSchematic:schematicDef");
+                if (MedievalOverhaulSchematicDefField == null)
+                {
+                    Logging.Warning(
+                        "Failed to find the RequiredSchematic-schematicDef-field in MedievalOverhaul. Will not be able to show or block research based on their extra requirements.");
+                    UsingMedievalOverhaul = false;
+                }
+            }
+        }
 
         UsingGrimworld =
             ModLister.GetActiveModWithIdentifier("Grimworld.Framework") != null;
@@ -283,6 +348,78 @@ public static class Assets
         {
             LongEventHandler.QueueLongEvent(StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true, null);
         }
+    }
+
+    public static bool IsBlockedByMedievalOverhaul(ResearchProjectDef researchProject)
+    {
+        if (!UsingMedievalOverhaul)
+        {
+            return false;
+        }
+
+        if (researchProject.modExtensions?.Any() == false)
+        {
+            return false;
+        }
+
+        var canStart = true;
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse, will be updated by the postfix method
+        var parameters = new object[] { researchProject, canStart };
+
+        MedievalOverhaulPostfixMethod.Invoke(null, parameters);
+
+        return !(bool)parameters[1];
+    }
+
+    public static bool TryGetBlockingSchematicFromMedievalOverhaul(ResearchProjectDef researchProject,
+        out string thingLabel)
+    {
+        thingLabel = null;
+        if (!UsingMedievalOverhaul)
+        {
+            return false;
+        }
+
+        if (researchProject.modExtensions?.Any() == false)
+        {
+            return false;
+        }
+
+        var modExtension =
+            researchProject.modExtensions.FirstOrDefault(extension => extension.GetType().Name == "RequiredSchematic");
+        if (modExtension == null)
+        {
+            return false;
+        }
+
+        var thingDef = (ThingDef)MedievalOverhaulSchematicDefField.GetValue(modExtension);
+        if (thingDef == null)
+        {
+            return false;
+        }
+
+        thingLabel = thingDef.LabelCap;
+        return true;
+    }
+
+    public static bool IsBlockedByWorldTechLevel(ResearchProjectDef researchProject)
+    {
+        if (!UsingWorldTechLevel)
+        {
+            return false;
+        }
+
+        if (!(bool)WorldTechLevelEnabledMethod.Invoke(null, null))
+        {
+            return false;
+        }
+
+        if (CachedWorldTechLevel == TechLevel.Undefined)
+        {
+            CachedWorldTechLevel = (TechLevel)WorldTechLevelFilterLevelMethod.Invoke(null, null);
+        }
+
+        return researchProject.techLevel > CachedWorldTechLevel;
     }
 
     public static bool IsBlockedByGrimworld(ResearchProjectDef researchProject)

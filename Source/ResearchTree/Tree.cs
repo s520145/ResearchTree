@@ -562,7 +562,7 @@ public static class Tree
             }
 
             Logging.Warning(
-                $"\tredundant prerequisites for {researchNode.Research.LabelCap}: {string.Join(", \n", enumerable.Select(r => r.LabelCap)).ToArray()}. Removing.");
+                $"\tredundant prerequisites for {researchNode.Research.LabelCap}: {string.Join(", \n", enumerable.Select(r => r.LabelCap).ToArray())}. Removing.");
             foreach (var item in enumerable)
             {
                 researchNode.Research.prerequisites.Remove(item);

@@ -165,12 +165,6 @@ public class ResearchNode : Node
             return availableCache;
         }
 
-        if (Research.CanStartNow)
-        {
-            availableCache = true;
-            return availableCache;
-        }
-
         if (!Research.TechprintRequirementMet)
         {
             availableCache = false;
@@ -206,7 +200,19 @@ public class ResearchNode : Node
             }
         }
 
-        if (Assets.UsingGrimworld && Assets.IsBlockedByGrimworld(Research))
+        if (Assets.IsBlockedByGrimworld(Research))
+        {
+            availableCache = false;
+            return availableCache;
+        }
+
+        if (Assets.IsBlockedByWorldTechLevel(Research))
+        {
+            availableCache = false;
+            return availableCache;
+        }
+
+        if (Assets.IsBlockedByMedievalOverhaul(Research))
         {
             availableCache = false;
             return availableCache;
@@ -651,6 +657,25 @@ public class ResearchNode : Node
         {
             tooltipstring.AppendLine();
             tooltipstring.AppendLine("Fluffy.ResearchTree.GrimworldDoesNotAllow".Translate());
+        }
+
+        if (Assets.IsBlockedByWorldTechLevel(Research))
+        {
+            tooltipstring.AppendLine();
+            tooltipstring.AppendLine("Fluffy.ResearchTree.WorldTechLevelDoesNotAllow".Translate());
+        }
+
+        if (Assets.IsBlockedByMedievalOverhaul(Research))
+        {
+            tooltipstring.AppendLine();
+            if (Assets.TryGetBlockingSchematicFromMedievalOverhaul(Research, out var thingLabel))
+            {
+                tooltipstring.AppendLine("DankPyon_RequiredSchematic".Translate() + $": {thingLabel}");
+            }
+            else
+            {
+                tooltipstring.AppendLine("DankPyon_RequiredSchematic".Translate());
+            }
         }
 
         if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)

@@ -60,4 +60,5 @@
   <Fluffy.ResearchTree.BackgroundColor>背景颜色</Fluffy.ResearchTree.BackgroundColor>
   <Fluffy.ResearchTree.LClickRemoveFromQueue>按住 Shift 键从队列中删除</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.GrimworldDoesNotAllow>未满足 Grimworld 研究要求，右键单击可显示详细信息</Fluffy.ResearchTree.GrimworldDoesNotAllow>
+  <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>世界技术等级设置不允许使用该技术</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
 </LanguageData>
