@@ -52,17 +52,26 @@ internal class FluffyResearchTreeMod : Mod
         listing_Standard.Gap();
         listing_Standard.Label("Fluffy.ResearchTree.LoadType".Translate());
 
-        if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeTwo".Translate(), Settings.LoadType == 1))
+        if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeTwo".Translate(), Settings.LoadType == Constants.LoadTypeLoadInBackground))
         {
-            Settings.LoadType = 1;
+            Settings.LoadType = Constants.LoadTypeLoadInBackground;
         }
 
-        if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeThree".Translate(), Settings.LoadType == 2))
+        if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeThree".Translate(), Settings.LoadType == Constants.LoadTypeFirstTimeOpening))
         {
-            Settings.LoadType = 2;
+            Settings.LoadType = Constants.LoadTypeFirstTimeOpening;
         }
 
-        if (Settings.LoadType == 1 && Prefs.UIScale > 1f)
+        if (!Settings.OverrideResearch)
+        {
+            if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeFour".Translate(), Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree))
+            {
+                Settings.LoadType = Constants.LoadTypeDoNotGenerateResearchTree;
+                Settings.OverrideResearch = false;
+            }
+        }
+
+        if (Settings.LoadType == Constants.LoadTypeLoadInBackground && Prefs.UIScale > 1f)
         {
             listing_Standard.Label("Fluffy.ResearchTree.UIScaleWarning".Translate());
         }
@@ -80,8 +89,10 @@ internal class FluffyResearchTreeMod : Mod
         }
 
         listing_Standard.Gap();
-        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.OverrideResearch".Translate(),
-            ref Settings.OverrideResearch);
+        if (Settings.LoadType != Constants.LoadTypeDoNotGenerateResearchTree)
+        {
+            listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.OverrideResearch".Translate(), ref Settings.OverrideResearch);
+        }
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.PauseOnOpen".Translate(), ref Settings.PauseOnOpen);
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.ShowCompletion".Translate(), ref Settings.ShowCompletion);
         if (ModsConfig.IdeologyActive)

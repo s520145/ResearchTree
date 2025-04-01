@@ -36,6 +36,7 @@
   <Fluffy.ResearchTree.LoadTypeOne>Pendant le chargement du jeu</Fluffy.ResearchTree.LoadTypeOne>
   <Fluffy.ResearchTree.LoadTypeTwo>Après le chargement du jeu en arrière-plan</Fluffy.ResearchTree.LoadTypeTwo>
   <Fluffy.ResearchTree.LoadTypeThree>Première ouverture de l'arbre de recherche</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.LoadTypeFour>Ne pas générer d'arbre de recherche, mais conserver la file d'attente de recherche</Fluffy.ResearchTree.LoadTypeFour>
   <Fluffy.ResearchTree.PreparingTree.LayoutNew>Finalisation de la présentation de l'arbre de recherche</Fluffy.ResearchTree.PreparingTree.LayoutNew>
   <Fluffy.ResearchTree.VanillaGraphics>Utiliser les anciennes méthodes graphiques (en cas de scintillement)</Fluffy.ResearchTree.VanillaGraphics>
   <Fluffy.ResearchTree.ShowCompletion>Afficher un message d'achèvement pour les recherches terminées</Fluffy.ResearchTree.ShowCompletion>

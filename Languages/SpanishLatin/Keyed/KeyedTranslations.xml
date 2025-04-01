@@ -34,6 +34,7 @@
   <Fluffy.ResearchTree.LoadType>¿Cuándo debe generarse el árbol de investigación?</Fluffy.ResearchTree.LoadType>
   <Fluffy.ResearchTree.LoadTypeOne>Durante la carga del juego</Fluffy.ResearchTree.LoadTypeOne>
   <Fluffy.ResearchTree.LoadTypeTwo>Después de la carga del juego en segundo plano</Fluffy.ResearchTree.LoadTypeTwo>
+  <Fluffy.ResearchTree.LoadTypeFour>No generar árbol de investigación, pero mantener cola de investigación</Fluffy.ResearchTree.LoadTypeFour>
   <Fluffy.ResearchTree.LoadTypeThree>La primera vez que se abre el árbol de investigación</Fluffy.ResearchTree.LoadTypeThree>
   <Fluffy.ResearchTree.QueuedNode>Nodo ya en cola</Fluffy.ResearchTree.QueuedNode>
   <Fluffy.ResearchTree.MissingFacilities>Faltan {0}</Fluffy.ResearchTree.MissingFacilities>

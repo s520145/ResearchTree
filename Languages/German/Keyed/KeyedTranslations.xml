@@ -37,6 +37,7 @@
   <Fluffy.ResearchTree.LoadTypeOne>Beim Laden des Spiels</Fluffy.ResearchTree.LoadTypeOne>
   <Fluffy.ResearchTree.LoadTypeTwo>Nach dem Laden des Spiels im Hintergrund</Fluffy.ResearchTree.LoadTypeTwo>
   <Fluffy.ResearchTree.LoadTypeThree>Erstmaliges Öffnen des Forschungsbaums</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.LoadTypeFour>Keinen Forschungsbaum generieren, aber Forschungswarteschlange behalten</Fluffy.ResearchTree.LoadTypeFour>
   <Fluffy.ResearchTree.PreparingTree.LayoutNew>Fertigstellung des Layouts des Forschungsbaums</Fluffy.ResearchTree.PreparingTree.LayoutNew>
   <Fluffy.ResearchTree.VanillaGraphics>Verwenden Sie die alten grafischen Methoden (bei Flackern)</Fluffy.ResearchTree.VanillaGraphics>
   <Fluffy.ResearchTree.ShowCompletion>Abschlussmeldung für beendete Recherchen anzeigen</Fluffy.ResearchTree.ShowCompletion>

@@ -344,7 +344,7 @@ public static class Assets
             ColorUnavailable[relevantTechLevels[i]] = Color.HSVToRGB(1f / count * i, 0.125f, 0.33f);
         }
 
-        if (FluffyResearchTreeMod.instance.Settings.LoadType == 1)
+        if (FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeLoadInBackground)
         {
             LongEventHandler.QueueLongEvent(StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true, null);
         }

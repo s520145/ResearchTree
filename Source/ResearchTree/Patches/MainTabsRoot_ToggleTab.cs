@@ -31,6 +31,11 @@ public class MainTabsRoot_ToggleTab
         {
             newTab = Assets.OrganizedResearchTab;
         }
+        
+        if (FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree)
+        {
+            return;
+        }
 
         switch (FluffyResearchTreeMod.instance.Settings.OverrideResearch)
         {

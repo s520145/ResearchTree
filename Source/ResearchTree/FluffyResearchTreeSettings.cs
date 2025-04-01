@@ -10,7 +10,7 @@ internal class FluffyResearchTreeSettings : ModSettings
 {
     public Color BackgroundColor = new Color(0f, 0f, 0f, 0.1f);
     public bool CtrlFunction = true;
-    public int LoadType = 1;
+    public int LoadType = Constants.LoadTypeLoadInBackground;
     public bool NoIdeologyPopup;
     public bool OverrideResearch = true;
     public bool PauseOnOpen = true;
@@ -43,7 +43,7 @@ internal class FluffyResearchTreeSettings : ModSettings
         ShowCompletion = false;
         NoIdeologyPopup = false;
         VerboseLogging = false;
-        LoadType = 1;
+        LoadType = Constants.LoadTypeLoadInBackground;
         BackgroundColor = new Color(0f, 0f, 0f, 0.1f);
     }
 }
