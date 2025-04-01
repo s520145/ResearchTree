@@ -175,7 +175,7 @@ public static class ResearchProjectDef_Extensions
             return null;
         }
 
-        var researchNode = Tree.ResearchToNodesCache.TryGetValue(research) as ResearchNode;
+        var researchNode = Tree.ResearchToNode(research) as ResearchNode;
         if (researchNode == null)
         {
             // It would be better to use warning instead of error. This is just a reminder.

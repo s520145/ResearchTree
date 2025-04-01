@@ -30,8 +30,7 @@ public static class Tree
 
     public static bool FirstLoadDone;
 
-    public static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache =
-        new Dictionary<ResearchProjectDef, Node>();
+    public static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache = new();
 
     public static Dictionary<TechLevel, IntRange> TechLevelBounds
     {
@@ -88,7 +87,18 @@ public static class Tree
             return null;
         }
     }
-
+    
+    public static Node ResearchToNode(ResearchProjectDef research)
+    {
+        var node = ResearchToNodesCache.TryGetValue(research);
+        if (node != null)
+        {
+            return node;
+        }
+        PopulateNodes();
+        return ResearchToNodesCache.TryGetValue(research);
+    }
+    
     public static void Reset(bool alsoZoom)
     {
         Messages.Message("Fluffy.ResearchTree.ResolutionChange".Translate(), MessageTypeDefOf.NeutralEvent);
@@ -114,7 +124,7 @@ public static class Tree
             MainTabWindow_ResearchTree.Instance.ViewRectDirty = true;
         }
 
-        if (FluffyResearchTreeMod.instance.Settings.LoadType == 1)
+        if (FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeLoadInBackground)
         {
             LongEventHandler.QueueLongEvent(Assets.StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true,
                 null);
@@ -123,14 +133,15 @@ public static class Tree
 
     public static void Initialize()
     {
-        if (Initialized || _initializing)
+        if (FluffyResearchTreeMod.instance?.Settings?.LoadType == Constants.LoadTypeDoNotGenerateResearchTree 
+            || Initialized || _initializing)
         {
             return;
         }
 
         _initializing = true;
 
-        if (FluffyResearchTreeMod.instance?.Settings?.LoadType == 1)
+        if (FluffyResearchTreeMod.instance?.Settings?.LoadType == Constants.LoadTypeLoadInBackground)
         {
             try
             {
@@ -414,7 +425,7 @@ public static class Tree
         }
     }
 
-    public static void HorizontalPositions()
+    private static void HorizontalPositions()
     {
         var relevantTechLevels = RelevantTechLevels;
         var num = 1;

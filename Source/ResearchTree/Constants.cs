@@ -26,6 +26,10 @@ public static class Constants
     public const int LeftClick = 0;
 
     public const int RightClick = 1;
+    
+    public const int LoadTypeLoadInBackground = 1;
+    public const int LoadTypeFirstTimeOpening = 2;
+    public const int LoadTypeDoNotGenerateResearchTree = 3;
 
     public static readonly Vector2 IconSize = new Vector2(18f, 18f);
 

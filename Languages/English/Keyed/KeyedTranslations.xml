@@ -41,6 +41,7 @@
   <Fluffy.ResearchTree.LoadTypeOne>During game load</Fluffy.ResearchTree.LoadTypeOne>
   <Fluffy.ResearchTree.LoadTypeTwo>After game load in background</Fluffy.ResearchTree.LoadTypeTwo>
   <Fluffy.ResearchTree.LoadTypeThree>First time opening research-tree</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.LoadTypeFour>Do not generate research tree, but keep research queue</Fluffy.ResearchTree.LoadTypeFour>
   <Fluffy.ResearchTree.QueuedNode>Already queued node</Fluffy.ResearchTree.QueuedNode>
   <Fluffy.ResearchTree.MissingFacilities>Missing {0}</Fluffy.ResearchTree.MissingFacilities>
   <Fluffy.ResearchTree.MissingTechprints>Insufficient techprints {0}/{1}</Fluffy.ResearchTree.MissingTechprints>

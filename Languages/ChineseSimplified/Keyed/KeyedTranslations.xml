@@ -36,6 +36,7 @@
   <Fluffy.ResearchTree.LoadTypeOne>游戏加载过程中</Fluffy.ResearchTree.LoadTypeOne>
   <Fluffy.ResearchTree.LoadTypeTwo>游戏在后台加载后</Fluffy.ResearchTree.LoadTypeTwo>
   <Fluffy.ResearchTree.LoadTypeThree>首次打开研究树</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.LoadTypeFour>不生成研究树，但保留研究队列</Fluffy.ResearchTree.LoadTypeFour>
   <Fluffy.ResearchTree.PreparingTree.LayoutNew>最终确定研究树布局</Fluffy.ResearchTree.PreparingTree.LayoutNew>
   <Fluffy.ResearchTree.VanillaGraphics>使用旧的图形方法（如果闪烁）</Fluffy.ResearchTree.VanillaGraphics>
   <Fluffy.ResearchTree.ShowCompletion>研究完成后弹出完成对话框</Fluffy.ResearchTree.ShowCompletion>

@@ -26,6 +26,7 @@
   <Fluffy.ResearchTree.LoadTypeOne>   Во время загрузки игры</Fluffy.ResearchTree.LoadTypeOne>
   <Fluffy.ResearchTree.LoadTypeTwo>   После загрузки игры в фоновом режиме</Fluffy.ResearchTree.LoadTypeTwo>
   <Fluffy.ResearchTree.LoadTypeThree> Первое открытие дерева исследований</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.LoadTypeFour>Не создавать дерево исследований, но сохранять очередь исследований</Fluffy.ResearchTree.LoadTypeFour>
   <Fluffy.ResearchTree.QueuedNode>Уже в очереди</Fluffy.ResearchTree.QueuedNode>
   <Fluffy.ResearchTree.MissingFacilities>Отсутствует {0}</Fluffy.ResearchTree.MissingFacilities>
   <Fluffy.ResearchTree.MissingTechprints>Недостаточно технологических отпечатков {0}/{1}</Fluffy.ResearchTree.MissingTechprints>

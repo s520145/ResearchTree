@@ -326,8 +326,8 @@ public class Queue : WorldComponent
     public static void DrawLabelForMainButton(Rect rect)
     {
         var currentStart = rect.xMax - Constants.SmallQueueLabelSize - Constants.Margin;
-        if (!Tree.Initialized && FluffyResearchTreeMod.instance.Settings.LoadType != 2 &&
-            FluffyResearchTreeMod.instance.Settings.OverrideResearch)
+        if (!Tree.Initialized && FluffyResearchTreeMod.instance.Settings.LoadType != Constants.LoadTypeFirstTimeOpening 
+                              && FluffyResearchTreeMod.instance.Settings.OverrideResearch)
         {
             DrawLabel(
                 new Rect(currentStart, 0f, Constants.SmallQueueLabelSize, Constants.SmallQueueLabelSize)

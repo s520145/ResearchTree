@@ -17,6 +17,11 @@ public class MainButtonWorker_DoButton
 
         Queue.DrawLabelForMainButton(rect);
 
+        if (FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree)
+        {
+            return;
+        }
+
         TooltipHandler.TipRegion(rect,
             FluffyResearchTreeMod.instance.Settings.OverrideResearch
                 ? "Fluffy.ResearchTree.HoldForClassic".Translate()
