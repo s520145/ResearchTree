@@ -26,7 +26,7 @@ public static class Constants
     public const int LeftClick = 0;
 
     public const int RightClick = 1;
-    
+
     public const int LoadTypeLoadInBackground = 1;
     public const int LoadTypeFirstTimeOpening = 2;
     public const int LoadTypeDoNotGenerateResearchTree = 3;

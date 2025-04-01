@@ -13,9 +13,9 @@ namespace FluffyResearchTree;
 
 public class ResearchNode : Node
 {
-    private static readonly Dictionary<ResearchProjectDef, bool> _buildingPresentCache = new();
+    private static readonly Dictionary<ResearchProjectDef, bool> _buildingPresentCache = [];
 
-    private static readonly Dictionary<ResearchProjectDef, List<ThingDef>> _missingFacilitiesCache = new();
+    private static readonly Dictionary<ResearchProjectDef, List<ThingDef>> _missingFacilitiesCache = [];
 
     private readonly int cacheOrder;
 
@@ -113,7 +113,7 @@ public class ResearchNode : Node
                 return false;
             }
 
-            return FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree 
+            return FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree
                    || DebugSettings.godMode || getCacheValue();
         }
     }

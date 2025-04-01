@@ -32,19 +32,16 @@ public static class SemiRandomResearch_DrawGoToTechTreeButton
         Find.WindowStack.TryRemove(mainTabWindow, false);
         var researchTab = MainButtonDefOf.Research;
         ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Main;
-        
-        if (FluffyResearchTreeMod.instance.Settings.LoadType != Constants.LoadTypeDoNotGenerateResearchTree)
+
+        switch (FluffyResearchTreeMod.instance.Settings.OverrideResearch)
         {
-            switch (FluffyResearchTreeMod.instance.Settings.OverrideResearch)
-            {
-                // LeftCtrl is the way of Dubs Mint Menus mod
-                case true when
-                    !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.LeftControl):
-                case false when
-                    Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.LeftControl):
-                    researchTab = Assets.MainButtonDefOf.FluffyResearchTree;
-                    break;
-            }
+            // LeftCtrl is the way of Dubs Mint Menus mod
+            case true when
+                !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.LeftControl):
+            case false when
+                Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.LeftControl):
+                researchTab = Assets.MainButtonDefOf.FluffyResearchTree;
+                break;
         }
 
         Find.WindowStack.Add(researchTab.TabWindow);

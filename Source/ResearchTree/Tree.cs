@@ -30,7 +30,7 @@ public static class Tree
 
     public static bool FirstLoadDone;
 
-    public static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache = new();
+    public static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache = [];
 
     public static Dictionary<TechLevel, IntRange> TechLevelBounds
     {
@@ -87,7 +87,7 @@ public static class Tree
             return null;
         }
     }
-    
+
     public static Node ResearchToNode(ResearchProjectDef research)
     {
         var node = ResearchToNodesCache.TryGetValue(research);
@@ -95,10 +95,11 @@ public static class Tree
         {
             return node;
         }
+
         PopulateNodes();
         return ResearchToNodesCache.TryGetValue(research);
     }
-    
+
     public static void Reset(bool alsoZoom)
     {
         Messages.Message("Fluffy.ResearchTree.ResolutionChange".Translate(), MessageTypeDefOf.NeutralEvent);
@@ -133,7 +134,7 @@ public static class Tree
 
     public static void Initialize()
     {
-        if (FluffyResearchTreeMod.instance?.Settings?.LoadType == Constants.LoadTypeDoNotGenerateResearchTree 
+        if (FluffyResearchTreeMod.instance?.Settings?.LoadType == Constants.LoadTypeDoNotGenerateResearchTree
             || Initialized || _initializing)
         {
             return;

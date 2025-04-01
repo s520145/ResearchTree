@@ -11,9 +11,9 @@ namespace FluffyResearchTree;
 
 public static class Def_Extensions
 {
-    private static readonly Dictionary<Def, Texture2D> _cachedDefIcons = new Dictionary<Def, Texture2D>();
+    private static readonly Dictionary<Def, Texture2D> _cachedDefIcons = [];
 
-    private static readonly Dictionary<Def, Color> _cachedIconColors = new Dictionary<Def, Color>();
+    private static readonly Dictionary<Def, Color> _cachedIconColors = [];
 
     public static void DrawColouredIcon(this Def def, Rect canvas)
     {
