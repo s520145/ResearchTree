@@ -64,11 +64,11 @@ internal class FluffyResearchTreeMod : Mod
             Settings.LoadType = Constants.LoadTypeFirstTimeOpening;
         }
 
-        //if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeFour".Translate(),
-        //        Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree))
-        //{
-        //    Settings.LoadType = Constants.LoadTypeDoNotGenerateResearchTree;
-        //}
+        if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeFour".Translate(),
+                Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree))
+        {
+            Settings.LoadType = Constants.LoadTypeDoNotGenerateResearchTree;
+        }
 
         if (Settings.LoadType == Constants.LoadTypeLoadInBackground && Prefs.UIScale > 1f)
         {

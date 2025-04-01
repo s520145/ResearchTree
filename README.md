@@ -38,6 +38,8 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 -  Added compatibility with [Better Research Tabs](https://steamcommunity.com/sharedfiles/filedetails/?id=3236847079)
 -  Added compatibility with [Organized Research Tab](https://steamcommunity.com/sharedfiles/filedetails/?id=2606510510)
 -  Added compatibility with [Semi Random Research](https://steamcommunity.com/sharedfiles/filedetails/?id=2879094186)
+-  Added compatibility with [Medieval Overhaul](https://steamcommunity.com/sharedfiles/filedetails/?id=3219596926)
+-  Added compatibility with [World Tech Level](https://steamcommunity.com/sharedfiles/filedetails/?id=3414187030)
 
 
 ![Image](https://i.imgur.com/pufA0kM.png)
