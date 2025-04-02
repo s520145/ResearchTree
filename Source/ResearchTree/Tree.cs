@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -24,7 +25,7 @@ public static class Tree
 
     private static Dictionary<TechLevel, IntRange> _techLevelBounds;
 
-    private static bool _initializing;
+    private static volatile bool _initializing;
 
     public static bool OrderDirty;
 
@@ -127,7 +128,7 @@ public static class Tree
 
         if (FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeLoadInBackground)
         {
-            LongEventHandler.QueueLongEvent(Assets.StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true,
+            LongEventHandler.QueueLongEvent(Initialize, "ResearchPal.BuildingResearchTreeAsync", true,
                 null);
         }
     }
@@ -146,6 +147,7 @@ public static class Tree
         {
             try
             {
+                Logging.Message("Initialization start in background");
                 Logging.Message("CheckPrerequisites");
                 CheckPrerequisites();
                 Logging.Message("CreateEdges");
@@ -162,15 +164,14 @@ public static class Tree
                 MinimizeEdgeLength();
                 Logging.Message("RemoveEmptyRows");
                 RemoveEmptyRows();
-                Initialized = true;
                 Logging.Message("Done");
-                return;
+                Initialized = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Logging.Warning("Error initializing research tree, will retry.", true);
+                Logging.Error("Error initializing research tree, will retry." + ex, true);
             }
-
+            _initializing = false;
             return;
         }
 
@@ -186,10 +187,14 @@ public static class Tree
         LongEventHandler.QueueLongEvent(MinimizeEdgeLength, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false,
             null);
         LongEventHandler.QueueLongEvent(RemoveEmptyRows, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false, null);
-        LongEventHandler.QueueLongEvent(delegate { Initialized = true; }, "Fluffy.ResearchTree.PreparingTree.LayoutNew",
+        LongEventHandler.QueueLongEvent(delegate { 
+                Initialized = true;
+                _initializing = false;
+            }, "Fluffy.ResearchTree.PreparingTree.LayoutNew",
             false, null);
-        LongEventHandler.QueueLongEvent(MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized,
-            "Fluffy.ResearchTree.RestoreQueue", false, null);
+        LongEventHandler.QueueLongEvent(MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized, "Fluffy.ResearchTree.RestoreQueue", false, null);
+        // open tab
+        LongEventHandler.QueueLongEvent(() => { Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research); }, "Fluffy.ResearchTree.RestoreQueue", false, null);
     }
 
     private static void RemoveEmptyRows()
