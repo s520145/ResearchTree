@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -171,6 +170,7 @@ public static class Tree
             {
                 Logging.Error("Error initializing research tree, will retry." + ex, true);
             }
+
             _initializing = false;
             return;
         }
@@ -187,14 +187,17 @@ public static class Tree
         LongEventHandler.QueueLongEvent(MinimizeEdgeLength, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false,
             null);
         LongEventHandler.QueueLongEvent(RemoveEmptyRows, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false, null);
-        LongEventHandler.QueueLongEvent(delegate { 
+        LongEventHandler.QueueLongEvent(delegate
+            {
                 Initialized = true;
                 _initializing = false;
             }, "Fluffy.ResearchTree.PreparingTree.LayoutNew",
             false, null);
-        LongEventHandler.QueueLongEvent(MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized, "Fluffy.ResearchTree.RestoreQueue", false, null);
+        LongEventHandler.QueueLongEvent(MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized,
+            "Fluffy.ResearchTree.RestoreQueue", false, null);
         // open tab
-        LongEventHandler.QueueLongEvent(() => { Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research); }, "Fluffy.ResearchTree.RestoreQueue", false, null);
+        LongEventHandler.QueueLongEvent(() => { Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research); },
+            "Fluffy.ResearchTree.RestoreQueue", false, null);
     }
 
     private static void RemoveEmptyRows()

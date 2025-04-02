@@ -1,5 +1,9 @@
 # Changelog for ResearchTree
 
+1.5.27 - Fixed issues with the last commit. Fixed tooltip and action when tree is not finished loading to avoid crashes
+Used DeepL to update translations for ChineseSimplified, French, German, Russian, Spanish
+
+
 1.5.26 - Added option to not generate a research tree but to keep the queue mechanic
 
 

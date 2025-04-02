@@ -64,14 +64,11 @@ internal class FluffyResearchTreeMod : Mod
             Settings.LoadType = Constants.LoadTypeFirstTimeOpening;
         }
 
-        if (!Settings.OverrideResearch)
+        if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeFour".Translate(),
+                Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree))
         {
-            if (listing_Standard.RadioButton("Fluffy.ResearchTree.LoadTypeFour".Translate(),
-                    Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree))
-            {
-                Settings.LoadType = Constants.LoadTypeDoNotGenerateResearchTree;
-                Settings.OverrideResearch = false;
-            }
+            Settings.LoadType = Constants.LoadTypeDoNotGenerateResearchTree;
+            Settings.OverrideResearch = false;
         }
 
         if (Settings.LoadType == Constants.LoadTypeLoadInBackground && Prefs.UIScale > 1f)
@@ -92,10 +89,13 @@ internal class FluffyResearchTreeMod : Mod
         }
 
         listing_Standard.Gap();
-        if (Settings.LoadType != Constants.LoadTypeDoNotGenerateResearchTree)
+        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.OverrideResearch".Translate(),
+            ref Settings.OverrideResearch);
+        if (Settings.OverrideResearch && Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree)
         {
-            listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.OverrideResearch".Translate(), ref Settings.OverrideResearch);
+            Settings.LoadType = Constants.LoadTypeLoadInBackground;
         }
+
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.PauseOnOpen".Translate(), ref Settings.PauseOnOpen);
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.ShowCompletion".Translate(), ref Settings.ShowCompletion);
         if (ModsConfig.IdeologyActive)

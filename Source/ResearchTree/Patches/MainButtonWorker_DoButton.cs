@@ -22,6 +22,12 @@ public class MainButtonWorker_DoButton
             return;
         }
 
+        if (!Tree.Initialized)
+        {
+            TooltipHandler.TipRegion(rect, "Fluffy.ResearchTree.LoadingWait".Translate());
+            return;
+        }
+
         TooltipHandler.TipRegion(rect,
             FluffyResearchTreeMod.instance.Settings.OverrideResearch
                 ? "Fluffy.ResearchTree.HoldForClassic".Translate()

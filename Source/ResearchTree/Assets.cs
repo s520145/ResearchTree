@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
@@ -341,7 +340,6 @@ public static class Assets
             ColorAvailable[relevantTechLevels[i]] = Color.HSVToRGB(1f / count * i, 0.33f, 0.33f);
             ColorUnavailable[relevantTechLevels[i]] = Color.HSVToRGB(1f / count * i, 0.125f, 0.33f);
         }
-
     }
 
     public static bool IsBlockedByMedievalOverhaul(ResearchProjectDef researchProject)

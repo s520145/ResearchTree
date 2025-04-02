@@ -22,6 +22,7 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 -  Added option to hide the "Missing Meme"-warning when selecting research
 -  Fixed check for hiddenRequirements
 -  Added selectable background color
+-  Added option to not generate a research-tree, but still use the queue mechanic in the vanilla tree. Thanks to JiaRG
 
 
 

@@ -32,8 +32,9 @@ public static class SemiRandomResearch_DrawGoToTechTreeButton
         Find.WindowStack.TryRemove(mainTabWindow, false);
         var researchTab = MainButtonDefOf.Research;
         ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Main;
-        
-        if (FluffyResearchTreeMod.instance.Settings.LoadType != Constants.LoadTypeDoNotGenerateResearchTree)
+
+        if (FluffyResearchTreeMod.instance.Settings.LoadType != Constants.LoadTypeDoNotGenerateResearchTree &&
+            Tree.Initialized)
         {
             switch (FluffyResearchTreeMod.instance.Settings.OverrideResearch)
             {
