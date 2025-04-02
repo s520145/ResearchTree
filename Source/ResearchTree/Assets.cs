@@ -77,8 +77,6 @@ public static class Assets
 
     public static readonly List<ResearchProjectDef> AllowedResearchDefs;
 
-    public static Thread initializeWorker;
-
     public static readonly bool BetterResearchTabLoaded;
 
     public static readonly bool SemiRandomResearchLoaded;
@@ -344,10 +342,6 @@ public static class Assets
             ColorUnavailable[relevantTechLevels[i]] = Color.HSVToRGB(1f / count * i, 0.125f, 0.33f);
         }
 
-        if (FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeLoadInBackground)
-        {
-            LongEventHandler.QueueLongEvent(StartLoadingWorker, "ResearchPal.BuildingResearchTreeAsync", true, null);
-        }
     }
 
     public static bool IsBlockedByMedievalOverhaul(ResearchProjectDef researchProject)
@@ -473,13 +467,6 @@ public static class Assets
         }
 
         return !unlocks.Contains("ArchotechUplink");
-    }
-
-    public static void StartLoadingWorker()
-    {
-        initializeWorker = new Thread(Tree.Initialize);
-        Logging.Message("Initialization start in background");
-        initializeWorker.Start();
     }
 
     public static void DrawWindowBackground(Rect rect, Color bgColor)
