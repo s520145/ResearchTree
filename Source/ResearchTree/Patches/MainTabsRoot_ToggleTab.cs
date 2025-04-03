@@ -37,7 +37,9 @@ public class MainTabsRoot_ToggleTab
             return;
         }
 
-        switch (FluffyResearchTreeMod.instance.Settings.OverrideResearch && Tree.Initialized)
+        switch (FluffyResearchTreeMod.instance.Settings.OverrideResearch &&
+                (Tree.Initialized || FluffyResearchTreeMod.instance.Settings.LoadType !=
+                    Constants.LoadTypeLoadInBackground))
         {
             // LeftCtrl is the way of Dubs Mint Menus mod
             case true when

@@ -22,7 +22,7 @@ public class MainButtonWorker_DoButton
             return;
         }
 
-        if (!Tree.Initialized)
+        if (!Tree.Initialized && FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeLoadInBackground)
         {
             TooltipHandler.TipRegion(rect, "Fluffy.ResearchTree.LoadingWait".Translate());
             return;

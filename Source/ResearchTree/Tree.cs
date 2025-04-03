@@ -96,7 +96,7 @@ public static class Tree
             return node;
         }
 
-        PopulateNodes();
+        _ = Nodes.OfType<ResearchNode>();
         return ResearchToNodesCache.TryGetValue(research);
     }
 
