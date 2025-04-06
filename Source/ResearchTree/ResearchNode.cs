@@ -516,7 +516,7 @@ public class ResearchNode : Node
             }
         }
 
-        if (!mouseOver || !Widgets.ButtonInvisible(Rect))
+        if (!Widgets.ButtonInvisible(Rect))
         {
             return;
         }
