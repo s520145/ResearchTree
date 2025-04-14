@@ -351,7 +351,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             searchRect.width - Constants.SmallQueueLabelSize - Constants.Margin,
             searchRect.height
         ).CenteredOnYIn(canvas.BottomHalf());
-        if (ModsConfig.AnomalyActive && Widgets.ButtonText(anomalyBtnRect, ResearchTabDefOf.Anomaly.generalTitle))
+        if (ModsConfig.AnomalyActive && Widgets.ButtonText(anomalyBtnRect, "Fluffy.ResearchTree.Anomaly".Translate()))
         {
             ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
             Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research);
