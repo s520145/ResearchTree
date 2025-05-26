@@ -16,6 +16,7 @@
             <label>research</label>
             <description>Examine and decide on research projects.</description>
             <workerClass>MainButtonWorker_ToggleResearchTab</workerClass>
+            <buttonVisible>false</buttonVisible>
             <tabWindowClass>TowersBetterResearchTabs.MainTabWindow_Research</tabWindowClass>
           </MainButtonDef>
         </value>

@@ -58,6 +58,7 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 [*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3236847079]Better Research Tabs[/url]
 [*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2606510510]Organized Research Tab[/url]
 [*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2879094186]Semi Random Research[/url]
+[*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3455432792]Semi Random Research: Progression Fork[/url]
 [*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3219596926]Medieval Overhaul[/url]
 [*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3414187030]World Tech Level[/url]
 [/list]
@@ -110,5 +111,5 @@ Parts of the code in this mod, and some content may be licensed by their origina
 [/list] 
 
 [url=https://steamcommunity.com/sharedfiles/filedetails/changelog/3030499331][img]https://img.shields.io/github/v/release/emipa606/ResearchTree?label=latest%20version&amp;style=plastic&amp;color=9f1111&amp;labelColor=black[/img][/url] | tags:  queue,  tree</description>
-  <modVersion IgnoreIfNoMatchingField="True">1.5.31</modVersion>
+  <modVersion IgnoreIfNoMatchingField="True">1.5.32</modVersion>
 </ModMetaData>

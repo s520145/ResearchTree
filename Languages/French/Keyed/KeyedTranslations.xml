@@ -64,4 +64,5 @@ Veuillez utiliser l'option de chargement à la première ouverture si vous renco
   <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>Les paramètres du niveau technologique mondial ne permettent pas l'utilisation de cette technologie</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.LoadingWait>L'arbre n'a pas fini d'être généré, cliquez pour ouvrir l'arbre vanille</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>Recherche sur les anomalies</Fluffy.ResearchTree.Anomaly>
+  <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
 </LanguageData>
