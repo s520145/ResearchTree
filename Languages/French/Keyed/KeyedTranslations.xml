@@ -55,12 +55,14 @@ Veuillez utiliser l'option de chargement à la première ouverture si vous renco
   <Fluffy.ResearchTree.VerboseLogging>Journalisation verbeuse</Fluffy.ResearchTree.VerboseLogging>
   <Fluffy.ResearchTree.NoIdeologyPopup>Ne pas montrer le mème manquant - avertissement</Fluffy.ResearchTree.NoIdeologyPopup>
   <Fluffy.ResearchTree.NoIdeologyPopupTT>Lors de la sélection d'une recherche, la fenêtre contextuelle avertissant qu'elle débloquera des objets que votre idéologie actuelle n'autorise pas ne s'affichera pas.</Fluffy.ResearchTree.NoIdeologyPopupTT>
+  <Fluffy.ResearchTree.HideWorldTechLevelBlockedNodes>Cacher la recherche qui est bloquée par le World Tech Level</Fluffy.ResearchTree.HideWorldTechLevelBlockedNodes>
   <Fluffy.ResearchTree.SemiRandomResearchLoaded>La recherche semi-aléatoire ne permet pas de choisir librement la recherche.</Fluffy.ResearchTree.SemiRandomResearchLoaded>
   <Fluffy.ResearchTree.Reset>Remise à zéro</Fluffy.ResearchTree.Reset>
   <Fluffy.ResearchTree.ResetLabel>Réinitialiser tous les paramètres</Fluffy.ResearchTree.ResetLabel>
   <Fluffy.ResearchTree.BackgroundColor>Couleur d'arrière-plan</Fluffy.ResearchTree.BackgroundColor>
   <Fluffy.ResearchTree.LClickRemoveFromQueue>Shift-Click pour supprimer de la file d'attente</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.GrimworldDoesNotAllow>La condition d'étude de Grimworld n'est pas remplie, cliquez sur le bouton droit de la souris pour afficher les informations détaillées.</Fluffy.ResearchTree.GrimworldDoesNotAllow>
+  <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>Les paramètres du niveau technologique mondial ne permettent pas l'utilisation de cette technologie</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.LoadingWait>L'arbre n'a pas fini d'être généré, cliquez pour ouvrir l'arbre vanille</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>Recherche sur les anomalies</Fluffy.ResearchTree.Anomaly>
 </LanguageData>

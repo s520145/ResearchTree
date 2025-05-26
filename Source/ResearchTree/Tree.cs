@@ -705,7 +705,7 @@ public static class Tree
             return;
         }
 
-        if (Assets.IsBlockedByWorldTechLevel(techlevel))
+        if (Assets.IsHiddenByWorldTechLevel(techlevel))
         {
             return;
         }
@@ -728,7 +728,7 @@ public static class Tree
 
         if (TechLevelBounds[techlevel].max < Size.x && num2 > visibleRect.xMin && num2 < visibleRect.xMax)
         {
-            if (!Assets.IsBlockedByWorldTechLevel(techlevel + 1))
+            if (!Assets.IsHiddenByWorldTechLevel(techlevel + 1))
             {
                 VerticalLabel(
                     new Rect(num2 - (Constants.TechLevelLabelSize.y / 2f) - (Constants.TechLevelLabelSize.x / 2f),

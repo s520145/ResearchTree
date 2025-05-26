@@ -60,6 +60,11 @@ public class Dialog_ResearchInfoCard : Window
             Assets.GrimworldInfoMethod.Invoke(null, [null, listing_Standard.GetRect(110f), 1f, researchProjectDef]);
         }
 
+        if (Assets.IsBlockedByWorldTechLevel(researchProjectDef))
+        {
+            listing_Standard.Label("Fluffy.ResearchTree.WorldTechLevelDoesNotAllow".Translate());
+        }
+
         if (Assets.IsBlockedByMedievalOverhaul(researchProjectDef))
         {
             if (Assets.TryGetBlockingSchematicFromMedievalOverhaul(researchProjectDef, out var thingLabel))

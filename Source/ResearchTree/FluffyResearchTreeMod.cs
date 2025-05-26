@@ -108,6 +108,12 @@ internal class FluffyResearchTreeMod : Mod
             Settings.NoIdeologyPopup = false;
         }
 
+        if (Assets.UsingWorldTechLevel)
+        {
+            listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.HideWorldTechLevelBlockedNodes".Translate(),
+                ref Settings.HideWorldTechLevelBlockedNodes);
+        }
+
         var colorRect = listing_Standard.GetRect(30f);
         Widgets.Label(colorRect.LeftHalf(), "Fluffy.ResearchTree.BackgroundColor".Translate());
         Widgets.DrawBoxSolidWithOutline(colorRect.RightHalf().RightHalf(), Settings.BackgroundColor,

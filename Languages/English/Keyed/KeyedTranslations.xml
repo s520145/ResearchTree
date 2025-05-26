@@ -19,12 +19,14 @@
   <Fluffy.ResearchTree.VerboseLogging>Verbose logging</Fluffy.ResearchTree.VerboseLogging>
   <Fluffy.ResearchTree.NoIdeologyPopup>Do not show missing meme-warning</Fluffy.ResearchTree.NoIdeologyPopup>
   <Fluffy.ResearchTree.NoIdeologyPopupTT>When selecting a research, the popup warning that it will unlock items that your current Ideology does not allow will not be shown</Fluffy.ResearchTree.NoIdeologyPopupTT>
+  <Fluffy.ResearchTree.HideWorldTechLevelBlockedNodes>Hide research blocked by World Tech Level</Fluffy.ResearchTree.HideWorldTechLevelBlockedNodes>
   <Fluffy.ResearchTree.Requires>Requires</Fluffy.ResearchTree.Requires>
   <Fluffy.ResearchTree.NotStarted>Not started, costs {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>In progress, {0} of {1} done</Fluffy.ResearchTree.InProgress>
   <Fluffy.ResearchTree.LeadsTo>Leads to</Fluffy.ResearchTree.LeadsTo>
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller does not allow this tech</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Rimedieval settings does not allow this tech</Fluffy.ResearchTree.RimedievalDoesNotAllow>
+  <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>World Tech Level settings does not allow this tech</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.GrimworldDoesNotAllow>Grimworld study requirement not fulfilled, right click to show detailed info</Fluffy.ResearchTree.GrimworldDoesNotAllow>
   <Fluffy.ResearchTree.SemiRandomResearchLoaded>Semi Random Research does not allow choosing research freely</Fluffy.ResearchTree.SemiRandomResearchLoaded>
   <Fluffy.ResearchTree.Anomaly>Anomaly Research</Fluffy.ResearchTree.Anomaly>

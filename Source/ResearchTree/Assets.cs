@@ -434,9 +434,19 @@ public static class Assets
         return !(bool)WorldTechLevelProjectVisibleMethod.Invoke(null, [researchProject]);
     }
 
-    public static bool IsBlockedByWorldTechLevel(TechLevel techLevel)
+    public static bool IsHiddenByWorldTechLevel(ResearchProjectDef researchProject)
     {
-        if (!UsingWorldTechLevel)
+        if (!UsingWorldTechLevel || !FluffyResearchTreeMod.instance.Settings.HideWorldTechLevelBlockedNodes)
+        {
+            return false;
+        }
+
+        return !(bool)WorldTechLevelProjectVisibleMethod.Invoke(null, [researchProject]);
+    }
+
+    public static bool IsHiddenByWorldTechLevel(TechLevel techLevel)
+    {
+        if (!UsingWorldTechLevel || !FluffyResearchTreeMod.instance.Settings.HideWorldTechLevelBlockedNodes)
         {
             return false;
         }

@@ -18,6 +18,7 @@
   <Fluffy.ResearchTree.VerboseLogging>Registro detallado</Fluffy.ResearchTree.VerboseLogging>
   <Fluffy.ResearchTree.NoIdeologyPopup>No mostrar advertencia de meme faltante</Fluffy.ResearchTree.NoIdeologyPopup>
   <Fluffy.ResearchTree.NoIdeologyPopupTT>Al seleccionar una investigación, no se mostrará la advertencia de que se desbloquearán elementos que tu Ideología actual no permite</Fluffy.ResearchTree.NoIdeologyPopupTT>
+  <Fluffy.ResearchTree.HideWorldTechLevelBlockedNodes>Ocultar la investigación bloqueada por World Tech Level</Fluffy.ResearchTree.HideWorldTechLevelBlockedNodes>
   <Fluffy.ResearchTree.Requires>Requiere</Fluffy.ResearchTree.Requires>
   <Fluffy.ResearchTree.NotStarted>No empezado, cuesta {0}</Fluffy.ResearchTree.NotStarted>
   <Fluffy.ResearchTree.InProgress>En progreso, {0} de {1} completado</Fluffy.ResearchTree.InProgress>
@@ -61,6 +62,7 @@
   <Fluffy.ResearchTree.BackgroundColor>Color de fondo</Fluffy.ResearchTree.BackgroundColor>
   <Fluffy.ResearchTree.LClickRemoveFromQueue>Mayús-Clic para eliminar de la cola</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.GrimworldDoesNotAllow>No se cumple el requisito de estudio de Grimworld, haz clic con el botón derecho para mostrar información detallada</Fluffy.ResearchTree.GrimworldDoesNotAllow>
+  <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>La configuración del nivel técnico mundial no permite esta tecnología</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.LoadingWait>Árbol no terminado de generar, haga clic para abrir el árbol de vainilla</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>Investigación de anomalías</Fluffy.ResearchTree.Anomaly>
 </LanguageData>
