@@ -75,7 +75,9 @@ public static class Assets
 
     public static readonly FieldInfo Sos2UlocksFieldInfo;
 
-    public static readonly List<ResearchProjectDef> AllowedResearchDefs;
+    public static readonly List<ResearchProjectDef> RimedievalAllowedResearchDefs;
+
+    public static readonly TechLevel RimedievalMaxTechLevel;
 
     public static readonly bool BetterResearchTabLoaded;
 
@@ -148,7 +150,7 @@ public static class Assets
         ColorAvailable = new Dictionary<TechLevel, Color>();
         ColorUnavailable = new Dictionary<TechLevel, Color>();
         TechLevelColor = new Color(1f, 1f, 1f, 0.2f);
-        AllowedResearchDefs = [];
+        RimedievalAllowedResearchDefs = [];
 
         UsingRimedieval =
             ModLister.GetActiveModWithIdentifier("Ogam.Rimedieval") != null;
@@ -175,12 +177,14 @@ public static class Assets
                 {
                     try
                     {
-                        AllowedResearchDefs =
+                        RimedievalAllowedResearchDefs =
                             (List<ResearchProjectDef>)GetAllowedProjectDefsMethod.Invoke(null,
                             [
                                 DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def =>
                                     !def.IsAnomalyResearch()).ToList()
                             ]);
+
+                        RimedievalMaxTechLevel = RimedievalAllowedResearchDefs.Max(e => e.techLevel);
                     }
                     catch (TargetInvocationException e)
                     {
@@ -434,24 +438,44 @@ public static class Assets
         return !(bool)WorldTechLevelProjectVisibleMethod.Invoke(null, [researchProject]);
     }
 
-    public static bool IsHiddenByWorldTechLevel(ResearchProjectDef researchProject)
+    public static bool IsHiddenByTechLevelRestrictions(ResearchProjectDef researchProject)
     {
-        if (!UsingWorldTechLevel || !FluffyResearchTreeMod.instance.Settings.HideWorldTechLevelBlockedNodes)
+        if (!FluffyResearchTreeMod.instance.Settings.HideNodesBlockedByTechLevel)
         {
             return false;
         }
 
-        return !(bool)WorldTechLevelProjectVisibleMethod.Invoke(null, [researchProject]);
+        if (UsingWorldTechLevel && !(bool)WorldTechLevelProjectVisibleMethod.Invoke(null, [researchProject]))
+        {
+            return true;
+        }
+
+        if (UsingRimedieval && !RimedievalAllowedResearchDefs.Contains(researchProject))
+        {
+            return true;
+        }
+
+        return false;
     }
 
-    public static bool IsHiddenByWorldTechLevel(TechLevel techLevel)
+    public static bool IsHiddenByTechLevelRestrictions(TechLevel techLevel)
     {
-        if (!UsingWorldTechLevel || !FluffyResearchTreeMod.instance.Settings.HideWorldTechLevelBlockedNodes)
+        if (!FluffyResearchTreeMod.instance.Settings.HideNodesBlockedByTechLevel)
         {
             return false;
         }
 
-        return !(bool)WorldTechLevelSectionVisibleMethod.Invoke(null, [techLevel]);
+        if (UsingWorldTechLevel && !(bool) WorldTechLevelSectionVisibleMethod.Invoke(null, [techLevel]))
+        {
+            return true;
+        }
+
+        if (UsingRimedieval && techLevel > RimedievalMaxTechLevel)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public static bool IsBlockedByGrimworld(ResearchProjectDef researchProject)

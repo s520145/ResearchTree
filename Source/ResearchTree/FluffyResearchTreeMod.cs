@@ -108,10 +108,10 @@ internal class FluffyResearchTreeMod : Mod
             Settings.NoIdeologyPopup = false;
         }
 
-        if (Assets.UsingWorldTechLevel)
+        if (Assets.UsingWorldTechLevel || Assets.UsingRimedieval)
         {
-            listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.HideWorldTechLevelBlockedNodes".Translate(),
-                ref Settings.HideWorldTechLevelBlockedNodes);
+            listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.HideNodesBlockedByTechLevel".Translate(),
+                ref Settings.HideNodesBlockedByTechLevel);
         }
 
         var colorRect = listing_Standard.GetRect(30f);
