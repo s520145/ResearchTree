@@ -17,12 +17,12 @@ public static class Def_Extensions
 
     public static void DrawColouredIcon(this Def def, Rect canvas)
     {
-        GUI.color = def.IconColor();
+        GUI.color = def.iconColor();
         GUI.DrawTexture(canvas, def.IconTexture(), ScaleMode.ScaleToFit);
         GUI.color = Color.white;
     }
 
-    public static Color IconColor(this Def def)
+    private static Color iconColor(this Def def)
     {
         if (def == null)
         {
@@ -39,7 +39,7 @@ public static class Def_Extensions
         var pawnKindDef = def as PawnKindDef;
         if (def is RecipeDef recipeDef && !recipeDef.products.NullOrEmpty())
         {
-            _cachedIconColors.Add(def, recipeDef.products.First().thingDef.IconColor());
+            _cachedIconColors.Add(def, recipeDef.products.First().thingDef.iconColor());
             return _cachedIconColors[def];
         }
 
@@ -57,7 +57,7 @@ public static class Def_Extensions
 
         if (thingDef is { entityDefToBuild: not null })
         {
-            _cachedIconColors.Add(def, thingDef.entityDefToBuild.IconColor());
+            _cachedIconColors.Add(def, thingDef.entityDefToBuild.iconColor());
             return _cachedIconColors[def];
         }
 

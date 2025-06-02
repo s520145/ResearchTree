@@ -6,7 +6,7 @@ namespace FluffyResearchTree;
 
 internal static class FastGUI
 {
-    private static Internal_DrawTextureArguments drawArguments = new Internal_DrawTextureArguments
+    private static Internal_DrawTextureArguments drawArguments = new()
     {
         leftBorder = 0,
         rightBorder = 0,
@@ -23,7 +23,7 @@ internal static class FastGUI
         borderWidths = Vector4.zero
     };
 
-    private static Internal_DrawTextureArguments drawArguments2 = new Internal_DrawTextureArguments
+    private static Internal_DrawTextureArguments drawArguments2 = new()
     {
         leftBorder = 0,
         rightBorder = 0,
@@ -40,7 +40,7 @@ internal static class FastGUI
         borderWidths = Vector4.zero
     };
 
-    public static void DrawTextureFast(Rect position, Texture image, Color color = new Color())
+    public static void DrawTextureFast(Rect position, Texture image, Color color = new())
     {
         if (color == new Color())
         {
@@ -62,7 +62,7 @@ internal static class FastGUI
         Graphics.Internal_DrawTexture(ref drawArguments);
     }
 
-    public static void DrawTextureFastWithCoords(Rect position, Texture image, Rect rect, Color color = new Color())
+    public static void DrawTextureFastWithCoords(Rect position, Texture image, Rect rect, Color color = new())
     {
         if (color == new Color())
         {

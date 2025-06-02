@@ -11,11 +11,11 @@ namespace FluffyResearchTree;
 [HarmonyPatch(typeof(MainTabWindow_Research), nameof(MainTabWindow_Research.AttemptBeginResearch))]
 public class MainTabWindow_Research_AttemptBeginResearch
 {
-    public static readonly MethodInfo Dialog_MessageBox_CreateConfirmationMethodInfo =
+    private static readonly MethodInfo Dialog_MessageBox_CreateConfirmationMethodInfo =
         AccessTools.Method(typeof(Dialog_MessageBox), nameof(Dialog_MessageBox.CreateConfirmation),
             [typeof(TaggedString), typeof(Action), typeof(bool), typeof(string), typeof(WindowLayer)]);
 
-    public static readonly MethodInfo Queue_CreateConfirmationMethodInfo =
+    private static readonly MethodInfo Queue_CreateConfirmationMethodInfo =
         AccessTools.Method(typeof(Queue), nameof(Queue.CreateConfirmation),
         [
             typeof(ResearchProjectDef), typeof(TaggedString), typeof(Action), typeof(bool), typeof(string),
@@ -44,8 +44,8 @@ public class MainTabWindow_Research_AttemptBeginResearch
         var opts = new List<CodeInstruction>
         {
             // Dialog_MessageBox.CreateConfirmation(...
-            new CodeInstruction(codes[9]), // ldloc.0
-            new CodeInstruction(codes[10]) // ldfld   projectToStart
+            new(codes[9]), // ldloc.0
+            new(codes[10]) // ldfld   projectToStart
         };
 
         codes.InsertRange(startIndex - 9, opts);

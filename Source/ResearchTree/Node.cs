@@ -12,47 +12,43 @@ namespace FluffyResearchTree;
 
 public class Node
 {
-    protected const float Offset = 2f;
+    private const float Offset = 2f;
 
-    protected readonly List<Edge<Node, Node>> _inEdges = [];
+    private Rect _costIconRect;
 
-    protected readonly List<Edge<Node, Node>> _outEdges = [];
+    private Rect _costLabelRect;
 
-    protected Rect _costIconRect;
+    private Rect _iconsRect;
 
-    protected Rect _costLabelRect;
-
-    protected Rect _iconsRect;
-
-    protected Rect _labelRect;
+    private Rect _labelRect;
 
     protected bool _largeLabel;
 
-    protected Vector2 _left = Vector2.zero;
+    private Vector2 _left = Vector2.zero;
 
-    protected Rect _lockRect;
+    private Rect _lockRect;
 
     protected Vector2 _pos = Vector2.zero;
 
-    protected Rect _rect;
+    private Rect _rect;
 
-    protected bool _rectsSet;
+    private bool _rectsSet;
 
-    protected Vector2 _right = Vector2.zero;
+    private Vector2 _right = Vector2.zero;
 
-    protected Vector2 _topLeft = Vector2.zero;
+    private Vector2 _topLeft = Vector2.zero;
 
     public List<Node> Descendants => OutNodes.Concat(OutNodes.SelectMany(n => n.Descendants)).ToList();
 
-    public List<Edge<Node, Node>> OutEdges => _outEdges;
+    public List<Edge<Node, Node>> OutEdges { get; } = [];
 
-    public List<Node> OutNodes => _outEdges.Select(e => e.Out).ToList();
+    public List<Node> OutNodes => OutEdges.Select(e => e.Out).ToList();
 
-    public List<Edge<Node, Node>> InEdges => _inEdges;
+    public List<Edge<Node, Node>> InEdges { get; } = [];
 
-    public List<Node> InNodes => _inEdges.Select(e => e.In).ToList();
+    public List<Node> InNodes => InEdges.Select(e => e.In).ToList();
 
-    public List<Edge<Node, Node>> Edges => _inEdges.Concat(_outEdges).ToList();
+    public List<Edge<Node, Node>> Edges => InEdges.Concat(OutEdges).ToList();
 
     public List<Node> Nodes => InNodes.Concat(OutNodes).ToList();
 
@@ -212,7 +208,7 @@ public class Node
         }
     }
 
-    public virtual Vector2 Pos => new Vector2(X, Y);
+    public virtual Vector2 Pos => new(X, Y);
 
     public virtual float Yf
     {
@@ -237,6 +233,8 @@ public class Node
     public virtual bool Available => false;
 
     public virtual bool Highlighted { get; set; }
+
+    public virtual bool IsVisible => true;
 
     protected internal virtual bool SetDepth(int min = 1)
     {
@@ -344,8 +342,6 @@ public class Node
 
         return false;
     }
-
-    public virtual bool IsVisible => true;
 
     public virtual void Draw(Rect visibleRect, bool forceDetailedMode = false)
     {

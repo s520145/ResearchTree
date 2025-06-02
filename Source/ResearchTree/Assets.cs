@@ -15,7 +15,7 @@ namespace FluffyResearchTree;
 [StaticConstructorOnStartup]
 public static class Assets
 {
-    public static Thread initializeWorker;
+    private static Thread initializeWorker;
 
     public static readonly Texture2D Button;
 
@@ -45,39 +45,37 @@ public static class Assets
 
     public static readonly bool UsingRimedieval;
 
-    public static readonly bool UsingSOS2;
+    private static readonly bool UsingSOS2;
 
     public static readonly bool UsingMinimap;
 
-    public static readonly bool UsingMedievalOverhaul;
+    private static readonly bool UsingMedievalOverhaul;
 
     public static readonly bool UsingWorldTechLevel;
 
-    public static readonly bool UsingGrimworld;
+    private static readonly bool UsingGrimworld;
 
-    public static readonly MethodInfo WorldTechLevelProjectVisibleMethod;
+    private static readonly MethodInfo WorldTechLevelProjectVisibleMethod;
 
-    public static readonly MethodInfo WorldTechLevelSectionVisibleMethod;
+    private static readonly MethodInfo WorldTechLevelSectionVisibleMethod;
 
-    public static readonly MethodInfo MedievalOverhaulPostfixMethod;
+    private static readonly MethodInfo MedievalOverhaulPostfixMethod;
 
-    public static readonly FieldInfo MedievalOverhaulSchematicDefField;
+    private static readonly FieldInfo MedievalOverhaulSchematicDefField;
 
-    public static readonly MethodInfo GrimworldPostfixMethod;
+    private static readonly MethodInfo GrimworldPostfixMethod;
 
     public static readonly MethodInfo GrimworldInfoMethod;
 
     public static readonly MethodInfo IsDisabledMethod;
 
-    public static readonly MethodInfo GetAllowedProjectDefsMethod;
+    private static readonly PropertyInfo Sos2WorldCompPropertyInfo;
 
-    public static readonly PropertyInfo Sos2WorldCompPropertyInfo;
-
-    public static readonly FieldInfo Sos2UlocksFieldInfo;
+    private static readonly FieldInfo Sos2UlocksFieldInfo;
 
     public static readonly List<ResearchProjectDef> RimedievalAllowedResearchDefs;
 
-    public static readonly TechLevel RimedievalMaxTechLevel;
+    private static readonly TechLevel RimedievalMaxTechLevel;
 
     public static readonly bool BetterResearchTabLoaded;
 
@@ -152,8 +150,7 @@ public static class Assets
         TechLevelColor = new Color(1f, 1f, 1f, 0.2f);
         RimedievalAllowedResearchDefs = [];
 
-        UsingRimedieval =
-            ModLister.GetActiveModWithIdentifier("Ogam.Rimedieval") != null;
+        UsingRimedieval = ModLister.GetActiveModWithIdentifier("Ogam.Rimedieval", true) != null;
         if (UsingRimedieval)
         {
             var defCleanerType = AccessTools.TypeByName("Rimedieval.DefCleaner");
@@ -165,9 +162,9 @@ public static class Assets
             }
             else
             {
-                GetAllowedProjectDefsMethod = AccessTools.Method(defCleanerType, "GetAllowedProjectDefs",
+                var getAllowedProjectDefsMethod1 = AccessTools.Method(defCleanerType, "GetAllowedProjectDefs",
                     [typeof(List<ResearchProjectDef>)]);
-                if (GetAllowedProjectDefsMethod == null)
+                if (getAllowedProjectDefsMethod1 == null)
                 {
                     Logging.Warning(
                         "Failed to find method GetAllowedProjectDefs in Rimedieval. Will not be able to show or block research based on Rimedieval settings.");
@@ -178,7 +175,7 @@ public static class Assets
                     try
                     {
                         RimedievalAllowedResearchDefs =
-                            (List<ResearchProjectDef>)GetAllowedProjectDefsMethod.Invoke(null,
+                            (List<ResearchProjectDef>)getAllowedProjectDefsMethod1.Invoke(null,
                             [
                                 DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def =>
                                     !def.IsAnomalyResearch()).ToList()
@@ -198,7 +195,7 @@ public static class Assets
         }
 
         UsingVanillaVehiclesExpanded =
-            ModLister.GetActiveModWithIdentifier("OskarPotocki.VanillaVehiclesExpanded") != null;
+            ModLister.GetActiveModWithIdentifier("OskarPotocki.VanillaVehiclesExpanded", true) != null;
         if (UsingVanillaVehiclesExpanded)
         {
             var utilsType = AccessTools.TypeByName("VanillaVehiclesExpanded.Utils");
@@ -231,11 +228,9 @@ public static class Assets
             }
         }
 
-        UsingMinimap =
-            ModLister.GetActiveModWithIdentifier("dubwise.dubsmintminimap") != null;
+        UsingMinimap = ModLister.GetActiveModWithIdentifier("dubwise.dubsmintminimap", true) != null;
 
-        UsingWorldTechLevel =
-            ModLister.GetActiveModWithIdentifier("m00nl1ght.WorldTechLevel") != null;
+        UsingWorldTechLevel = ModLister.GetActiveModWithIdentifier("m00nl1ght.WorldTechLevel", true) != null;
 
         if (UsingWorldTechLevel)
         {
@@ -260,8 +255,7 @@ public static class Assets
             }
         }
 
-        UsingMedievalOverhaul =
-            ModLister.GetActiveModWithIdentifier("DankPyon.Medieval.Overhaul") != null;
+        UsingMedievalOverhaul = ModLister.GetActiveModWithIdentifier("DankPyon.Medieval.Overhaul", true) != null;
 
         if (UsingMedievalOverhaul)
         {
@@ -286,8 +280,7 @@ public static class Assets
             }
         }
 
-        UsingGrimworld =
-            ModLister.GetActiveModWithIdentifier("Grimworld.Framework") != null;
+        UsingGrimworld = ModLister.GetActiveModWithIdentifier("Grimworld.Framework", true) != null;
 
         if (UsingGrimworld)
         {
@@ -310,8 +303,7 @@ public static class Assets
             }
         }
 
-        UsingSOS2 =
-            ModLister.GetActiveModWithIdentifier("kentington.saveourship2") != null;
+        UsingSOS2 = ModLister.GetActiveModWithIdentifier("kentington.saveourship2", true) != null;
         if (UsingSOS2)
         {
             var shipInteriorType = AccessTools.TypeByName("SaveOurShip2.ShipInteriorMod2");
@@ -369,7 +361,7 @@ public static class Assets
     }
 
 
-    public static void StartLoadingWorker()
+    private static void StartLoadingWorker()
     {
         initializeWorker = new Thread(Tree.Initialize);
         Logging.Message("Initialization start in background");
@@ -450,12 +442,7 @@ public static class Assets
             return true;
         }
 
-        if (UsingRimedieval && !RimedievalAllowedResearchDefs.Contains(researchProject))
-        {
-            return true;
-        }
-
-        return false;
+        return UsingRimedieval && !RimedievalAllowedResearchDefs.Contains(researchProject);
     }
 
     public static bool IsHiddenByTechLevelRestrictions(TechLevel techLevel)
@@ -465,17 +452,12 @@ public static class Assets
             return false;
         }
 
-        if (UsingWorldTechLevel && !(bool) WorldTechLevelSectionVisibleMethod.Invoke(null, [techLevel]))
+        if (UsingWorldTechLevel && !(bool)WorldTechLevelSectionVisibleMethod.Invoke(null, [techLevel]))
         {
             return true;
         }
 
-        if (UsingRimedieval && techLevel > RimedievalMaxTechLevel)
-        {
-            return true;
-        }
-
-        return false;
+        return UsingRimedieval && techLevel > RimedievalMaxTechLevel;
     }
 
     public static bool IsBlockedByGrimworld(ResearchProjectDef researchProject)

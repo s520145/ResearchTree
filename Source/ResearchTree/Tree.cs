@@ -30,9 +30,9 @@ public static class Tree
 
     public static bool FirstLoadDone;
 
-    public static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache = [];
+    private static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache = [];
 
-    public static Dictionary<TechLevel, IntRange> TechLevelBounds
+    private static Dictionary<TechLevel, IntRange> TechLevelBounds
     {
         get
         {
@@ -50,12 +50,9 @@ public static class Tree
     {
         get
         {
-            if (_relevantTechLevels == null)
-            {
-                _relevantTechLevels = (from TechLevel tl in Enum.GetValues(typeof(TechLevel))
-                    where DefDatabase<ResearchProjectDef>.AllDefsListForReading.Any(rp => rp.techLevel == tl)
-                    select tl).OrderBy(tl => tl).ToList();
-            }
+            _relevantTechLevels ??= (from TechLevel tl in Enum.GetValues(typeof(TechLevel))
+                where DefDatabase<ResearchProjectDef>.AllDefsListForReading.Any(rp => rp.techLevel == tl)
+                select tl).OrderBy(tl => tl).ToList();
 
             return _relevantTechLevels;
         }
@@ -74,7 +71,7 @@ public static class Tree
         }
     }
 
-    public static List<Edge<Node, Node>> Edges
+    private static List<Edge<Node, Node>> Edges
     {
         get
         {
@@ -539,7 +536,7 @@ public static class Tree
         }
     }
 
-    public static void CheckPrerequisites()
+    private static void CheckPrerequisites()
     {
         var keepIterating = true;
         var iterator = 10;
@@ -698,7 +695,7 @@ public static class Tree
         }
     }
 
-    public static void DrawTechLevel(TechLevel techlevel, Rect visibleRect)
+    private static void DrawTechLevel(TechLevel techlevel, Rect visibleRect)
     {
         if (!TechLevelBounds.ContainsKey(techlevel))
         {
@@ -756,7 +753,7 @@ public static class Tree
         return Enumerable.FirstOrDefault(Nodes, n => n.X == X && n.Y == Y);
     }
 
-    public static void MinimizeCrossings()
+    private static void MinimizeCrossings()
     {
         for (var i = 1; i <= Size.x; i++)
         {
@@ -995,7 +992,7 @@ public static class Tree
         return list.Sum(e => e.Length) * (!@in ? 1 : 2);
     }
 
-    public static List<Node> Layer(int depth, bool ordered = false)
+    private static List<Node> Layer(int depth, bool ordered = false)
     {
         if (!ordered || !OrderDirty)
         {
@@ -1010,7 +1007,7 @@ public static class Tree
         return Nodes.Where(n => n.X == depth).ToList();
     }
 
-    public static List<Node> Row(int Y)
+    private static List<Node> Row(int Y)
     {
         return Nodes.Where(n => n.Y == Y).ToList();
     }

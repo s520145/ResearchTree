@@ -52,7 +52,7 @@ public class Queue : WorldComponent
         }
     }
 
-    public static int NumQueued => _instance._queue.Count;
+    private static int NumQueued => _instance._queue.Count;
 
     public static void TryDequeue(ResearchNode node)
     {

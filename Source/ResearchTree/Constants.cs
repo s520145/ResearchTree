@@ -31,15 +31,15 @@ public static class Constants
     public const int LoadTypeFirstTimeOpening = 2;
     public const int LoadTypeDoNotGenerateResearchTree = 3;
 
-    public static readonly Vector2 IconSize = new Vector2(18f, 18f);
+    public static readonly Vector2 IconSize = new(18f, 18f);
 
-    public static readonly Vector2 LargeIconSize = new Vector2(64f, 64f);
+    public static readonly Vector2 LargeIconSize = new(64f, 64f);
 
-    public static readonly Vector2 NodeMargins = new Vector2(50f, 10f);
+    public static readonly Vector2 NodeMargins = new(50f, 10f);
 
-    public static readonly Vector2 NodeSize = new Vector2(200f, 50f);
+    public static readonly Vector2 NodeSize = new(200f, 50f);
 
     public static readonly float TopBarHeight = NodeSize.y + 12f + 20f;
 
-    public static readonly Vector2 TechLevelLabelSize = new Vector2(200f, QueueLabelSize);
+    public static readonly Vector2 TechLevelLabelSize = new(200f, QueueLabelSize);
 }

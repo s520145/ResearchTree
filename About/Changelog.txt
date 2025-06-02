@@ -1,5 +1,8 @@
 # Changelog for ResearchTree
 
+1.5.33 - There is now an option to hide research that is blocked by tech-limiting mods instead of just disabling them. Thanks to m00nl1ght-dev
+
+
 1.5.32 - Fixed Better Research Tabs compatibility
 Used DeepL to update translations for ChineseSimplified, French, Spanish
 

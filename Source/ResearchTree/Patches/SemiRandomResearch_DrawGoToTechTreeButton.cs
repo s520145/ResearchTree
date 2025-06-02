@@ -9,7 +9,7 @@ public static class SemiRandomResearch_DrawGoToTechTreeButton
 {
     public static bool Prefix(Rect mainRect)
     {
-        var num = 32f;
+        const float num = 32f;
 
         var rect = new Rect(mainRect.xMax - num - 6f, mainRect.yMin, num, num);
         TooltipHandler.TipRegion(rect,

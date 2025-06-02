@@ -1,7 +1,6 @@
 // ResearchNode.cs
 // Copyright Karel Kroeze, 2020-2020
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -117,6 +116,9 @@ public class ResearchNode : Node
                    || DebugSettings.godMode || getCacheValue();
         }
     }
+
+    public override bool IsVisible =>
+        !Assets.IsBlockedBySOS2(Research) && !Assets.IsHiddenByTechLevelRestrictions(Research);
 
     public void ClearInstanceCaches()
     {
@@ -265,7 +267,7 @@ public class ResearchNode : Node
         return availableCache;
     }
 
-    public bool BuildingPresent(ResearchProjectDef research)
+    private bool BuildingPresent(ResearchProjectDef research)
     {
         if (DebugSettings.godMode && Prefs.DevMode)
         {
@@ -309,7 +311,7 @@ public class ResearchNode : Node
         return def.ResearchNode();
     }
 
-    public List<ThingDef> MissingFacilities(ResearchProjectDef research)
+    private List<ThingDef> MissingFacilities(ResearchProjectDef research)
     {
         var hasCache = _missingFacilitiesCache.TryGetValue(research, out var value);
 
@@ -371,8 +373,6 @@ public class ResearchNode : Node
     {
         return BuildingPresent(Research);
     }
-
-    public override bool IsVisible => !Assets.IsBlockedBySOS2(Research) && !Assets.IsHiddenByTechLevelRestrictions(Research);
 
     public override void Draw(Rect visibleRect, bool forceDetailedMode = false)
     {
@@ -582,8 +582,8 @@ public class ResearchNode : Node
     public List<ResearchNode> GetMissingRequiredRecursive()
     {
         var enumerable =
-            (Research.prerequisites?.Where(rpd => !rpd.IsFinished) ?? Array.Empty<ResearchProjectDef>())
-            .Concat(Research.hiddenPrerequisites?.Where(rpd => !rpd.IsFinished) ?? Array.Empty<ResearchProjectDef>())
+            (Research.prerequisites?.Where(rpd => !rpd.IsFinished) ?? [])
+            .Concat(Research.hiddenPrerequisites?.Where(rpd => !rpd.IsFinished) ?? [])
             .Select(rpd => rpd.ResearchNode())
             .ToList();
 
@@ -596,7 +596,7 @@ public class ResearchNode : Node
         return list.Distinct().ToList();
     }
 
-    public List<ThingDef> MissingFacilities()
+    private List<ThingDef> MissingFacilities()
     {
         return MissingFacilities(Research);
     }

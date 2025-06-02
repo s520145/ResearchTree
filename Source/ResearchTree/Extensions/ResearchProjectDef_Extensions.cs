@@ -10,13 +10,11 @@ namespace FluffyResearchTree;
 
 public static class ResearchProjectDef_Extensions
 {
-    private static readonly Dictionary<Def, List<Pair<Def, string>>> _unlocksCache =
-        new Dictionary<Def, List<Pair<Def, string>>>();
+    private static readonly Dictionary<Def, List<Pair<Def, string>>> _unlocksCache = new();
 
-    private static Dictionary<Def, List<ResearchProjectDef>> _unlockedByCache =
-        new Dictionary<Def, List<ResearchProjectDef>>();
+    private static Dictionary<Def, List<ResearchProjectDef>> _unlockedByCache = new();
 
-    public static Dictionary<Def, List<ResearchProjectDef>> unlockedByCache
+    private static Dictionary<Def, List<ResearchProjectDef>> unlockedByCache
     {
         get
         {
@@ -66,7 +64,7 @@ public static class ResearchProjectDef_Extensions
         return hashSet.ToList();
     }
 
-    public static IEnumerable<ThingDef> GetPlantsUnlocked(this ResearchProjectDef research)
+    private static IEnumerable<ThingDef> GetPlantsUnlocked(this ResearchProjectDef research)
     {
         return DefDatabase<ThingDef>.AllDefsListForReading.Where(td =>
             (td.plant?.sowResearchPrerequisites?.Contains(research)).GetValueOrDefault()).OrderBy(def => def.label);
@@ -102,7 +100,7 @@ public static class ResearchProjectDef_Extensions
         return list.Distinct().ToList();
     }
 
-    public static IEnumerable<RecipeDef> GetRecipesUnlocked(this ResearchProjectDef research)
+    private static IEnumerable<RecipeDef> GetRecipesUnlocked(this ResearchProjectDef research)
     {
         var first = DefDatabase<RecipeDef>.AllDefsListForReading.Where(rd => rd.researchPrerequisite == research);
         var second = from rd in DefDatabase<ThingDef>.AllDefsListForReading.Where(delegate(ThingDef td)
@@ -116,14 +114,14 @@ public static class ResearchProjectDef_Extensions
         return first.Concat(second).Distinct().OrderBy(def => def.label);
     }
 
-    public static IEnumerable<TerrainDef> GetTerrainUnlocked(this ResearchProjectDef research)
+    private static IEnumerable<TerrainDef> GetTerrainUnlocked(this ResearchProjectDef research)
     {
         return DefDatabase<TerrainDef>.AllDefsListForReading.Where(td =>
                 unlockedByCache.TryGetValue(td, out var researchList) && researchList.Contains(research))
             .OrderBy(def => def.label);
     }
 
-    public static IEnumerable<ThingDef> GetThingsUnlocked(this ResearchProjectDef research)
+    private static IEnumerable<ThingDef> GetThingsUnlocked(this ResearchProjectDef research)
     {
         return DefDatabase<ThingDef>.AllDefsListForReading.Where(td =>
                 unlockedByCache.TryGetValue(td, out var researchList) && researchList.Contains(research))

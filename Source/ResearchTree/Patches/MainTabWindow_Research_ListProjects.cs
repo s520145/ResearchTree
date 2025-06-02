@@ -11,7 +11,7 @@ namespace FluffyResearchTree;
 [HarmonyPatch(typeof(MainTabWindow_Research), nameof(MainTabWindow_Research.ListProjects))]
 public class MainTabWindow_Research_ListProjects
 {
-    public static readonly MethodInfo CustomButtonTextMethodInfo =
+    private static readonly MethodInfo CustomButtonTextMethodInfo =
         AccessTools.Method(typeof(Widgets), nameof(Widgets.CustomButtonText));
 
     /// <summary>

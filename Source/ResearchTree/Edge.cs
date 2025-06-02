@@ -43,7 +43,7 @@ public class Edge<T1, T2> where T1 : Node where T2 : Node
 
     public float Length => Mathf.Abs(_in.Yf - _out.Yf) * (!IsDummy ? 1 : 10);
 
-    public bool IsDummy { get; private set; }
+    private bool IsDummy { get; set; }
 
     public int DrawOrder
     {

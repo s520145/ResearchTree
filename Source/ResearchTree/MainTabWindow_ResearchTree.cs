@@ -12,12 +12,12 @@ namespace FluffyResearchTree;
 
 public class MainTabWindow_ResearchTree : MainTabWindow
 {
-    internal static Vector2 _scrollPosition = Vector2.zero;
+    private static Vector2 _scrollPosition = Vector2.zero;
 
     private static Rect _treeRect;
     private readonly HashSet<ResearchProjectDef> _matchingProjects = [];
 
-    private readonly QuickSearchWidget _quickSearchWidget = new QuickSearchWidget();
+    private readonly QuickSearchWidget _quickSearchWidget = new();
 
     private Rect _baseViewRect;
 
@@ -58,7 +58,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     public float ZoomLevel
     {
         get => _zoomLevel;
-        set
+        private set
         {
             _zoomLevel = Mathf.Clamp(value, 1f, MaxZoomLevel);
             ViewRectDirty = true;
@@ -66,7 +66,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         }
     }
 
-    public Rect ViewRect
+    private Rect ViewRect
     {
         get
         {
@@ -86,7 +86,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         }
     }
 
-    public Rect ViewRect_Inner
+    private Rect ViewRect_Inner
     {
         get
         {
@@ -102,7 +102,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         }
     }
 
-    public Rect TreeRect
+    private static Rect TreeRect
     {
         get
         {
@@ -119,10 +119,9 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         }
     }
 
-    public Rect VisibleRect =>
-        new Rect(_scrollPosition.x, _scrollPosition.y, ViewRect_Inner.width, ViewRect_Inner.height);
+    private Rect VisibleRect => new(_scrollPosition.x, _scrollPosition.y, ViewRect_Inner.width, ViewRect_Inner.height);
 
-    internal float MaxZoomLevel
+    private float MaxZoomLevel
     {
         get
         {

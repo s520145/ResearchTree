@@ -7,7 +7,7 @@ namespace FluffyResearchTree;
 
 public class Dialog_ResearchInfoCard : Window
 {
-    private static readonly Color alternateBackground = new Color(0.2f, 0.2f, 0.2f, 0.5f);
+    private static readonly Color alternateBackground = new(0.2f, 0.2f, 0.2f, 0.5f);
     private readonly ResearchProjectDef researchProjectDef;
     private Vector2 scrollPosition = Vector2.zero;
 
@@ -17,7 +17,7 @@ public class Dialog_ResearchInfoCard : Window
         Setup();
     }
 
-    public override Vector2 InitialSize => new Vector2(955f, 765f);
+    public override Vector2 InitialSize => new(955f, 765f);
 
     public override void DoWindowContents(Rect inRect)
     {
