@@ -11,7 +11,7 @@ public static class Logging
     {
         if (FluffyResearchTreeMod.instance.Settings.VerboseLogging)
         {
-            Log.Message(Format(message));
+            Log.Message(format(message));
         }
     }
 
@@ -19,11 +19,11 @@ public static class Logging
     {
         if (once)
         {
-            Log.WarningOnce(Format(message), message.GetHashCode());
+            Log.WarningOnce(format(message), message.GetHashCode());
             return;
         }
 
-        Log.Warning(Format(message));
+        Log.Warning(format(message));
     }
 
 
@@ -31,14 +31,14 @@ public static class Logging
     {
         if (once)
         {
-            Log.ErrorOnce(Format(message), message.GetHashCode());
+            Log.ErrorOnce(format(message), message.GetHashCode());
             return;
         }
 
-        Log.Error(Format(message));
+        Log.Error(format(message));
     }
 
-    private static string Format(string message)
+    private static string format(string message)
     {
         return $"[ResearchTree]: {message}";
     }

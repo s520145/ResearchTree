@@ -4,7 +4,7 @@ using Verse;
 
 namespace FluffyResearchTree;
 
-[HarmonyPatch(typeof(DiaOption), nameof(DiaOption.Activate))]
+[HarmonyPatch(typeof(DiaOption), "Activate")]
 public class DiaOption_Activate
 {
     private static void Prefix(string ___text)

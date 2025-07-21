@@ -11,6 +11,7 @@
     <li>1.3</li>
     <li>1.4</li>
     <li>1.5</li>
+    <li>1.6</li>
   </supportedVersions>
   <modDependencies>
     <li>
@@ -61,11 +62,12 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 [*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3455432792]Semi Random Research: Progression Fork[/url]
 [*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3219596926]Medieval Overhaul[/url]
 [*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3414187030]World Tech Level[/url]
+[*] Added option to hide research that is blocked by tech-limiting mods instead of just disabling them. Thanks to m00nl1ght-dev
 [/list]
 [img]https://i.imgur.com/pufA0kM.png[/img]
 
 [table]
-    [tr][td][url=https://dsc.gg/mlie][img]https://i.imgur.com/zdzzBrc.png[/img][/url][/td] [td][url=https://github.com/emipa606/ResearchTree][img]https://i.imgur.com/kTkpTOE.png[/img][/url][/td]
+    [tr][td][url=https://discord.gg/h5TY6DA][img]https://i.imgur.com/zdzzBrc.png[/img][/url][/td] [td][url=https://github.com/emipa606/ResearchTree][img]https://i.imgur.com/kTkpTOE.png[/img][/url][/td]
     [/tr]
     [tr]
         [td][img]https://i.imgur.com/WjDSfUn.png[/img][/td]
@@ -88,9 +90,6 @@ A better research tree.
 
 [i]This looks very similar to ResearchPal[/i] Yep. ResearchPal is based on a legacy version of this mod that was kept up-to-date by SkyArkAngel in the HCSK modpack. I haven’t worked on this mod in a long time, but I recently had some spare time and decided to give it another go. Feel free to use whichever you like better (ResearchPal has an entirely different layout algorithm). You can run both mods side by side to check out the different tree layouts, but be aware that the research queue will not work correctly if both mods are loaded.
 
-[h2]Known Issues[/h2]
- - Layouts are not perfect, if you have experience with graph layouts - please do feel free to look at the source code, and/or implement a Sugiyama layout algorithm for me that runs in C
-
 [h2]Contributors[/h2]
  - Templarr: Russian translation - Suh. Junmin: Korean translation - rw-chaos: German translation - 53N4: Spanish translation - Silverside: Fix UI scaling bug for vertical text - shiuanyue: Chinese (traditional) translation - notfood: Implement techprint requirements - HanYaodong: Add simplified Chinese translation 
 
@@ -103,7 +102,7 @@ Parts of the code in this mod, and some content may be licensed by their origina
 [list]
 [*] See if the the error persists if you just have this mod and its requirements active.
 [*] If not, try adding your other mods until it happens again.
-[*] Post your error-log using [url=https://steamcommunity.com/workshop/filedetails/?id=818773962]HugsLib[/url] or the standalone [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873415404]Uploader[/url] and command Ctrl+F12
+[*] Post your error-log using the [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873415404]Log Uploader[/url] or the standalone [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873415404]Uploader[/url] and command Ctrl+F12
 [*] For best support, please use the Discord-channel for error-reporting.
 [*] Do not report errors by making a discussion-thread, I get no notification of that.
 [*] If you have the solution for a problem, please post it to the GitHub repository.
@@ -111,5 +110,5 @@ Parts of the code in this mod, and some content may be licensed by their origina
 [/list] 
 
 [url=https://steamcommunity.com/sharedfiles/filedetails/changelog/3030499331][img]https://img.shields.io/github/v/release/emipa606/ResearchTree?label=latest%20version&amp;style=plastic&amp;color=9f1111&amp;labelColor=black[/img][/url] | tags:  queue,  tree</description>
-  <modVersion IgnoreIfNoMatchingField="True">1.5.33</modVersion>
+  <modVersion IgnoreIfNoMatchingField="True">1.6.0</modVersion>
 </ModMetaData>

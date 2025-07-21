@@ -14,7 +14,7 @@ public class Dialog_ResearchInfoCard : Window
     public Dialog_ResearchInfoCard(ResearchProjectDef researchProject)
     {
         researchProjectDef = researchProject;
-        Setup();
+        setup();
     }
 
     public override Vector2 InitialSize => new(955f, 765f);
@@ -25,70 +25,70 @@ public class Dialog_ResearchInfoCard : Window
         mainRect = mainRect.ContractedBy(18f);
         mainRect.height -= 20f;
 
-        var listing_Standard = new Listing_Standard();
-        listing_Standard.Begin(mainRect);
+        var listingStandard = new Listing_Standard();
+        listingStandard.Begin(mainRect);
         Text.Font = GameFont.Medium;
-        listing_Standard.Label(GetTitle());
+        listingStandard.Label(getTitle());
         Text.Font = GameFont.Small;
 
         if (!string.IsNullOrEmpty(researchProjectDef.modContentPack?.Name))
         {
-            listing_Standard.Label(researchProjectDef.modContentPack.Name);
+            listingStandard.Label(researchProjectDef.modContentPack.Name);
         }
 
         if (researchProjectDef.IsFinished)
         {
-            listing_Standard.Label("Finished".Translate());
+            listingStandard.Label("Finished".Translate());
         }
         else
         {
             if (researchProjectDef.ProgressReal > 0)
             {
-                listing_Standard.Label("Fluffy.ResearchTree.InProgress".Translate(researchProjectDef.ProgressReal,
+                listingStandard.Label("Fluffy.ResearchTree.InProgress".Translate(researchProjectDef.ProgressReal,
                     researchProjectDef.baseCost));
             }
             else
             {
-                listing_Standard.Label("Fluffy.ResearchTree.NotStarted".Translate(researchProjectDef.baseCost));
+                listingStandard.Label("Fluffy.ResearchTree.NotStarted".Translate(researchProjectDef.baseCost));
             }
         }
 
-        listing_Standard.Label(researchProjectDef.description);
+        listingStandard.Label(researchProjectDef.description);
 
         if (Assets.IsBlockedByGrimworld(researchProjectDef))
         {
-            Assets.GrimworldInfoMethod.Invoke(null, [null, listing_Standard.GetRect(110f), 1f, researchProjectDef]);
+            Assets.GrimworldInfoMethod.Invoke(null, [null, listingStandard.GetRect(110f), 1f, researchProjectDef]);
         }
 
         if (Assets.IsBlockedByWorldTechLevel(researchProjectDef))
         {
-            listing_Standard.Label("Fluffy.ResearchTree.WorldTechLevelDoesNotAllow".Translate());
+            listingStandard.Label("Fluffy.ResearchTree.WorldTechLevelDoesNotAllow".Translate());
         }
 
         if (Assets.IsBlockedByMedievalOverhaul(researchProjectDef))
         {
             if (Assets.TryGetBlockingSchematicFromMedievalOverhaul(researchProjectDef, out var thingLabel))
             {
-                listing_Standard.Label("DankPyon_RequiredSchematic".Translate() + $": {thingLabel}");
+                listingStandard.Label("DankPyon_RequiredSchematic".Translate() + $": {thingLabel}");
             }
             else
             {
-                listing_Standard.Label("DankPyon_RequiredSchematic".Translate());
+                listingStandard.Label("DankPyon_RequiredSchematic".Translate());
             }
         }
 
-        listing_Standard.GapLine();
-        listing_Standard.End();
+        listingStandard.GapLine();
+        listingStandard.End();
 
-        var unlockDefsAndDescs = researchProjectDef.GetUnlockDefsAndDescs();
+        var unlockDefsAndDescs = researchProjectDef.GetUnlockDefsAndDescriptions();
         if (!unlockDefsAndDescs.Any())
         {
             return;
         }
 
         var borderRect = mainRect;
-        borderRect.y += listing_Standard.CurHeight + 12f;
-        borderRect.height -= listing_Standard.CurHeight + 12f;
+        borderRect.y += listingStandard.CurHeight + 12f;
+        borderRect.height -= listingStandard.CurHeight + 12f;
         var scrollContentRect = borderRect;
         scrollContentRect.height = unlockDefsAndDescs.Count * (Constants.LargeIconSize.y + 2f);
         scrollContentRect.width -= 20;
@@ -148,7 +148,7 @@ public class Dialog_ResearchInfoCard : Window
         Widgets.EndScrollView();
     }
 
-    private string GetTitle()
+    private string getTitle()
     {
         if (researchProjectDef == null)
         {
@@ -158,7 +158,7 @@ public class Dialog_ResearchInfoCard : Window
         return researchProjectDef.LabelCap;
     }
 
-    private void Setup()
+    private void setup()
     {
         forcePause = true;
         doCloseButton = true;

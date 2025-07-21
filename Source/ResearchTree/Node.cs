@@ -333,14 +333,10 @@ public class Node
         _rectsSet = true;
     }
 
-    public virtual bool IsWithinViewport(Rect visibleRect)
+    public bool IsWithinViewport(Rect visibleRect)
     {
-        if (!(Rect.xMin > visibleRect.xMax) && !(Rect.xMax < visibleRect.xMin) && !(Rect.yMin > visibleRect.yMax))
-        {
-            return !(Rect.yMax < visibleRect.yMin);
-        }
-
-        return false;
+        // Check if the node's rectangle intersects with the visible rectangle
+        return Rect.Overlaps(visibleRect.ExpandedBy(50f));
     }
 
     public virtual void Draw(Rect visibleRect, bool forceDetailedMode = false)

@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Reflection;
+using HarmonyLib;
+using UnityEngine;
 using Verse;
 using Verse.Steam;
 
@@ -6,6 +9,9 @@ namespace FluffyResearchTree;
 
 public static class TooltipHandler_Modified
 {
+    private static readonly FieldInfo activeTipsFieldInfo = AccessTools.Field(typeof(TooltipHandler), "activeTips");
+    private static readonly FieldInfo frameFieldInfo = AccessTools.Field(typeof(TooltipHandler), "frame");
+
     public static void TipRegion(Rect rect, TipSignal tip)
     {
         if (Event.current.type != EventType.Repaint || !rect.Contains(Event.current.mousePosition) &&
@@ -21,15 +27,17 @@ public static class TooltipHandler_Modified
             Widgets.DrawBox(rect);
         }
 
-        if (!TooltipHandler.activeTips.ContainsKey(tip.uniqueId))
+        var activeTips = (Dictionary<int, ActiveTip>)activeTipsFieldInfo.GetValue(null);
+        if (!activeTips.ContainsKey(tip.uniqueId))
         {
             var activeTip = new ActiveTip(tip);
-            TooltipHandler.activeTips.Add(tip.uniqueId, activeTip);
-            TooltipHandler.activeTips[tip.uniqueId].firstTriggerTime = Time.realtimeSinceStartup;
+            activeTips.Add(tip.uniqueId, activeTip);
+            activeTips[tip.uniqueId].firstTriggerTime = Time.realtimeSinceStartup;
         }
 
-        TooltipHandler.activeTips[tip.uniqueId].lastTriggerFrame = TooltipHandler.frame;
-        TooltipHandler.activeTips[tip.uniqueId].signal.text = tip.text;
-        TooltipHandler.activeTips[tip.uniqueId].signal.textGetter = tip.textGetter;
+        activeTips[tip.uniqueId].lastTriggerFrame = (int)frameFieldInfo.GetValue(null);
+        activeTips[tip.uniqueId].signal.text = tip.text;
+        activeTips[tip.uniqueId].signal.textGetter = tip.textGetter;
+        activeTipsFieldInfo.SetValue(null, activeTips);
     }
 }

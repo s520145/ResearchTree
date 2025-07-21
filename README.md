@@ -42,6 +42,7 @@ Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=126
 -  Added compatibility with [Semi Random Research: Progression Fork](https://steamcommunity.com/sharedfiles/filedetails/?id=3455432792)
 -  Added compatibility with [Medieval Overhaul](https://steamcommunity.com/sharedfiles/filedetails/?id=3219596926)
 -  Added compatibility with [World Tech Level](https://steamcommunity.com/sharedfiles/filedetails/?id=3414187030)
+-  Added option to hide research that is blocked by tech-limiting mods instead of just disabling them. Thanks to m00nl1ght-dev
 
 
 ![Image](https://i.imgur.com/pufA0kM.png)
@@ -64,10 +65,6 @@ A better research tree.
 
 *This looks very similar to ResearchPal* Yep. ResearchPal is based on a legacy version of this mod that was kept up-to-date by SkyArkAngel in the HCSK modpack. I haven’t worked on this mod in a long time, but I recently had some spare time and decided to give it another go. Feel free to use whichever you like better (ResearchPal has an entirely different layout algorithm). You can run both mods side by side to check out the different tree layouts, but be aware that the research queue will not work correctly if both mods are loaded.
 
-## Known Issues
-
- - Layouts are not perfect, if you have experience with graph layouts - please do feel free to look at the source code, and/or implement a Sugiyama layout algorithm for me that runs in C
-
 ## Contributors
 
  - Templarr: Russian translation - Suh. Junmin: Korean translation - rw-chaos: German translation - 53N4: Spanish translation - Silverside: Fix UI scaling bug for vertical text - shiuanyue: Chinese (traditional) translation - notfood: Implement techprint requirements - HanYaodong: Add simplified Chinese translation 
@@ -84,7 +81,7 @@ Parts of the code in this mod, and some content may be licensed by their origina
 
 -  See if the the error persists if you just have this mod and its requirements active.
 -  If not, try adding your other mods until it happens again.
--  Post your error-log using [HugsLib](https://steamcommunity.com/workshop/filedetails/?id=818773962) or the standalone [Uploader](https://steamcommunity.com/sharedfiles/filedetails/?id=2873415404) and command Ctrl+F12
+-  Post your error-log using the [Log Uploader](https://steamcommunity.com/sharedfiles/filedetails/?id=2873415404) or the standalone [Uploader](https://steamcommunity.com/sharedfiles/filedetails/?id=2873415404) and command Ctrl+F12
 -  For best support, please use the Discord-channel for error-reporting.
 -  Do not report errors by making a discussion-thread, I get no notification of that.
 -  If you have the solution for a problem, please post it to the GitHub repository.

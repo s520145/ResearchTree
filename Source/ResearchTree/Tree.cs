@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -64,7 +65,7 @@ public static class Tree
         {
             if (_nodes == null)
             {
-                PopulateNodes();
+                populateNodes();
             }
 
             return _nodes;
@@ -147,19 +148,19 @@ public static class Tree
                 Logging.Message("CheckPrerequisites");
                 CheckPrerequisites();
                 Logging.Message("CreateEdges");
-                CreateEdges();
+                createEdges();
                 Logging.Message("HorizontalPositions");
-                HorizontalPositions();
+                horizontalPositions();
                 Logging.Message("NormalizeEdges");
-                NormalizeEdges();
+                normalizeEdges();
                 Logging.Message("Collapse");
-                Collapse();
+                collapse();
                 Logging.Message("MinimizeCrossings");
-                MinimizeCrossings();
+                minimizeCrossings();
                 Logging.Message("MinimizeEdgeLength");
-                MinimizeEdgeLength();
+                minimizeEdgeLength();
                 Logging.Message("RemoveEmptyRows");
-                RemoveEmptyRows();
+                removeEmptyRows();
                 Logging.Message("Done");
                 Initialized = true;
             }
@@ -173,17 +174,17 @@ public static class Tree
         }
 
         LongEventHandler.QueueLongEvent(CheckPrerequisites, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
-        LongEventHandler.QueueLongEvent(CreateEdges, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
-        LongEventHandler.QueueLongEvent(HorizontalPositions, "Fluffy.ResearchTree.PreparingTree.Setup", false,
+        LongEventHandler.QueueLongEvent(createEdges, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
+        LongEventHandler.QueueLongEvent(horizontalPositions, "Fluffy.ResearchTree.PreparingTree.Setup", false,
             null);
-        LongEventHandler.QueueLongEvent(NormalizeEdges, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
-        LongEventHandler.QueueLongEvent(Collapse, "Fluffy.ResearchTree.PreparingTree.CrossingReduction", false,
+        LongEventHandler.QueueLongEvent(normalizeEdges, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
+        LongEventHandler.QueueLongEvent(collapse, "Fluffy.ResearchTree.PreparingTree.CrossingReduction", false,
             null);
-        LongEventHandler.QueueLongEvent(MinimizeCrossings, "Fluffy.ResearchTree.PreparingTree.CrossingReduction",
+        LongEventHandler.QueueLongEvent(minimizeCrossings, "Fluffy.ResearchTree.PreparingTree.CrossingReduction",
             false, null);
-        LongEventHandler.QueueLongEvent(MinimizeEdgeLength, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false,
+        LongEventHandler.QueueLongEvent(minimizeEdgeLength, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false,
             null);
-        LongEventHandler.QueueLongEvent(RemoveEmptyRows, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false, null);
+        LongEventHandler.QueueLongEvent(removeEmptyRows, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false, null);
         LongEventHandler.QueueLongEvent(delegate
             {
                 Initialized = true;
@@ -197,12 +198,12 @@ public static class Tree
             "Fluffy.ResearchTree.RestoreQueue", false, null);
     }
 
-    private static void RemoveEmptyRows()
+    private static void removeEmptyRows()
     {
         var y = 1;
         while (y <= Size.z)
         {
-            if (Row(y).NullOrEmpty())
+            if (row(y).NullOrEmpty())
             {
                 foreach (var item in Nodes.Where(n => n.Y > y))
                 {
@@ -216,12 +217,12 @@ public static class Tree
         }
     }
 
-    private static void MinimizeEdgeLength()
+    private static void minimizeEdgeLength()
     {
         var edgeLengthSweepLocal = false;
         var num = 0;
         var num2 = 2;
-        var num3 = 50;
+        const int num3 = 50;
         while ((!edgeLengthSweepLocal || num2 > 0) && num < num3)
         {
             edgeLengthSweepLocal = EdgeLengthSweep_Local(num++);
@@ -244,18 +245,18 @@ public static class Tree
 
     private static bool EdgeLengthSweep_Global()
     {
-        var num = EdgeLength();
+        var num = edgeLength();
         for (var i = 2; i <= Size.x; i++)
         {
             EdgeLengthSweep_Global_Layer(i, true);
         }
 
-        return EdgeLength() < num;
+        return edgeLength() < num;
     }
 
     private static bool EdgeLengthSweep_Local(int iteration)
     {
-        var num = EdgeLength();
+        var num = edgeLength();
         if (iteration % 2 == 0)
         {
             for (var i = 2; i <= Size.x; i++)
@@ -271,7 +272,7 @@ public static class Tree
             }
         }
 
-        return EdgeLength() < num;
+        return edgeLength() < num;
     }
 
     private static void EdgeLengthSweep_Global_Layer(int l, bool @in)
@@ -283,7 +284,7 @@ public static class Tree
             return;
         }
 
-        foreach (var item in Layer(l, true))
+        foreach (var item in layer(l, true))
         {
             var nodes = item.Nodes;
             if (!nodes.Any())
@@ -305,24 +306,24 @@ public static class Tree
                     continue;
                 }
 
-                var node = NodeAt(l, i);
+                var node = nodeAt(l, i);
                 if (node != null)
                 {
-                    if (!TrySwap(item, node))
+                    if (!trySwap(item, node))
                     {
                         continue;
                     }
 
                     if (Crossings(l) > num2)
                     {
-                        TrySwap(node, item);
+                        trySwap(node, item);
                         continue;
                     }
 
                     var num5 = EdgeLength(l, @in);
                     if (num - num5 < Constants.Epsilon)
                     {
-                        TrySwap(node, item);
+                        trySwap(node, item);
                     }
                     else
                     {
@@ -357,7 +358,7 @@ public static class Tree
     {
         var num = @in ? l - 1 : l + 1;
         var num2 = Crossings(num);
-        foreach (var item in Layer(l, true))
+        foreach (var item in layer(l, true))
         {
             foreach (var item2 in @in ? item.InEdges : item.OutEdges)
             {
@@ -382,24 +383,24 @@ public static class Tree
                         continue;
                     }
 
-                    var node2 = NodeAt(num, i);
+                    var node2 = nodeAt(num, i);
                     if (node2 != null)
                     {
-                        if (!TrySwap(node, node2))
+                        if (!trySwap(node, node2))
                         {
                             continue;
                         }
 
                         if (Crossings(num) > num2)
                         {
-                            TrySwap(node2, node);
+                            trySwap(node2, node);
                             continue;
                         }
 
                         var length = item2.Length;
                         if (num3 - length < Constants.Epsilon)
                         {
-                            TrySwap(node2, node);
+                            trySwap(node2, node);
                         }
                         else
                         {
@@ -431,11 +432,11 @@ public static class Tree
         }
     }
 
-    private static void HorizontalPositions()
+    private static void horizontalPositions()
     {
         var relevantTechLevels = RelevantTechLevels;
         var num = 1;
-        var num2 = 50;
+        const int num2 = 50;
         bool setDepth;
         do
         {
@@ -475,7 +476,7 @@ public static class Tree
         }
     }
 
-    private static void NormalizeEdges()
+    private static void normalizeEdges()
     {
         foreach (var item3 in new List<Edge<Node, Node>>(Edges.Where(e => e.Span > 1)))
         {
@@ -506,7 +507,7 @@ public static class Tree
         }
     }
 
-    private static void CreateEdges()
+    private static void createEdges()
     {
         if (_edges.NullOrEmpty())
         {
@@ -630,34 +631,36 @@ public static class Tree
         return returnValue;
     }
 
-    private static void PopulateNodes()
+    private static void populateNodes()
     {
-        // filter Anomaly DLC research
+        // Filter Anomaly DLC research
         var allDefsListForReading =
-            DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def => def.knowledgeCategory == null);
-        // find hidden nodes (nodes that have themselves as a prerequisite)
+            DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def => def.knowledgeCategory == null).ToArray();
         var hidden = allDefsListForReading.Where(p => p.prerequisites?.Contains(p) ?? false);
-        // find locked nodes (nodes that have a hidden node as a prerequisite)
         var second = allDefsListForReading.Where(p => p.Ancestors().Intersect(hidden).Any());
         var researchList = allDefsListForReading.Except(hidden).Except(second).ToList();
+
         _nodes = [];
         Assets.TotalAmountOfResearch = researchList.Count;
-        var iterator = 0;
-        foreach (var def in researchList)
+
+        // Parallelize node creation
+        Parallel.ForEach(researchList, (def, _, index) =>
         {
-            var researchNode = new ResearchNode(def, iterator);
-            _nodes.Add(researchNode);
-            ResearchToNodesCache[def] = researchNode;
-            iterator++;
-        }
+            var researchNode = new ResearchNode(def, (int)index);
+            lock (_nodes)
+            {
+                _nodes.Add(researchNode);
+                ResearchToNodesCache[def] = researchNode;
+            }
+        });
     }
 
-    private static void Collapse()
+    private static void collapse()
     {
         _ = Size;
         for (var i = 1; i <= Size.x; i++)
         {
-            var list = Layer(i, true);
+            var list = layer(i, true);
             var num = 1;
             foreach (var item in list)
             {
@@ -679,23 +682,40 @@ public static class Tree
 
     public static void Draw(Rect visibleRect)
     {
+        // Draw tech levels
         foreach (var relevantTechLevel in RelevantTechLevels)
         {
-            DrawTechLevel(relevantTechLevel, visibleRect);
+            drawTechLevel(relevantTechLevel, visibleRect);
         }
 
-        foreach (var item in Edges.OrderBy(e => e.DrawOrder))
+        // Draw edges
+        foreach (var edge in Edges.OrderBy(e => e.DrawOrder))
         {
-            item.Draw(visibleRect);
+            if (IsEdgeVisible(edge, visibleRect))
+            {
+                edge.Draw(visibleRect);
+            }
         }
 
+        // Draw nodes
         foreach (var node in Nodes)
         {
-            node.Draw(visibleRect);
+            if (node.IsWithinViewport(visibleRect))
+            {
+                node.Draw(visibleRect);
+            }
         }
     }
 
-    private static void DrawTechLevel(TechLevel techlevel, Rect visibleRect)
+    public static bool IsEdgeVisible<T1, T2>(Edge<T1, T2> edge, Rect visibleRect)
+        where T1 : Node
+        where T2 : Node
+    {
+        // Check if either endpoint of the edge is within the visible rectangle
+        return edge.In.IsWithinViewport(visibleRect) || edge.Out.IsWithinViewport(visibleRect);
+    }
+
+    private static void drawTechLevel(TechLevel techlevel, Rect visibleRect)
     {
         if (!TechLevelBounds.ContainsKey(techlevel))
         {
@@ -717,7 +737,7 @@ public static class Tree
         {
             Widgets.DrawLine(new Vector2(num, visibleRect.yMin), new Vector2(num, visibleRect.yMax),
                 Assets.TechLevelColor, 1f);
-            VerticalLabel(
+            verticalLabel(
                 new Rect(num + (Constants.TechLevelLabelSize.y / 2f) - (Constants.TechLevelLabelSize.x / 2f),
                     visibleRect.center.y - (Constants.TechLevelLabelSize.y / 2f), Constants.TechLevelLabelSize.x,
                     Constants.TechLevelLabelSize.y), techlevel.ToStringHuman());
@@ -727,7 +747,7 @@ public static class Tree
         {
             if (!Assets.IsHiddenByTechLevelRestrictions(techlevel + 1))
             {
-                VerticalLabel(
+                verticalLabel(
                     new Rect(num2 - (Constants.TechLevelLabelSize.y / 2f) - (Constants.TechLevelLabelSize.x / 2f),
                         visibleRect.center.y - (Constants.TechLevelLabelSize.y / 2f), Constants.TechLevelLabelSize.x,
                         Constants.TechLevelLabelSize.y), techlevel.ToStringHuman());
@@ -738,7 +758,7 @@ public static class Tree
         Text.Anchor = TextAnchor.UpperLeft;
     }
 
-    private static void VerticalLabel(Rect rect, string text)
+    private static void verticalLabel(Rect rect, string text)
     {
         var matrix = GUI.matrix;
         GUI.matrix = Matrix4x4.identity;
@@ -748,31 +768,32 @@ public static class Tree
         GUI.matrix = matrix;
     }
 
-    private static Node NodeAt(int X, int Y)
+    private static Node nodeAt(int X, int Y)
     {
         return Enumerable.FirstOrDefault(Nodes, n => n.X == X && n.Y == Y);
     }
 
-    private static void MinimizeCrossings()
+    private static void minimizeCrossings()
     {
-        for (var i = 1; i <= Size.x; i++)
+        Parallel.For(1, Size.x + 1, i =>
         {
-            var list = (from n in Layer(i)
+            var list = (from n in layer(i)
                 orderby n.Descendants.Count
                 select n).ToList();
             for (var j = 0; j < list.Count; j++)
             {
                 list[j].Y = j + 1;
             }
-        }
+        });
 
         var barymetricSweep = false;
         var num = 0;
         var num2 = 2;
-        var num3 = 50;
+        const int num3 = 50;
+
         while ((!barymetricSweep || num2 > 0) && num < num3)
         {
-            barymetricSweep = BarymetricSweep(num++);
+            barymetricSweep = Tree.barymetricSweep(num++);
             if (!barymetricSweep)
             {
                 num2--;
@@ -783,16 +804,16 @@ public static class Tree
         num2 = 2;
         while (num2 > 0 && num < num3)
         {
-            if (!GreedySweep(num++))
+            if (!greedySweep(num++))
             {
                 num2--;
             }
         }
     }
 
-    private static bool GreedySweep(int iteration)
+    private static bool greedySweep(int iteration)
     {
-        var num = Crossings();
+        var num = crossings();
         if (iteration % 2 == 0)
         {
             for (var i = 1; i <= Size.x; i++)
@@ -808,7 +829,7 @@ public static class Tree
             }
         }
 
-        return Crossings() < num;
+        return crossings() < num;
     }
 
     private static void GreedySweep_Layer(int l)
@@ -819,12 +840,12 @@ public static class Tree
             return;
         }
 
-        var list = Layer(l, true);
+        var list = layer(l, true);
         for (var i = 0; i < list.Count - 1; i++)
         {
             for (var j = i + 1; j < list.Count; j++)
             {
-                if (!TrySwap(list[i], list[j]))
+                if (!trySwap(list[i], list[j]))
                 {
                     continue;
                 }
@@ -836,13 +857,13 @@ public static class Tree
                 }
                 else
                 {
-                    TrySwap(list[j], list[i]);
+                    trySwap(list[j], list[i]);
                 }
             }
         }
     }
 
-    private static bool TrySwap(Node A, Node B)
+    private static bool trySwap(Node A, Node B)
     {
         if (A.X != B.X)
         {
@@ -854,9 +875,9 @@ public static class Tree
         return true;
     }
 
-    private static bool BarymetricSweep(int iteration)
+    private static bool barymetricSweep(int iteration)
     {
-        var num = Crossings();
+        var num = crossings();
         if (iteration % 2 == 0)
         {
             for (var i = 2; i <= Size.x; i++)
@@ -872,13 +893,13 @@ public static class Tree
             }
         }
 
-        return Crossings() < num;
+        return crossings() < num;
     }
 
     private static void BarymetricSweep_Layer(int layer, bool left)
     {
         var orderedEnumerable =
-            from n in Layer(layer).ToDictionary(n => n, n => GetBarycentre(n, left ? n.InNodes : n.OutNodes))
+            from n in Tree.layer(layer).ToDictionary(n => n, n => getBarycentre(n, left ? n.InNodes : n.OutNodes))
             orderby n.Value
             select n;
         var num = float.MinValue;
@@ -907,7 +928,7 @@ public static class Tree
         }
     }
 
-    private static float GetBarycentre(Node node, List<Node> neighbours)
+    private static float getBarycentre(Node node, List<Node> neighbours)
     {
         if (neighbours.NullOrEmpty())
         {
@@ -917,7 +938,7 @@ public static class Tree
         return neighbours.Sum(n => n.Yf) / neighbours.Count;
     }
 
-    private static int Crossings()
+    private static int crossings()
     {
         var num = 0;
         for (var i = 1; i < Size.x; i++)
@@ -928,7 +949,7 @@ public static class Tree
         return num;
     }
 
-    private static float EdgeLength()
+    private static float edgeLength()
     {
         var num = 0f;
         for (var i = 1; i < Size.x; i++)
@@ -956,7 +977,7 @@ public static class Tree
 
     private static int Crossings(int layer, bool @in)
     {
-        var list = (from e in Layer(layer).SelectMany(n => !@in ? n.OutEdges : n.InEdges)
+        var list = (from e in Tree.layer(layer).SelectMany(n => !@in ? n.OutEdges : n.InEdges)
             orderby e.In.Y, e.Out.Y
             select e).ToList();
         if (list.Count < 2)
@@ -981,7 +1002,7 @@ public static class Tree
 
     private static float EdgeLength(int layer, bool @in)
     {
-        var list = (from e in Layer(layer).SelectMany(n => !@in ? n.OutEdges : n.InEdges)
+        var list = (from e in Tree.layer(layer).SelectMany(n => !@in ? n.OutEdges : n.InEdges)
             orderby e.In.Y, e.Out.Y
             select e).ToList();
         if (list.NullOrEmpty())
@@ -992,7 +1013,7 @@ public static class Tree
         return list.Sum(e => e.Length) * (!@in ? 1 : 2);
     }
 
-    private static List<Node> Layer(int depth, bool ordered = false)
+    private static List<Node> layer(int depth, bool ordered = false)
     {
         if (!ordered || !OrderDirty)
         {
@@ -1007,7 +1028,7 @@ public static class Tree
         return Nodes.Where(n => n.X == depth).ToList();
     }
 
-    private static List<Node> Row(int Y)
+    private static List<Node> row(int Y)
     {
         return Nodes.Where(n => n.Y == Y).ToList();
     }

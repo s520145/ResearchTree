@@ -117,7 +117,7 @@ internal class FluffyResearchTreeMod : Mod
         var colorRect = listing_Standard.GetRect(30f);
         Widgets.Label(colorRect.LeftHalf(), "Fluffy.ResearchTree.BackgroundColor".Translate());
         Widgets.DrawBoxSolidWithOutline(colorRect.RightHalf().RightHalf(), Settings.BackgroundColor,
-            Widgets.WindowBGBorderColor, 2);
+            Assets.WindowBgBorderColor, 2);
         if (Widgets.ButtonInvisible(colorRect.RightHalf().RightHalf()))
         {
             Find.WindowStack.Add(new Dialog_ColourPicker(Settings.BackgroundColor,

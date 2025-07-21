@@ -2,11 +2,17 @@
   "Continued": true,
   "CanAdd": "0",
   "CanRemove": "0",
-  "PreviewVersion": "1.5",
+  "PreviewVersion": "1.6",
   "SocialImageSet": true,
   "SearchTags": [
     " queue",
     " tree"
   ],
-  "LastXmlCleaning": "2025-06-02T15:27:24.2978754+02:00"
+  "LastXmlCleaning": "2025-07-21T14:34:34.2823801+02:00",
+  "Patches": true,
+  "Defs": true,
+  "Assemblies": true,
+  "LinesOfCode": 180176,
+  "LinesOfXML": 2001,
+  "CodeBaseSize": 83
 }

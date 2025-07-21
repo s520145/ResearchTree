@@ -1,87 +1,70 @@
-// Cloned from https://github.com/Owlchemist/ResearchPowl
-
+using System;
+using System.Reflection;
+using HarmonyLib;
 using UnityEngine;
 
 namespace FluffyResearchTree;
 
 internal static class FastGUI
 {
-    private static Internal_DrawTextureArguments drawArguments = new()
-    {
-        leftBorder = 0,
-        rightBorder = 0,
-        topBorder = 0,
-        bottomBorder = 0,
-        leftBorderColor = Color.white,
-        topBorderColor = Color.white,
-        rightBorderColor = Color.white,
-        bottomBorderColor = Color.white,
-        cornerRadiuses = new Vector4(0f, 0f, 0f, 0f),
-        smoothCorners = false,
-        sourceRect = new Rect(0f, 0f, 1f, 1f),
-        mat = GUI.roundedRectMaterial,
-        borderWidths = Vector4.zero
-    };
+    private static readonly Type UnityInternalDrawTextureArgumentsType =
+        AccessTools.TypeByName("UnityEngine.Internal_DrawTextureArguments");
 
-    private static Internal_DrawTextureArguments drawArguments2 = new()
+    private static readonly MethodInfo UnityInternalDrawTextureMethod =
+        AccessTools.Method(typeof(Graphics), "Internal_DrawTexture");
+
+    private static object createInternalDrawTextureArguments(Rect position, Texture image, Rect? sourceRect,
+        Color color)
     {
-        leftBorder = 0,
-        rightBorder = 0,
-        topBorder = 0,
-        bottomBorder = 0,
-        leftBorderColor = Color.white,
-        topBorderColor = Color.white,
-        rightBorderColor = Color.white,
-        bottomBorderColor = Color.white,
-        cornerRadiuses = new Vector4(0f, 0f, 0f, 0f),
-        smoothCorners = false,
-        sourceRect = new Rect(0f, 0f, 1f, 1f),
-        mat = GUI.roundedRectMaterial,
-        borderWidths = Vector4.zero
-    };
+        if (UnityInternalDrawTextureArgumentsType == null)
+        {
+            throw new InvalidOperationException("Unable to access Unity's internal types.");
+        }
+
+        var unityDrawArgs = Activator.CreateInstance(UnityInternalDrawTextureArgumentsType);
+
+        UnityInternalDrawTextureArgumentsType.GetField("screenRect")?.SetValue(unityDrawArgs, position);
+        UnityInternalDrawTextureArgumentsType.GetField("texture")?.SetValue(unityDrawArgs, image);
+        UnityInternalDrawTextureArgumentsType.GetField("color")?.SetValue(unityDrawArgs, color);
+        UnityInternalDrawTextureArgumentsType.GetField("sourceRect")
+            ?.SetValue(unityDrawArgs, sourceRect ?? new Rect(0f, 0f, 1f, 1f));
+        UnityInternalDrawTextureArgumentsType.GetField("mat")?.SetValue(unityDrawArgs, Assets.RoundedRectMaterial);
+        UnityInternalDrawTextureArgumentsType.GetField("borderWidths")?.SetValue(unityDrawArgs, Vector4.zero);
+        UnityInternalDrawTextureArgumentsType.GetField("cornerRadiuses")?.SetValue(unityDrawArgs, Vector4.zero);
+        UnityInternalDrawTextureArgumentsType.GetField("smoothCorners")?.SetValue(unityDrawArgs, false);
+
+        return unityDrawArgs;
+    }
 
     public static void DrawTextureFast(Rect position, Texture image, Color color = new())
     {
+        if (UnityInternalDrawTextureMethod == null)
+        {
+            throw new InvalidOperationException("Unable to access Unity's internal methods.");
+        }
+
         if (color == new Color())
         {
             color = GUI.color;
         }
 
-        //if (FluffyResearchTreeMod.instance.Settings.VanillaGraphics)
-        //{
-        //    var oldcolor = GUI.color;
-        //    GUI.color = color;
-        //    GUI.DrawTexture(position, image);
-        //    GUI.color = oldcolor;
-        //    return;
-        //}
-
-        drawArguments.screenRect = position;
-        drawArguments.texture = image;
-        drawArguments.color = color;
-        Graphics.Internal_DrawTexture(ref drawArguments);
+        var unityDrawArgs = createInternalDrawTextureArguments(position, image, null, color);
+        UnityInternalDrawTextureMethod.Invoke(null, [unityDrawArgs]);
     }
 
     public static void DrawTextureFastWithCoords(Rect position, Texture image, Rect rect, Color color = new())
     {
+        if (UnityInternalDrawTextureMethod == null)
+        {
+            throw new InvalidOperationException("Unable to access Unity's internal methods.");
+        }
+
         if (color == new Color())
         {
             color = GUI.color;
         }
 
-        //if (FluffyResearchTreeMod.instance.Settings.VanillaGraphics)
-        //{
-        //    var oldcolor = GUI.color;
-        //    GUI.color = color;
-        //    GUI.DrawTextureWithTexCoords(position, image, rect);
-        //    GUI.color = oldcolor;
-        //    return;
-        //}
-
-        drawArguments2.screenRect = position;
-        drawArguments2.texture = image;
-        drawArguments2.color = color;
-        drawArguments2.sourceRect = rect;
-        Graphics.Internal_DrawTexture(ref drawArguments2);
+        var unityDrawArgs = createInternalDrawTextureArguments(position, image, rect, color);
+        UnityInternalDrawTextureMethod.Invoke(null, [unityDrawArgs]);
     }
 }

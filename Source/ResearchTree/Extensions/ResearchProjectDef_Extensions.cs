@@ -64,7 +64,7 @@ public static class ResearchProjectDef_Extensions
         return hashSet.ToList();
     }
 
-    private static IEnumerable<ThingDef> GetPlantsUnlocked(this ResearchProjectDef research)
+    private static IEnumerable<ThingDef> getPlantsUnlocked(this ResearchProjectDef research)
     {
         return DefDatabase<ThingDef>.AllDefsListForReading.Where(td =>
             (td.plant?.sowResearchPrerequisites?.Contains(research)).GetValueOrDefault()).OrderBy(def => def.label);
@@ -100,7 +100,7 @@ public static class ResearchProjectDef_Extensions
         return list.Distinct().ToList();
     }
 
-    private static IEnumerable<RecipeDef> GetRecipesUnlocked(this ResearchProjectDef research)
+    private static IEnumerable<RecipeDef> getRecipesUnlocked(this ResearchProjectDef research)
     {
         var first = DefDatabase<RecipeDef>.AllDefsListForReading.Where(rd => rd.researchPrerequisite == research);
         var second = from rd in DefDatabase<ThingDef>.AllDefsListForReading.Where(delegate(ThingDef td)
@@ -114,21 +114,22 @@ public static class ResearchProjectDef_Extensions
         return first.Concat(second).Distinct().OrderBy(def => def.label);
     }
 
-    private static IEnumerable<TerrainDef> GetTerrainUnlocked(this ResearchProjectDef research)
+    private static IEnumerable<TerrainDef> getTerrainUnlocked(this ResearchProjectDef research)
     {
         return DefDatabase<TerrainDef>.AllDefsListForReading.Where(td =>
                 unlockedByCache.TryGetValue(td, out var researchList) && researchList.Contains(research))
             .OrderBy(def => def.label);
     }
 
-    private static IEnumerable<ThingDef> GetThingsUnlocked(this ResearchProjectDef research)
+    private static IEnumerable<ThingDef> getThingsUnlocked(this ResearchProjectDef research)
     {
         return DefDatabase<ThingDef>.AllDefsListForReading.Where(td =>
                 unlockedByCache.TryGetValue(td, out var researchList) && researchList.Contains(research))
             .OrderBy(def => def.label);
     }
 
-    public static List<Pair<Def, string>> GetUnlockDefsAndDescs(this ResearchProjectDef research, bool dedupe = true)
+    public static List<Pair<Def, string>> GetUnlockDefsAndDescriptions(this ResearchProjectDef research,
+        bool dedupe = true)
     {
         if (_unlocksCache.TryGetValue(research, out var descs))
         {
@@ -136,22 +137,23 @@ public static class ResearchProjectDef_Extensions
         }
 
         var list = new List<Pair<Def, string>>();
-        list.AddRange(from d in research.GetThingsUnlocked()
+        list.AddRange(from d in research.getThingsUnlocked()
             where d.IconTexture() != null
             select new Pair<Def, string>(d, "Fluffy.ResearchTree.AllowsBuildingX".Translate(d.LabelCap)));
-        list.AddRange(from d in research.GetTerrainUnlocked()
+        list.AddRange(from d in research.getTerrainUnlocked()
             where d.IconTexture() != null
             select new Pair<Def, string>(d, "Fluffy.ResearchTree.AllowsBuildingX".Translate(d.LabelCap)));
-        list.AddRange(from d in research.GetRecipesUnlocked()
+        list.AddRange(from d in research.getRecipesUnlocked()
             where d.IconTexture() != null
             select new Pair<Def, string>(d, "Fluffy.ResearchTree.AllowsCraftingX".Translate(d.LabelCap)));
-        list.AddRange(from d in research.GetPlantsUnlocked()
+        list.AddRange(from d in research.getPlantsUnlocked()
             where d.IconTexture() != null
             select new Pair<Def, string>(d, "Fluffy.ResearchTree.AllowsPlantingX".Translate(d.LabelCap)));
         var list2 = research.Descendants();
         if (dedupe && list2.Any())
         {
-            var descendantUnlocks = research.Descendants().SelectMany(c => from u in c.GetUnlockDefsAndDescs(false)
+            var descendantUnlocks = research.Descendants().SelectMany(c =>
+                    from u in c.GetUnlockDefsAndDescriptions(false)
                     select u.First).Distinct()
                 .ToList();
             list = list.Where(u => !descendantUnlocks.Contains(u.First)).ToList();

@@ -1,0 +1,34 @@
+ManifestFileVersion: 0
+CRC: 658892840
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 3d0a8ed39fa46dbc6a05b1990534bec9
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 2612ac43db082a73502ee80f2eceb73f
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 3d0a8ed39fa46dbc6a05b1990534bec9
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Data/Mlie.ResearchTree/Textures/Lines/Outline/ew.png
+- Assets/Data/Mlie.ResearchTree/Textures/Lines/Solid/ew.png
+- Assets/Data/Mlie.ResearchTree/Textures/Icons/circle-fill.png
+- Assets/Data/Mlie.ResearchTree/Textures/Icons/magnifying-glass.png
+- Assets/Data/Mlie.ResearchTree/Textures/Lines/Solid/circle.png
+- Assets/Data/Mlie.ResearchTree/Textures/Buttons/button.png
+- Assets/Data/Mlie.ResearchTree/Textures/Lines/Outline/end.png
+- Assets/Data/Mlie.ResearchTree/Textures/Icons/more.png
+- Assets/Data/Mlie.ResearchTree/Textures/Buttons/button-active.png
+- Assets/Data/Mlie.ResearchTree/Textures/Icons/padlock.png
+- Assets/Data/Mlie.ResearchTree/Textures/Lines/Outline/ns.png
+- Assets/Data/Mlie.ResearchTree/Textures/Lines/Solid/end.png
+- Assets/Data/Mlie.ResearchTree/Textures/Lines/Solid/ns.png
+- Assets/Data/Mlie.ResearchTree/Textures/Lines/Outline/circle.png
+- Assets/Data/Mlie.ResearchTree/Textures/Icons/Research.png
+Dependencies: []

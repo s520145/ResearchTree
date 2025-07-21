@@ -8,7 +8,7 @@ using Verse;
 
 namespace FluffyResearchTree;
 
-[HarmonyPatch(typeof(MainTabWindow_Research), nameof(MainTabWindow_Research.AttemptBeginResearch))]
+[HarmonyPatch(typeof(MainTabWindow_Research), "AttemptBeginResearch")]
 public class MainTabWindow_Research_AttemptBeginResearch
 {
     private static readonly MethodInfo Dialog_MessageBox_CreateConfirmationMethodInfo =

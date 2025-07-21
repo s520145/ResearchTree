@@ -93,6 +93,17 @@ public static class Assets
 
     public static bool SemiResearchEnabled;
 
+    public static Color WindowBgBorderColor = AccessTools.Field(typeof(Widgets), "WindowBGBorderColor")
+        .GetValue(null) as Color? ?? new Color(0.2f, 0.2f, 0.2f);
+
+    public static readonly MethodInfo InternalDrawTextureMethod =
+        AccessTools.Method(typeof(Graphics), "Internal_DrawTexture");
+
+    private static readonly PropertyInfo roundedRectMaterialProperty =
+        AccessTools.Property(typeof(GUI), "roundedRectMaterial");
+
+    private static Material roundedRectMaterial;
+
     static Assets()
     {
         if (ModLister.GetActiveModWithIdentifier("andery233xj.mod.BetterResearchTabs", true) != null)
@@ -360,6 +371,25 @@ public static class Assets
         }
     }
 
+    public static Material RoundedRectMaterial
+    {
+        get
+        {
+            if (roundedRectMaterialProperty == null)
+            {
+                return null;
+            }
+
+            if (roundedRectMaterial != null)
+            {
+                return roundedRectMaterial;
+            }
+
+            roundedRectMaterial = (Material)roundedRectMaterialProperty.GetValue(null, null);
+            return roundedRectMaterial;
+        }
+    }
+
 
     private static void StartLoadingWorker()
     {
@@ -519,7 +549,7 @@ public static class Assets
         GUI.DrawTexture(rect, BaseContent.WhiteTex);
         GUI.color = bgColor;
         GUI.DrawTexture(rect, BaseContent.WhiteTex);
-        GUI.color = Widgets.WindowBGBorderColor;
+        GUI.color = WindowBgBorderColor;
         Widgets.DrawBox(rect);
         GUI.color = Color.white;
     }

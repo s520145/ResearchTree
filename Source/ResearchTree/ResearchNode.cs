@@ -130,12 +130,7 @@ public class ResearchNode : Node
 
     private bool getCacheValue()
     {
-        if (!Assets.RefreshResearch)
-        {
-            return availableCache;
-        }
-
-        if (hasRefreshedAvailability)
+        if (!Assets.RefreshResearch || hasRefreshedAvailability)
         {
             return availableCache;
         }
@@ -148,43 +143,11 @@ public class ResearchNode : Node
 
         hasRefreshedAvailability = true;
 
-        if (MissingFacilities(Research).Any())
-        {
-            availableCache = false;
-            return availableCache;
-        }
-
-        if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
-        {
-            availableCache = false;
-            return availableCache;
-        }
-
-        if (Assets.UsingRimedieval && !Assets.RimedievalAllowedResearchDefs.Contains(Research))
-        {
-            availableCache = false;
-            return availableCache;
-        }
-
-        if (!Research.TechprintRequirementMet)
-        {
-            availableCache = false;
-            return availableCache;
-        }
-
-        if (Research.requiredResearchBuilding != null && !Research.PlayerHasAnyAppropriateResearchBench)
-        {
-            availableCache = false;
-            return availableCache;
-        }
-
-        if (!Research.PlayerMechanitorRequirementMet)
-        {
-            availableCache = false;
-            return availableCache;
-        }
-
-        if (!Research.AnalyzedThingsRequirementsMet)
+        if (missingFacilities(Research).Any() || Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled ||
+            Assets.UsingRimedieval && !Assets.RimedievalAllowedResearchDefs.Contains(Research) ||
+            !Research.TechprintRequirementMet ||
+            Research.requiredResearchBuilding != null && !Research.PlayerHasAnyAppropriateResearchBench ||
+            !Research.PlayerMechanitorRequirementMet || !Research.AnalyzedThingsRequirementsMet)
         {
             availableCache = false;
             return availableCache;
@@ -201,19 +164,8 @@ public class ResearchNode : Node
             }
         }
 
-        if (Assets.IsBlockedByGrimworld(Research))
-        {
-            availableCache = false;
-            return availableCache;
-        }
-
-        if (Assets.IsBlockedByWorldTechLevel(Research))
-        {
-            availableCache = false;
-            return availableCache;
-        }
-
-        if (Assets.IsBlockedByMedievalOverhaul(Research))
+        if (Assets.IsBlockedByGrimworld(Research) || Assets.IsBlockedByWorldTechLevel(Research) ||
+            Assets.IsBlockedByMedievalOverhaul(Research))
         {
             availableCache = false;
             return availableCache;
@@ -267,7 +219,7 @@ public class ResearchNode : Node
         return availableCache;
     }
 
-    private bool BuildingPresent(ResearchProjectDef research)
+    private bool buildingPresent(ResearchProjectDef research)
     {
         if (DebugSettings.godMode && Prefs.DevMode)
         {
@@ -276,12 +228,7 @@ public class ResearchNode : Node
 
         var hasCache = _buildingPresentCache.TryGetValue(research, out var value);
 
-        if (!Assets.RefreshResearch && hasCache)
-        {
-            return value;
-        }
-
-        if (hasRefreshedBuildings && hasCache)
+        if (!Assets.RefreshResearch && hasCache || hasRefreshedBuildings && hasCache)
         {
             return value;
         }
@@ -299,7 +246,7 @@ public class ResearchNode : Node
             .Any(b => research.CanBeResearchedAt(b, true));
         if (value)
         {
-            value = research.Ancestors().All(BuildingPresent);
+            value = research.Ancestors().All(buildingPresent);
         }
 
         _buildingPresentCache[research] = value;
@@ -311,16 +258,11 @@ public class ResearchNode : Node
         return def.ResearchNode();
     }
 
-    private List<ThingDef> MissingFacilities(ResearchProjectDef research)
+    private List<ThingDef> missingFacilities(ResearchProjectDef research)
     {
         var hasCache = _missingFacilitiesCache.TryGetValue(research, out var value);
 
-        if (!Assets.RefreshResearch && hasCache)
-        {
-            return value;
-        }
-
-        if (hasRefreshedFacilities && hasCache)
+        if (!Assets.RefreshResearch && hasCache || hasRefreshedFacilities && hasCache)
         {
             return value;
         }
@@ -371,7 +313,7 @@ public class ResearchNode : Node
 
     public bool BuildingPresent()
     {
-        return BuildingPresent(Research);
+        return buildingPresent(Research);
     }
 
     public override void Draw(Rect visibleRect, bool forceDetailedMode = false)
@@ -463,12 +405,12 @@ public class ResearchNode : Node
             }
 
             Text.WordWrap = true;
-            BuildTips();
+            buildTips();
 
             // draw unlock icons
             if (detailedMode)
             {
-                var unlockDefsAndDescs = Research.GetUnlockDefsAndDescs();
+                var unlockDefsAndDescs = Research.GetUnlockDefsAndDescriptions();
                 for (var i = 0; i < unlockDefsAndDescs.Count; i++)
                 {
                     var rect = new Rect(IconsRect.xMax - ((i + 1) * (Constants.IconSize.x + 4f)),
@@ -598,43 +540,44 @@ public class ResearchNode : Node
 
     private List<ThingDef> MissingFacilities()
     {
-        return MissingFacilities(Research);
+        return missingFacilities(Research);
     }
 
-    private void BuildTips()
+    private void buildTips()
     {
         if (Queue._draggedNode != null)
         {
             return;
         }
 
-        var tooltipstring = GetResearchTooltipString();
+        var researchTooltipString = getResearchTooltipString();
         var missingFacilities = MissingFacilities();
         if (missingFacilities?.Any() == true)
         {
-            tooltipstring.AppendLine();
-            tooltipstring.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
                 missingFacilities.Select(td => td.LabelCap).ToArray())));
         }
 
         if (!Research.TechprintRequirementMet)
         {
-            tooltipstring.AppendLine();
-            tooltipstring.AppendLine("Fluffy.ResearchTree.MissingTechprints".Translate(Research.TechprintsApplied,
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingTechprints".Translate(
+                Research.TechprintsApplied,
                 Research.techprintCount));
         }
 
         if (!Research.AnalyzedThingsRequirementsMet)
         {
-            tooltipstring.AppendLine();
-            tooltipstring.AppendLine("Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
                 Research.requiredAnalyzed.Select(def => def.LabelCap))));
         }
 
         if (!Research.PlayerMechanitorRequirementMet)
         {
-            tooltipstring.AppendLine();
-            tooltipstring.AppendLine("Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
         }
 
         if (Assets.UsingVanillaVehiclesExpanded)
@@ -644,57 +587,57 @@ public class ResearchNode : Node
 
             if (boolResult)
             {
-                tooltipstring.AppendLine();
+                researchTooltipString.AppendLine();
                 var wreck = (ThingDef)valueArray[1];
                 if (wreck != null)
                 {
-                    tooltipstring.AppendLine();
-                    tooltipstring.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
+                    researchTooltipString.AppendLine();
+                    researchTooltipString.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
                 }
             }
         }
 
         if (Assets.IsBlockedByGrimworld(Research))
         {
-            tooltipstring.AppendLine();
-            tooltipstring.AppendLine("Fluffy.ResearchTree.GrimworldDoesNotAllow".Translate());
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.GrimworldDoesNotAllow".Translate());
         }
 
         if (Assets.IsBlockedByWorldTechLevel(Research))
         {
-            tooltipstring.AppendLine();
-            tooltipstring.AppendLine("Fluffy.ResearchTree.WorldTechLevelDoesNotAllow".Translate());
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.WorldTechLevelDoesNotAllow".Translate());
         }
 
         if (Assets.IsBlockedByMedievalOverhaul(Research))
         {
-            tooltipstring.AppendLine();
+            researchTooltipString.AppendLine();
             if (Assets.TryGetBlockingSchematicFromMedievalOverhaul(Research, out var thingLabel))
             {
-                tooltipstring.AppendLine("DankPyon_RequiredSchematic".Translate() + $": {thingLabel}");
+                researchTooltipString.AppendLine("DankPyon_RequiredSchematic".Translate() + $": {thingLabel}");
             }
             else
             {
-                tooltipstring.AppendLine("DankPyon_RequiredSchematic".Translate());
+                researchTooltipString.AppendLine("DankPyon_RequiredSchematic".Translate());
             }
         }
 
         if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
         {
-            tooltipstring.AppendLine();
-            tooltipstring.AppendLine("Fluffy.ResearchTree.SemiRandomResearchLoaded".Translate());
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.SemiRandomResearchLoaded".Translate());
         }
 
         if (Assets.UsingRimedieval && !Assets.RimedievalAllowedResearchDefs.Contains(Research))
         {
-            tooltipstring.AppendLine();
-            tooltipstring.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
         }
 
-        TooltipHandler_Modified.TipRegion(Rect, tooltipstring.ToString());
+        TooltipHandler_Modified.TipRegion(Rect, researchTooltipString.ToString());
     }
 
-    private StringBuilder GetResearchTooltipString()
+    private StringBuilder getResearchTooltipString()
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.AppendLine(Research.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n");

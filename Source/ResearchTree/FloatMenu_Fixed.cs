@@ -29,7 +29,7 @@ public class FloatMenu_Fixed : FloatMenu
         focusWhenOpened = false;
     }
 
-    public override void SetInitialSizeAndPosition()
+    protected override void SetInitialSizeAndPosition()
     {
         var menuSize = InitialSize;
 

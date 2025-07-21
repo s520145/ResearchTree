@@ -8,7 +8,7 @@ using Verse;
 
 namespace FluffyResearchTree;
 
-[HarmonyPatch(typeof(MainTabWindow_Research), nameof(MainTabWindow_Research.ListProjects))]
+[HarmonyPatch(typeof(MainTabWindow_Research), "ListProjects")]
 public class MainTabWindow_Research_ListProjects
 {
     private static readonly MethodInfo CustomButtonTextMethodInfo =

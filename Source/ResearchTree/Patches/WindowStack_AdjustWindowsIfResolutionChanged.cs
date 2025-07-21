@@ -4,7 +4,7 @@ using Verse;
 
 namespace FluffyResearchTree;
 
-[HarmonyPatch(typeof(WindowStack), nameof(WindowStack.AdjustWindowsIfResolutionChanged))]
+[HarmonyPatch(typeof(WindowStack), "AdjustWindowsIfResolutionChanged")]
 public class WindowStack_AdjustWindowsIfResolutionChanged
 {
     private static void Prefix(IntVec2 ___prevResolution, out IntVec2 __state)

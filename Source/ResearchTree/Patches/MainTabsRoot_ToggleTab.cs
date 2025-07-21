@@ -50,4 +50,12 @@ public class MainTabsRoot_ToggleTab
                 break;
         }
     }
+
+    public static void Postfix()
+    {
+        if (Find.MainTabsRoot.OpenTab == null)
+        {
+            ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab = null;
+        }
+    }
 }
