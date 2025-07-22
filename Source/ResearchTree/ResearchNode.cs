@@ -145,7 +145,7 @@ public class ResearchNode : Node
 
         if (missingFacilities(Research).Any() || Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled ||
             Assets.UsingRimedieval && !Assets.RimedievalAllowedResearchDefs.Contains(Research) ||
-            !Research.TechprintRequirementMet ||
+            !Research.TechprintRequirementMet || !Research.InspectionRequirementsMet ||
             Research.requiredResearchBuilding != null && !Research.PlayerHasAnyAppropriateResearchBench ||
             !Research.PlayerMechanitorRequirementMet || !Research.AnalyzedThingsRequirementsMet)
         {
@@ -565,6 +565,12 @@ public class ResearchNode : Node
             researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingTechprints".Translate(
                 Research.TechprintsApplied,
                 Research.techprintCount));
+        }
+
+        if (!Research.InspectionRequirementsMet)
+        {
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("MissingGravEngineInspection".Translate());
         }
 
         if (!Research.AnalyzedThingsRequirementsMet)
