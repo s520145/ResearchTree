@@ -245,7 +245,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         // 再应用缩放并绘制
         applyZoomLevel();
-        _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect, true, true); // 见问题3
+        _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect, true, true); 
         Tree.Draw(VisibleRect);
         Queue.DrawLabels(VisibleRect);
         GUI.EndScrollView(false);
@@ -262,7 +262,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     }
 
     // default W A S D move
-    // 替换原来的 handleDolly()
     private static void handleDolly()
     {
         // 每帧一次，避免在 Layout/MouseMove 阶段重复加步长

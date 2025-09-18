@@ -68,7 +68,7 @@ public static class Tree
         }
     }
 
-    // 尝试从 ResearchProjectDef 上取出 ResearchTabDef；兼容 tab / researchTab / researchTabDef 等命名
+    // 尝试从 ResearchProjectDef 上取出 ResearchTabDef
     private static ResearchTabDef GetProjectTab(ResearchProjectDef def)
     {
         if (def == null) return null;
@@ -120,7 +120,6 @@ public static class Tree
         return cur as ResearchNode;
     }
 
-    // —— 替换为这版 ——
     // 只要“隐藏已完成”开启，且这条小边所在链的两端任一真实研究节点已完成，就隐藏整条链
     private static bool EdgeHiddenBySkipCompleted<TIn, TOut>(Edge<TIn, TOut> e)
         where TIn : Node where TOut : Node
@@ -479,12 +478,10 @@ public static class Tree
         return sum;
     }
 
-    // 需要：using System.Diagnostics;
-    // 依赖：EdgeLengthSweep_Local(int iter, out int gain)、EdgeLengthSweep_Global()、TotalEdgeLength_Int(bool @in)
 
     private static void minimizeEdgeLength()
     {
-        // ====== 可调参数（按需调节）======
+        // ====== 可调参数======
         const int MAX_PAIR_ITERS = 12;   // 最多做多少“对”（= 2*此值 次 Local）
         const int MIN_PAIR_ITERS = 2;    // 至少做多少“对”，避免过早停
         const double PAIR_REL_EPS = 0.04; // 每对相对收益阈值（4%）；更快停可设 0.06~0.08
@@ -521,11 +518,10 @@ public static class Tree
             int pairGain = gainIn + gainOut;           // 这“一对”的真实收益
             double pairRel = (double)pairGain / denom;   // 这“一对”的相对收益
 
-            // 记录日志（可随时关掉）
             Logging.Message($"[Profile] EdgeLengthSweep_Local pair={pair} took {sw.ElapsedMilliseconds} ms, " +
                             $"gainIn={gainIn}, gainOut={gainOut}, pairGain={pairGain}, pairRel={pairRel:P2}");
 
-            // 累计相对收益（简单相加，作为早停达标之一）
+            // 累计相对收益
             cumRel += pairRel;
 
             // ---- 是否满足早停条件 ----
@@ -563,7 +559,6 @@ public static class Tree
 
         Logging.Message($"[Profile] EdgeLengthSweep_Local(pair-mode) total {localMs} ms");
 
-        // ---- Global：保持原样 ----
         var swg = Stopwatch.StartNew();
         EdgeLengthSweep_Global();
         swg.Stop();
@@ -575,7 +570,7 @@ public static class Tree
     {
         if (LayerSlots == null || LayerSlots.Length == 0) return;
 
-        // 常见做法：左右各 2 轮（可调小/大）
+        //左右各 2 轮（可调小/大）
         const int ROUNDS = 2;
 
         for (int round = 0; round < ROUNDS; round++)
@@ -647,7 +642,7 @@ public static class Tree
             return ia.CompareTo(ib);
         });
 
-        // 4) 可选：不让交叉数变差（你也可以关掉这段以更激进地收短边）
+        // 4)不让交叉数变差（可以关掉这段以更激进地收短边）
         int beforeCross = Crossings(l);
         ApplyLayerOrder(l, candOrder);
         int afterCross = Crossings(l);
@@ -967,7 +962,7 @@ public static class Tree
         var st = FluffyResearchTreeMod.instance?.Settings;
         if (st != null)
         {
-            st.EnsureTabCache(); // 你设置里已有，用于处理中途增/减 mod 的 tab 集合
+            st.EnsureTabCache(); //用于处理中途增/减 mod 的 tab 集合
 
             // 仅当“选中了具体子集”时才做过滤；空集表示“全部”
             if (st.IncludedTabs != null && st.IncludedTabs.Count > 0)
@@ -1188,13 +1183,12 @@ public static class Tree
                 return arr[Y - 1];
         }
 
-        // 兜底（初始化早期或未建缓存时）
         return Enumerable.FirstOrDefault(Nodes, n => n.X == X && n.Y == Y);
     }
 
     private static void minimizeCrossings()
     {
-        // ====== 可调参数（与 minimizeEdgeLength 风格保持一致）======
+        // ====== 可调参数======
         const int MAX_PASSES_BARY = 50;  // 与原版一致：最多尝试 50 次
         const int MAX_PASSES_GREEDY = 50;
         const int MIN_PASSES_BARY = 0;   // 如需更保守可设 2~3；0 表示与原版一致
@@ -1536,7 +1530,7 @@ public static class Tree
         }
 
         if (targetY.Count < 2) return 0;
-        return CountInversions(targetY.ToArray()); // 使用你现有的 Fenwick 逆序数
+        return CountInversions(targetY.ToArray()); // 使用现有的 Fenwick 逆序数
     }
 
     private static float EdgeLength(int layer, bool @in)
