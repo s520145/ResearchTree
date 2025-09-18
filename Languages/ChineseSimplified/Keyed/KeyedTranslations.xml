@@ -65,5 +65,12 @@
   <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>世界技术等级设置不允许使用该技术</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.LoadingWait>树未完成生成，点击可打开香草树</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>异常研究</Fluffy.ResearchTree.Anomaly>
+  <Fluffy.ResearchTree.SkipCompleted>生成时跳过已完成项目</Fluffy.ResearchTree.SkipCompleted>
+  <Fluffy.ResearchTree.VisualGroupByTab>按照研究标签分组</Fluffy.ResearchTree.VisualGroupByTab>
+  <Fluffy.ResearchTree.RequestRebuild>重建研究树</Fluffy.ResearchTree.RequestRebuild>
+  <Fluffy.ResearchTree.AllTabsCache>选择需要生成的研究标签</Fluffy.ResearchTree.AllTabsCache>
+  <Fluffy.ResearchTree.Building>生成中</Fluffy.ResearchTree.Building>
+  <Fluffy.ResearchTree.invisible>隐藏未完成项目</Fluffy.ResearchTree.invisible>
+  <Fluffy.ResearchTree.visible>显示未完成项目</Fluffy.ResearchTree.visible>
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
 </LanguageData>

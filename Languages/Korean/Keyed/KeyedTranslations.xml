@@ -22,4 +22,11 @@
   <Fluffy.ResearchTree.PreparingTree.Layout>레이아웃 다듬기</Fluffy.ResearchTree.PreparingTree.Layout>
   <Fluffy.ResearchTree.RestoreQueue>대기열 복원</Fluffy.ResearchTree.RestoreQueue>
   <Fluffy.ResearchTree.OverrideResearch>연구 트리를 기본 연구 탭으로 만듭니다.\n(바닐라를 열려면 Shift 키를 누르세요)</Fluffy.ResearchTree.OverrideResearch>
+  <Fluffy.ResearchTree.SkipCompleted>생성 중 완료된 프로젝트 건너뛰기</Fluffy.ResearchTree.SkipCompleted>
+  <Fluffy.ResearchTree.VisualGroupByTab>연구 태그별 그룹화</Fluffy.ResearchTree.VisualGroupByTab>
+  <Fluffy.ResearchTree.RequestRebuild>연구 트리 다시 빌드</Fluffy.ResearchTree.RequestRebuild>
+  <Fluffy.ResearchTree.AllTabsCache>생성할 연구 태그 선택</Fluffy.ResearchTree.AllTabsCache>
+  <Fluffy.ResearchTree.Building>생성 중</Fluffy.ResearchTree.Building>
+  <Fluffy.ResearchTree.invisible>미완료 프로젝트 숨기기</Fluffy.ResearchTree.invisible>
+  <Fluffy.ResearchTree.visible>미완료 프로젝트 표시</Fluffy.ResearchTree.visible>
 </LanguageData>

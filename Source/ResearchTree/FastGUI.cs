@@ -3,68 +3,85 @@ using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 
-namespace FluffyResearchTree;
-
-internal static class FastGUI
+namespace FluffyResearchTree
 {
-    private static readonly Type UnityInternalDrawTextureArgumentsType =
-        AccessTools.TypeByName("UnityEngine.Internal_DrawTextureArguments");
-
-    private static readonly MethodInfo UnityInternalDrawTextureMethod =
-        AccessTools.Method(typeof(Graphics), "Internal_DrawTexture");
-
-    private static object createInternalDrawTextureArguments(Rect position, Texture image, Rect? sourceRect,
-        Color color)
+    internal static class FastGUI
     {
-        if (UnityInternalDrawTextureArgumentsType == null)
+        // 缓存类型与方法
+        private static readonly Type ArgsType = AccessTools.TypeByName("UnityEngine.Internal_DrawTextureArguments");
+        private static readonly MethodInfo DrawTexMI = AccessTools.Method(typeof(Graphics), "Internal_DrawTexture");
+
+        // 缓存字段（只解析一次）
+        private static readonly FieldInfo FI_screenRect = ArgsType?.GetField("screenRect", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        private static readonly FieldInfo FI_texture = ArgsType?.GetField("texture", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        private static readonly FieldInfo FI_color = ArgsType?.GetField("color", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        private static readonly FieldInfo FI_sourceRect = ArgsType?.GetField("sourceRect", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        private static readonly FieldInfo FI_mat = ArgsType?.GetField("mat", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        private static readonly FieldInfo FI_borderWidths = ArgsType?.GetField("borderWidths", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        private static readonly FieldInfo FI_cornerRadiuses = ArgsType?.GetField("cornerRadiuses", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        private static readonly FieldInfo FI_smoothCorners = ArgsType?.GetField("smoothCorners", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        private static readonly Rect FullRect01 = new Rect(0f, 0f, 1f, 1f);
+
+        // 线程局部：复用装箱参数与 Invoke 缓冲
+        [ThreadStatic] private static object _argsBoxed;
+        [ThreadStatic] private static object[] _invokeBuf;
+
+        static FastGUI()
         {
-            throw new InvalidOperationException("Unable to access Unity's internal types.");
+            if (ArgsType == null || DrawTexMI == null ||
+                FI_screenRect == null || FI_texture == null || FI_color == null ||
+                FI_sourceRect == null || FI_mat == null || FI_borderWidths == null ||
+                FI_cornerRadiuses == null || FI_smoothCorners == null)
+            {
+                throw new InvalidOperationException("Unable to access Unity's Internal_DrawTexture members.");
+            }
         }
 
-        var unityDrawArgs = Activator.CreateInstance(UnityInternalDrawTextureArgumentsType);
-
-        UnityInternalDrawTextureArgumentsType.GetField("screenRect")?.SetValue(unityDrawArgs, position);
-        UnityInternalDrawTextureArgumentsType.GetField("texture")?.SetValue(unityDrawArgs, image);
-        UnityInternalDrawTextureArgumentsType.GetField("color")?.SetValue(unityDrawArgs, color);
-        UnityInternalDrawTextureArgumentsType.GetField("sourceRect")
-            ?.SetValue(unityDrawArgs, sourceRect ?? new Rect(0f, 0f, 1f, 1f));
-        UnityInternalDrawTextureArgumentsType.GetField("mat")?.SetValue(unityDrawArgs, Assets.RoundedRectMaterial);
-        UnityInternalDrawTextureArgumentsType.GetField("borderWidths")?.SetValue(unityDrawArgs, Vector4.zero);
-        UnityInternalDrawTextureArgumentsType.GetField("cornerRadiuses")?.SetValue(unityDrawArgs, Vector4.zero);
-        UnityInternalDrawTextureArgumentsType.GetField("smoothCorners")?.SetValue(unityDrawArgs, false);
-
-        return unityDrawArgs;
-    }
-
-    public static void DrawTextureFast(Rect position, Texture image, Color color = new())
-    {
-        if (UnityInternalDrawTextureMethod == null)
+        // 仅首用创建装箱对象；每次只更新会变化的字段
+        private static object PrepareArgs(Rect position, Texture image, Rect? src, Color tint)
         {
-            throw new InvalidOperationException("Unable to access Unity's internal methods.");
+            if (_argsBoxed == null)
+            {
+                _argsBoxed = Activator.CreateInstance(ArgsType);
+                // 与原行为一致：使用 RoundedRect 材质，不改其属性，避免任何“粘色”
+                FI_mat.SetValue(_argsBoxed, Assets.RoundedRectMaterial);
+                FI_borderWidths.SetValue(_argsBoxed, Vector4.zero);
+                FI_cornerRadiuses.SetValue(_argsBoxed, Vector4.zero);
+                FI_smoothCorners.SetValue(_argsBoxed, false);
+            }
+
+            FI_screenRect.SetValue(_argsBoxed, position);
+            FI_texture.SetValue(_argsBoxed, image);
+            FI_color.SetValue(_argsBoxed, tint);
+            FI_sourceRect.SetValue(_argsBoxed, src ?? FullRect01);
+
+            return _argsBoxed;
         }
 
-        if (color == new Color())
+        public static void DrawTextureFast(Rect position, Texture image, Color color = new())
         {
-            color = GUI.color;
+            if (DrawTexMI == null) throw new InvalidOperationException("Unable to access Unity's internal methods.");
+
+            // 语义保持：未传色则使用 GUI.color（不改 GUI.color，也不做额外乘色）
+            Color tint = (color == new Color()) ? GUI.color : color;
+
+            var boxed = PrepareArgs(position, image, null, tint);
+            var buf = _invokeBuf ??= new object[1];
+            buf[0] = boxed;
+            DrawTexMI.Invoke(null, buf);
         }
 
-        var unityDrawArgs = createInternalDrawTextureArguments(position, image, null, color);
-        UnityInternalDrawTextureMethod.Invoke(null, [unityDrawArgs]);
-    }
-
-    public static void DrawTextureFastWithCoords(Rect position, Texture image, Rect rect, Color color = new())
-    {
-        if (UnityInternalDrawTextureMethod == null)
+        public static void DrawTextureFastWithCoords(Rect position, Texture image, Rect rect, Color color = new())
         {
-            throw new InvalidOperationException("Unable to access Unity's internal methods.");
-        }
+            if (DrawTexMI == null) throw new InvalidOperationException("Unable to access Unity's internal methods.");
 
-        if (color == new Color())
-        {
-            color = GUI.color;
-        }
+            Color tint = (color == new Color()) ? GUI.color : color;
 
-        var unityDrawArgs = createInternalDrawTextureArguments(position, image, rect, color);
-        UnityInternalDrawTextureMethod.Invoke(null, [unityDrawArgs]);
+            var boxed = PrepareArgs(position, image, rect, tint);
+            var buf = _invokeBuf ??= new object[1];
+            buf[0] = boxed;
+            DrawTexMI.Invoke(null, buf);
+        }
     }
 }

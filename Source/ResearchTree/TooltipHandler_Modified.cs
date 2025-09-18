@@ -12,6 +12,15 @@ public static class TooltipHandler_Modified
     private static readonly FieldInfo activeTipsFieldInfo = AccessTools.Field(typeof(TooltipHandler), "activeTips");
     private static readonly FieldInfo frameFieldInfo = AccessTools.Field(typeof(TooltipHandler), "frame");
 
+    // ===== PATCH: Tooltip 全局开关（轻量无侵入） =====
+    public static bool GloballyDisabled;
+
+    public static void TipRegionIfEnabled(UnityEngine.Rect rect, string tip)
+    {
+        if (GloballyDisabled) return;
+        TipRegion(rect, tip); // 复用你现在已有的 API
+    }
+
     public static void TipRegion(Rect rect, TipSignal tip)
     {
         if (Event.current.type != EventType.Repaint || !rect.Contains(Event.current.mousePosition) &&

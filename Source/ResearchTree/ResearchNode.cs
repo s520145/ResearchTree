@@ -28,6 +28,39 @@ public class ResearchNode : Node
     private bool hasRefreshedBuildings;
     private bool hasRefreshedFacilities;
 
+    // --- 研究台/设施短期缓存（60 ticks 刷新一次） ---
+    private static int _benchesCacheTick = -1;
+    private static List<Building_ResearchBench> _benchesCached;
+    private static HashSet<ThingDef> _benchDefsCached;
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    private static void RefreshBenchCacheIfNeeded()
+    {
+        int now = Find.TickManager?.TicksGame ?? 0;
+        if (_benchesCacheTick != -1 && now - _benchesCacheTick < 60 &&
+            _benchesCached != null && _benchDefsCached != null)
+            return;
+
+        _benchesCacheTick = now;
+
+        // 收集所有殖民者研究台
+        var benches = new List<Building_ResearchBench>(64);
+        var maps = Find.Maps;
+        for (int mi = 0; mi < maps.Count; mi++)
+        {
+            var list = maps[mi].listerBuildings.allBuildingsColonist;
+            for (int bi = 0; bi < list.Count; bi++)
+                if (list[bi] is Building_ResearchBench rb)
+                    benches.Add(rb);
+        }
+        _benchesCached = benches;
+
+        // 研究台 def 去重
+        var defs = new HashSet<ThingDef>();
+        for (int i = 0; i < benches.Count; i++)
+            defs.Add(benches[i].def);
+        _benchDefsCached = defs;
+    }
 
     public ResearchNode(ResearchProjectDef research, int order)
     {
@@ -221,37 +254,49 @@ public class ResearchNode : Node
 
     private bool buildingPresent(ResearchProjectDef research)
     {
-        if (DebugSettings.godMode && Prefs.DevMode)
-        {
-            return true;
-        }
+        if (DebugSettings.godMode && Prefs.DevMode) return true;
 
-        var hasCache = _buildingPresentCache.TryGetValue(research, out var value);
-
-        if (!Assets.RefreshResearch && hasCache || hasRefreshedBuildings && hasCache)
+        if (_buildingPresentCache.TryGetValue(research, out var value))
         {
-            return value;
-        }
-
-        if (currentCacheOrder < Assets.TotalAmountOfResearch && hasCache)
-        {
-            currentCacheOrder++;
-            return value;
+            if (!Assets.RefreshResearch || hasRefreshedBuildings) return value;
+            if (currentCacheOrder < Assets.TotalAmountOfResearch)
+            {
+                currentCacheOrder++;
+                return value;
+            }
         }
 
         hasRefreshedBuildings = true;
 
-        value = research.requiredResearchBuilding == null || Find.Maps
-            .SelectMany(map => map.listerBuildings.allBuildingsColonist).OfType<Building_ResearchBench>()
-            .Any(b => research.CanBeResearchedAt(b, true));
+        // 刷新 60tick 研究台缓存
+        RefreshBenchCacheIfNeeded();
+
+        // 是否存在可进行该研究的“任一”研究台
+        bool anyBenchOk = (research.requiredResearchBuilding == null);
+        if (!anyBenchOk)
+        {
+            for (int i = 0; i < _benchesCached.Count; i++)
+            {
+                if (research.CanBeResearchedAt(_benchesCached[i], true)) { anyBenchOk = true; break; }
+            }
+        }
+
+        value = anyBenchOk;
+
+        // 若本项目可做，则其祖先也必须可做
         if (value)
         {
-            value = research.Ancestors().All(buildingPresent);
+            var ancestors = research.Ancestors();
+            for (int i = 0; i < ancestors.Count; i++)
+            {
+                if (!buildingPresent(ancestors[i])) { value = false; break; }
+            }
         }
 
         _buildingPresentCache[research] = value;
         return value;
     }
+
 
     public static implicit operator ResearchNode(ResearchProjectDef def)
     {
@@ -260,56 +305,71 @@ public class ResearchNode : Node
 
     private List<ThingDef> missingFacilities(ResearchProjectDef research)
     {
-        var hasCache = _missingFacilitiesCache.TryGetValue(research, out var value);
-
-        if (!Assets.RefreshResearch && hasCache || hasRefreshedFacilities && hasCache)
+        // 先读缓存
+        if (_missingFacilitiesCache.TryGetValue(research, out var cached))
         {
-            return value;
-        }
-
-        if (currentCacheOrder < Assets.TotalAmountOfResearch && hasCache)
-        {
-            currentCacheOrder++;
-            return value;
+            if (!Assets.RefreshResearch || hasRefreshedFacilities) return cached;
+            if (currentCacheOrder < Assets.TotalAmountOfResearch)
+            {
+                currentCacheOrder++;
+                return cached;
+            }
         }
 
         hasRefreshedFacilities = true;
 
-        var list = research.Ancestors().Where(rpd => !rpd.IsFinished && !rpd.PlayerHasAnyAppropriateResearchBench)
-            .ToList();
-        list.Add(research);
-        var availableBenches = Find.Maps.SelectMany(map => map.listerBuildings.allBuildingsColonist)
-            .OfType<Building_ResearchBench>();
-        var distinctBenches = availableBenches.Select(b => b.def).Distinct();
-        value = [];
-        foreach (var item in list)
+        // 刷新 60tick 研究台缓存
+        RefreshBenchCacheIfNeeded();
+
+        // 本项目 + 未完成祖先（且自身没可用研究台）
+        var chain = new List<ResearchProjectDef>(8);
+        var ancestors = research.Ancestors();
+        for (int i = 0; i < ancestors.Count; i++)
         {
-            if (item.requiredResearchBuilding != null)
-            {
-                if (!distinctBenches.Contains(item.requiredResearchBuilding))
-                {
-                    value.Add(item.requiredResearchBuilding);
-                }
-            }
+            var a = ancestors[i];
+            if (!a.IsFinished && !a.PlayerHasAnyAppropriateResearchBench)
+                chain.Add(a);
+        }
+        chain.Add(research);
 
-            if (item.requiredResearchFacilities.NullOrEmpty())
-            {
-                continue;
-            }
+        var missing = new List<ThingDef>(4);
 
-            foreach (var facility in item.requiredResearchFacilities)
+        for (int i = 0; i < chain.Count; i++)
+        {
+            var item = chain[i];
+
+            // 必需研究台
+            var reqBench = item.requiredResearchBuilding;
+            if (reqBench != null && !_benchDefsCached.Contains(reqBench))
+                missing.Add(reqBench);
+
+            // 必需设施
+            var reqFacs = item.requiredResearchFacilities;
+            if (reqFacs == null || reqFacs.Count == 0) continue;
+
+            for (int f = 0; f < reqFacs.Count; f++)
             {
-                if (!availableBenches.Any(b => b.HasFacility(facility)))
+                var fac = reqFacs[f];
+                bool anyHas = false;
+                for (int b = 0; b < _benchesCached.Count; b++)
                 {
-                    value.Add(facility);
+                    if (_benchesCached[b].HasFacility(fac)) { anyHas = true; break; }
                 }
+                if (!anyHas) missing.Add(fac);
             }
         }
 
-        value = value.Distinct().ToList();
-        _missingFacilitiesCache[research] = value;
-        return value;
+        // 去重
+        if (missing.Count > 1)
+        {
+            var hs = new HashSet<ThingDef>(missing);
+            missing = new List<ThingDef>(hs);
+        }
+
+        _missingFacilitiesCache[research] = missing;
+        return missing;
     }
+
 
     public bool BuildingPresent()
     {
@@ -513,30 +573,54 @@ public class ResearchNode : Node
         Queue.Notify_InstantFinished(this);
     }
 
-    public List<ResearchNode> GetMissingRequired()
-    {
-        return GetMissingRequiredRecursive()
-            .Concat(new List<ResearchNode>([this]))
-            .Distinct()
-            .ToList();
-    }
-
     public List<ResearchNode> GetMissingRequiredRecursive()
     {
-        var enumerable =
-            (Research.prerequisites?.Where(rpd => !rpd.IsFinished) ?? [])
-            .Concat(Research.hiddenPrerequisites?.Where(rpd => !rpd.IsFinished) ?? [])
-            .Select(rpd => rpd.ResearchNode())
-            .ToList();
+        // 显式栈 + 去重，一次遍历；与原语义等价（不含 this）
+        var result = new List<ResearchNode>(8);
+        var seen = new HashSet<ResearchNode>();
+        var stack = new List<ResearchNode>(8);
 
-        var list = new List<ResearchNode>(enumerable);
-        foreach (var item in enumerable)
+        void PushPrereqs(ResearchProjectDef rpd)
         {
-            list.AddRange(item.GetMissingRequiredRecursive());
+            var pre = rpd.prerequisites;
+            if (pre != null)
+                for (int i = 0; i < pre.Count; i++)
+                    if (!pre[i].IsFinished)
+                    {
+                        var n = pre[i].ResearchNode();
+                        if (seen.Add(n)) stack.Add(n);
+                    }
+
+            var hid = rpd.hiddenPrerequisites;
+            if (hid != null)
+                for (int i = 0; i < hid.Count; i++)
+                    if (!hid[i].IsFinished)
+                    {
+                        var n = hid[i].ResearchNode();
+                        if (seen.Add(n)) stack.Add(n);
+                    }
         }
 
-        return list.Distinct().ToList();
+        PushPrereqs(Research);
+
+        while (stack.Count > 0)
+        {
+            var node = stack[stack.Count - 1];
+            stack.RemoveAt(stack.Count - 1);
+            result.Add(node);
+            PushPrereqs(node.Research);
+        }
+
+        return result;
     }
+
+    public List<ResearchNode> GetMissingRequired()
+    {
+        var list = GetMissingRequiredRecursive();
+        if (!list.Contains(this)) list.Add(this);
+        return list;
+    }
+
 
     private List<ThingDef> MissingFacilities()
     {

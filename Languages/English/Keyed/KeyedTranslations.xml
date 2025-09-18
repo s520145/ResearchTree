@@ -65,4 +65,11 @@
   <Fluffy.ResearchTree.UIScaleWarning>When using UI scale larger than 1x you may experience research labels getting cut off if using the background loading option.
 Please use the load on first time opening if you experience this.</Fluffy.ResearchTree.UIScaleWarning>
   <Fluffy.ResearchTree.OverrideResearch>Make the research tree as default research tab \n(hold shift for open vanilla)</Fluffy.ResearchTree.OverrideResearch>
+  <Fluffy.ResearchTree.SkipCompleted>Skip completed projects during generation</Fluffy.ResearchTree.SkipCompleted>
+  <Fluffy.ResearchTree.VisualGroupByTab>Group by research tags</Fluffy.ResearchTree.VisualGroupByTab>
+  <Fluffy.ResearchTree.RequestRebuild>Rebuild research tree</Fluffy.ResearchTree.RequestRebuild>
+  <Fluffy.ResearchTree.AllTabsCache>Select research tags to generate</Fluffy.ResearchTree.AllTabsCache>
+  <Fluffy.ResearchTree.Building>Generating</Fluffy.ResearchTree.Building>
+  <Fluffy.ResearchTree.invisible>Hide incomplete projects</Fluffy.ResearchTree.invisible>
+  <Fluffy.ResearchTree.visible>Show incomplete projects</Fluffy.ResearchTree.visible>
 </LanguageData>

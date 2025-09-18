@@ -308,6 +308,12 @@ public class Queue : WorldComponent
     public static void DrawLabels(Rect visibleRect)
     {
         var num = 1;
+
+        if (Event.current.type != EventType.Repaint)
+        {
+            return;
+        }
+
         foreach (var item in _instance._queue)
         {
             var rect = new Rect(item.Rect.xMax - (Constants.QueueLabelSize / 2f),

@@ -1,7 +1,8 @@
-﻿using System.Reflection;
-using ColourPicker;
+﻿using ColourPicker;
 using HarmonyLib;
 using Mlie;
+using RimWorld;
+using System.Reflection;
 using UnityEngine;
 using Verse;
 
@@ -15,6 +16,8 @@ internal class FluffyResearchTreeMod : Mod
     public static FluffyResearchTreeMod instance;
 
     private static string currentVersion;
+
+    private Vector2 scrollPosTabs = Vector2.zero;
 
     //public static Thread initializeWorker;
 
@@ -49,6 +52,8 @@ internal class FluffyResearchTreeMod : Mod
     {
         var listing_Standard = new Listing_Standard();
         listing_Standard.Begin(rect);
+        listing_Standard.ColumnWidth = rect.width / 2f - 12f;
+        Settings.EnsureTabCache();
         listing_Standard.Gap();
         listing_Standard.Label("Fluffy.ResearchTree.LoadType".Translate());
 
@@ -124,6 +129,13 @@ internal class FluffyResearchTreeMod : Mod
                 color => { Settings.BackgroundColor = color; }));
         }
 
+        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.SkipCompleted".Translate(), ref Settings.SkipCompleted);
+        listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VisualGroupByTab".Translate(), ref Settings.VisualGroupByTab);
+        if (Widgets.ButtonText(listing_Standard.GetRect(30f), "Fluffy.ResearchTree.RequestRebuild".Translate()))
+        {
+            //Tree.RequestRebuild(reason: "SettingsChanged");
+        }
+
         listing_Standard.GapLine();
         if (listing_Standard.ButtonTextLabeledPct("Fluffy.ResearchTree.ResetLabel".Translate(),
                 "Fluffy.ResearchTree.Reset".Translate(), 0.75f))
@@ -133,6 +145,7 @@ internal class FluffyResearchTreeMod : Mod
 
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VerboseLogging".Translate(), ref Settings.VerboseLogging);
 
+
         if (currentVersion != null)
         {
             listing_Standard.Gap();
@@ -140,6 +153,38 @@ internal class FluffyResearchTreeMod : Mod
             listing_Standard.Label("Fluffy.ResearchTree.CurrentModVersion".Translate(currentVersion));
             GUI.contentColor = Color.white;
         }
+
+        listing_Standard.NewColumn();
+
+        // 右列标题
+        listing_Standard.Label("Fluffy.ResearchTree.AllTabsCache".Translate());
+
+        // 计算可视区域和内容高度
+        float outRectHeight = rect.height - 80f; // 给顶部按钮等留一点空间
+        Rect outRect = listing_Standard.GetRect(outRectHeight);
+        Rect viewRect = new Rect(0f, 0f, outRect.width - 20f, (Settings.AllTabsCache?.Count ?? 0) * 28f);
+
+        // 开始滚动视图
+        Widgets.BeginScrollView(outRect, ref scrollPosTabs, viewRect);
+        var ls2 = new Listing_Standard { ColumnWidth = viewRect.width };
+        ls2.Begin(viewRect);
+
+        if (Settings.AllTabsCache != null)
+        {
+            foreach (var tab in Settings.AllTabsCache)
+            {
+                if (tab == null) continue;
+
+                bool on = Settings.IncludedTabs.Contains(tab.defName);
+                var label = $"{tab.LabelCap} ({tab.modContentPack?.Name ?? "Core"})";
+                ls2.CheckboxLabeled(label, ref on);
+                if (on) Settings.IncludedTabs.Add(tab.defName);
+                else Settings.IncludedTabs.Remove(tab.defName);
+            }
+        }
+
+        ls2.End();
+        Widgets.EndScrollView();
 
         listing_Standard.End();
     }

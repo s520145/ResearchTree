@@ -1,4 +1,4 @@
-// MainTabWindow_ResearchTree.cs
+﻿// MainTabWindow_ResearchTree.cs
 // Copyright Karel Kroeze, 2020-2020
 
 using System.Collections.Generic;
@@ -37,6 +37,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     private Rect _viewRectInner;
 
     private float _zoomLevel = 1f;
+
+    private bool _panning;                 // 是否已进入平移
+    private Vector2 _dragStart;            // 按下时坐标
+    private const float PanThreshold = 4f; // 启动平移的像素阈值（避免轻点触发）
 
     public bool ViewRectDirty = true;
 
@@ -153,6 +157,12 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     public override void PreOpen()
     {
         base.PreOpen();
+
+        // 关键：吸收窗口周围输入，防止事件下沉到地图/底层 UI
+        absorbInputAroundWindow = true;
+        closeOnClickedOutside = false;   // 避免 RimWorld 的“点外面就关”的默认行为
+        preventCameraMotion = true;      // 避免地图摄像机因这个点击而响应
+
         setRects();
         Tree.WaitForInitialization();
         Assets.RefreshResearch = true;
@@ -207,24 +217,38 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         windowRect.width = UI.screenWidth;
         windowRect.height = UI.screenHeight - MainButtonDef.ButtonHeight;
     }
+    private void ClampScroll()
+    {
+        if (!Tree.Initialized) return;
+        var maxX = Mathf.Max(0f, TreeRect.width - ViewRect.width);
+        var maxY = Mathf.Max(0f, TreeRect.height - ViewRect.height);
+        _scrollPosition.x = Mathf.Clamp(_scrollPosition.x, 0f, maxX);
+        _scrollPosition.y = Mathf.Clamp(_scrollPosition.y, 0f, maxY);
+    }
 
     public override void DoWindowContents(Rect canvas)
     {
+        // 顶栏
+        drawTopBar(new Rect(canvas.xMin, canvas.yMin, canvas.width, Constants.TopBarHeight));
+
         if (!Tree.Initialized)
         {
             Close();
             return;
         }
 
-        drawTopBar(new Rect(canvas.xMin, canvas.yMin, canvas.width, Constants.TopBarHeight));
+        // 先处理输入（同帧生效）
+        handleZoom();
+        handleDolly();
+        handleDragging();
+        ClampScroll();
+
+        // 再应用缩放并绘制
         applyZoomLevel();
-        _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect);
+        _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect, true, true); // 见问题3
         Tree.Draw(VisibleRect);
         Queue.DrawLabels(VisibleRect);
-        handleZoom();
         GUI.EndScrollView(false);
-        handleDragging();
-        handleDolly();
         ResetZoomLevel();
         GUI.color = Color.white;
         Text.Anchor = TextAnchor.UpperLeft;
@@ -238,40 +262,32 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     }
 
     // default W A S D move
+    // 替换原来的 handleDolly()
     private static void handleDolly()
     {
-        const float num = 10f;
-        if (KeyBindingDefOf.MapDolly_Left.IsDown)
-        {
-            _scrollPosition.x -= num;
-        }
+        // 每帧一次，避免在 Layout/MouseMove 阶段重复加步长
+        if (Event.current.type != EventType.Repaint) return;
 
-        if (KeyBindingDefOf.MapDolly_Right.IsDown)
-        {
-            _scrollPosition.x += num;
-        }
+        // 步长随帧时间与缩放变化：缩得越小（ZoomLevel大），单帧移动更多
+        float step = 600f * Time.unscaledDeltaTime * Mathf.Max(1f, Instance.ZoomLevel);
 
-        if (KeyBindingDefOf.MapDolly_Up.IsDown)
-        {
-            _scrollPosition.y -= num;
-        }
+        if (KeyBindingDefOf.MapDolly_Left.IsDown) _scrollPosition.x -= step;
+        if (KeyBindingDefOf.MapDolly_Right.IsDown) _scrollPosition.x += step;
+        if (KeyBindingDefOf.MapDolly_Up.IsDown) _scrollPosition.y -= step;
+        if (KeyBindingDefOf.MapDolly_Down.IsDown) _scrollPosition.y += step;
 
-        if (KeyBindingDefOf.MapDolly_Down.IsDown)
-        {
-            _scrollPosition.y += num;
-        }
+        Instance.ClampScroll();
     }
 
     private void handleZoom()
     {
-        if (!Event.current.isScrollWheel)
-        {
-            return;
-        }
+        if (!Tree.Initialized) return;
+        if (!Event.current.isScrollWheel) return;
 
         if (Event.current.control == FluffyResearchTreeMod.instance.Settings.CtrlFunction)
         {
             _scrollPosition.y += Event.current.delta.y * 10f;
+            ClampScroll();
             return;
         }
 
@@ -279,38 +295,52 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         var vector = (Event.current.mousePosition - _scrollPosition) / ZoomLevel;
         ZoomLevel += Event.current.delta.y * Constants.ZoomStep * ZoomLevel;
         _scrollPosition = mousePosition - (vector * ZoomLevel);
+        ClampScroll();
         Event.current.Use();
     }
 
     private void handleDragging()
     {
-        if (Queue._draggedNode != null)
+        if (Queue._draggedNode != null) return;
+
+        var e = Event.current;
+
+        // 先确认鼠标在窗口内（不是只看 ViewRect）
+        bool inWindow = Mouse.IsOver(this.windowRect);
+        bool inView = inWindow && ViewRect.Contains(e.mousePosition);
+
+        if (e.type == EventType.MouseDown && e.button == 0 && inWindow)
         {
+            _dragging = inView;           // 只在视口内作为“候选拖拽”
+            _panning = false;
+            _dragStart = _mousePosition = e.mousePosition;
+            // 不 Use()，保留给节点/控件
             return;
         }
 
-        if (Event.current.type == EventType.MouseDown)
+        if (e.type == EventType.MouseUp && e.button == 0)
         {
-            _dragging = true;
-            _mousePosition = Event.current.mousePosition;
-            Event.current.Use();
-        }
-
-        if (Event.current.type == EventType.MouseUp)
-        {
-            _dragging = false;
-            _mousePosition = Vector2.zero;
-        }
-
-        if (Event.current.type != EventType.MouseDrag)
-        {
+            _dragging = _panning = false;
+            _dragStart = _mousePosition = Vector2.zero;
             return;
         }
 
-        var mousePosition = Event.current.mousePosition;
-        _scrollPosition += _mousePosition - mousePosition;
-        _mousePosition = mousePosition;
+        if (_dragging && e.type == EventType.MouseDrag && e.button == 0)
+        {
+            if (!_panning)
+            {
+                if ((e.mousePosition - _dragStart).sqrMagnitude < PanThreshold * PanThreshold) return;
+                _panning = true;
+            }
+
+            var cur = e.mousePosition;
+            _scrollPosition += _mousePosition - cur;
+            _mousePosition = cur;
+            ClampScroll();
+            e.Use(); // 只有真正平移时才吞事件
+        }
     }
+
 
     private void applyZoomLevel()
     {
@@ -327,37 +357,93 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         GUI.BeginClip(new Rect(0f, UI.screenHeight - Constants.TopBarHeight,
             UI.screenWidth, UI.screenHeight - MainButtonDef.ButtonHeight - Constants.TopBarHeight));
     }
-
     private void drawTopBar(Rect canvas)
     {
-        var rect = canvas;
-        var rect2 = canvas;
-        rect.width = 200f;
-        rect2.xMin += 206f;
-        DrawSearchBar(rect.ContractedBy(Constants.Margin));
-        Queue.DrawQueue(rect2.ContractedBy(Constants.Margin), !_dragging);
+        // 左侧固定 400 宽作为“搜索 + 按钮”区域
+        var left = new Rect(canvas.x, canvas.y, 400f, canvas.height);
+        // 右侧队列区域：从左栏右侧再加一个通用间距
+        var right = canvas;
+        right.xMin = left.xMax + Constants.Margin;
+
+        DrawSearchBar(left.ContractedBy(Constants.Margin));
+        Queue.DrawQueue(right.ContractedBy(Constants.Margin), !_dragging);
     }
 
     private void DrawSearchBar(Rect canvas)
     {
-        var searchRect =
-            new Rect(canvas.xMin, 0f, canvas.width, Constants.QueueLabelSize).CenteredOnYIn(canvas.TopHalf());
+        // 统一高度/间距
+        float h = Constants.QueueLabelSize;
+        float gap = 6f;                     // 垂直/水平间距
+        float pad = 24f;                    // 按钮文字左右内边距
 
-        var anomalyBtnRect = new Rect(
-            searchRect.x + Constants.SmallQueueLabelSize + Constants.Margin,
-            searchRect.y,
-            searchRect.width - Constants.SmallQueueLabelSize - Constants.Margin,
-            searchRect.height
-        ).CenteredOnYIn(canvas.BottomHalf());
-        if (ModsConfig.AnomalyActive && Widgets.ButtonText(anomalyBtnRect, "Fluffy.ResearchTree.Anomaly".Translate()))
+        // 文本 & 尺寸测量
+        bool isShow = FluffyResearchTreeMod.instance.Settings.SkipCompleted;
+        string anomalyLabel = "Fluffy.ResearchTree.Anomaly".Translate();
+        string toggleLabel = isShow ? "Fluffy.ResearchTree.invisible".Translate()
+                                     : "Fluffy.ResearchTree.visible".Translate();
+
+        var oldFont = Text.Font;
+        Text.Font = GameFont.Small;
+        Vector2 szAnomaly = Text.CalcSize(anomalyLabel);
+        Vector2 szToggle = Text.CalcSize(toggleLabel);
+        Text.Font = oldFont;
+
+        float btnH = h;
+        float btnW1 = Mathf.Max(120f, szAnomaly.x + pad);
+        float btnW2 = Mathf.Max(200f, szToggle.x + pad);
+
+        // —— 布局：搜索框固定在上，占整行；按钮在下并排 —— //
+        // 第一行：搜索框（整行）
+        var searchRect = new Rect(
+            canvas.xMin,
+            canvas.yMin,            // 顶部
+            canvas.width,
+            h
+        );
+
+        // 第二行：按钮区域
+        float buttonsY = searchRect.yMax + gap;
+
+        // 右对齐两按钮：[  ...  ][ Anomaly ][ Toggle ]
+        var toggleBtnRect = new Rect(canvas.xMax - btnW2, buttonsY, btnW2, btnH);
+        var anomalyBtnRect = new Rect(toggleBtnRect.x - gap - btnW1, buttonsY, btnW1, btnH);
+
+        // 若画布过窄（极端情况下），自动堆叠按钮以避免重叠
+        if (anomalyBtnRect.x < canvas.xMin)
+        {
+            // 竖直堆叠，右对齐
+            anomalyBtnRect = new Rect(canvas.xMax - btnW1, buttonsY, btnW1, btnH);
+            toggleBtnRect = new Rect(canvas.xMax - btnW2, anomalyBtnRect.yMax + gap, btnW2, btnH);
+        }
+
+        // ---- Anomaly 按钮 ----
+        if (ModsConfig.AnomalyActive && Widgets.ButtonText(anomalyBtnRect, anomalyLabel))
         {
             ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
             Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research);
             return;
         }
 
+        // ---- 切换按钮（暗绿/暗红 + 白字）----
+        var bg = isShow ? new Color(0.1f, 0.5f, 0.1f) : new Color(0.6f, 0.1f, 0.1f);
+        Widgets.DrawBoxSolid(toggleBtnRect, bg);
+
+        var oldAnchor = Text.Anchor; var oldColor = GUI.color;
+        Text.Anchor = TextAnchor.MiddleCenter; GUI.color = Color.white;
+        Widgets.Label(toggleBtnRect, toggleLabel);
+        Text.Anchor = oldAnchor; GUI.color = oldColor;
+
+        if (Widgets.ButtonInvisible(toggleBtnRect, doMouseoverSound: true))
+        {
+            FluffyResearchTreeMod.instance.Settings.SkipCompleted = !FluffyResearchTreeMod.instance.Settings.SkipCompleted;
+            Tree.ResetNodeAvailabilityCache();
+            Assets.RefreshResearch = true;
+        }
+
+        // ---- 搜索框 ----
         _quickSearchWidget.OnGUI(searchRect, () => updateSearchResults(canvas));
     }
+
 
     public void CenterOn(Node node)
     {

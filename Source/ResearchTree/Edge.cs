@@ -75,6 +75,11 @@ public class Edge<T1, T2> where T1 : Node where T2 : Node
             return;
         }
 
+        if (Event.current.type != EventType.Repaint)
+        {
+            return;
+        }
+
         var right = In.Right;
         var left = Out.Left;
         if (Math.Abs(right.y - left.y) < Constants.Epsilon)

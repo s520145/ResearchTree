@@ -1,114 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-  <name>Research Tree (Continued)</name>
-  <packageId>Mlie.ResearchTree</packageId>
-  <author>Fluffy</author>
-  <url>https://github.com/emipa606/ResearchTree</url>
-  <supportedVersions>
-    <li>1.0</li>
-    <li>1.1</li>
-    <li>1.2</li>
-    <li>1.3</li>
-    <li>1.4</li>
-    <li>1.5</li>
-    <li>1.6</li>
-  </supportedVersions>
-  <modDependencies>
-    <li>
-      <packageId>brrainz.harmony</packageId>
-      <displayName>Harmony</displayName>
-      <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
-      <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
-    </li>
-  </modDependencies>
-  <loadAfter>
-    <li>brrainz.harmony</li>
-  </loadAfter>
-  <description>[img]https://i.imgur.com/buuPQel.png[/img]
-Update of Fluffys mod https://steamcommunity.com/sharedfiles/filedetails/?id=1266570759
-
-[b]Added features[/b]
-[list]
-[*] Added research-infocard, visible by Rightclick
-[*] Research can now be added/moved to the front of the queue with Ctrl+Leftclick
-[*] Added the current progress values on not finished projects
-[*] Locked camera when opening the research-window
-[*] Original research-window can be opened by holding shift
-[*] Added mod-option for when the tree should be generated, the default is now during game start
-[*] Added mod-option to pause the game when the tree is open
-[*] Added some caching of the research-nodes to avoid stuttering with large research-trees
-[*] Added scroll-wheel scrolling when holding Ctrl
-[*] Adapted some of the graphical tricks in [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2877856030]ResearchPowl[/url]
-[*] Added a scroll-bar for the research-queue to be able to see all queued projects
-[*] Added dragging to reorder the search-queue, thanks to JiaRG
-[*] Added option to hide the "Missing Meme"-warning when selecting research
-[*] Fixed check for hiddenRequirements
-[*] Added selectable background color
-[*] Added option to not generate a research-tree, but still use the queue mechanic in the vanilla tree. Thanks to JiaRG
-[/list]
-
-[b]Compatibilities[/b]
-[list]
-[*] Fixed compatibility with Biotech
-[*] Updated compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2868392160]Research Reinvented[/url]
-[*] Updated compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2552092060]Research Whatever[/url]
-[*] Added support for the custom research requirements in [url=https://steamcommunity.com/workshop/filedetails/?id=3014906877]Vanilla Vehicles Expanded[/url]
-[*] Added support for the extra research requirements in [url=https://steamcommunity.com/workshop/filedetails/?id=3119805903]GrimWorld 40,000 - Framework[/url]
-[*] Added compatibility with the tech-hiding from [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1909914131]Save Our Ship 2[/url]
-[*] Added compatibility with the tech-limiting in [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2516523040]Rimedieval[/url]. Needs a reload if the settings in Rimedieval are changed.
-[*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3236847079]Better Research Tabs[/url]
-[*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2606510510]Organized Research Tab[/url]
-[*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2879094186]Semi Random Research[/url]
-[*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3455432792]Semi Random Research: Progression Fork[/url]
-[*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3219596926]Medieval Overhaul[/url]
-[*] Added compatibility with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3414187030]World Tech Level[/url]
-[*] Added option to hide research that is blocked by tech-limiting mods instead of just disabling them. Thanks to m00nl1ght-dev
-[/list]
-[img]https://i.imgur.com/pufA0kM.png[/img]
-
-[table]
-    [tr][td][url=https://discord.gg/h5TY6DA][img]https://i.imgur.com/zdzzBrc.png[/img][/url][/td] [td][url=https://github.com/emipa606/ResearchTree][img]https://i.imgur.com/kTkpTOE.png[/img][/url][/td]
-    [/tr]
-    [tr]
-        [td][img]https://i.imgur.com/WjDSfUn.png[/img][/td]
-        [td][img]https://i.imgur.com/h5VwTNL.png[/img][/td]
-    [/tr]
-[/table]
-	
-[img]https://i.imgur.com/Z4GOv8H.png[/img]
-A better research tree.
-
-[h2]Features[/h2]
- - automatically generated to maximize readability*. - shows research projects, buildings, plants and recipes unlocked by each research project. - projects can be queued, and colonists will automatically start the next project when the current research project completes. - search functionality to quickly find research projects. 
-
-[h2]FAQ[/h2]
-[i]Can I add/remove this from an existing save?[/i] You can add it to existing saves without problems. Removing this mod will lead to some errors when loading, but these should not affect gameplay - and will go away after saving.
-
-[i]Why is research X in position Y?[/i] Honestly, I have no idea. The placement of projects (nodes) is automated to minimize the number of crossings between dependencies (edges), and reduce the total length of these edges. There are many possible scenarios in which this can lead to placements that may appear non-optimal. Sometimes they really are non-optimal, sometimes they just appear to be so. See also the [i]technical[/i] section below for more information.
-
-[i]Can I use this with mod X[/i] Most likely, yes. Added researches and their requirements are automatically parsed and the tree layout will be updated accordingly. ResearchPal implements a lot of the same functionality as this mod, and the research queue will likely not work correctly if both mods are loaded.
-
-[i]This looks very similar to ResearchPal[/i] Yep. ResearchPal is based on a legacy version of this mod that was kept up-to-date by SkyArkAngel in the HCSK modpack. I haven’t worked on this mod in a long time, but I recently had some spare time and decided to give it another go. Feel free to use whichever you like better (ResearchPal has an entirely different layout algorithm). You can run both mods side by side to check out the different tree layouts, but be aware that the research queue will not work correctly if both mods are loaded.
-
-[h2]Contributors[/h2]
- - Templarr: Russian translation - Suh. Junmin: Korean translation - rw-chaos: German translation - 53N4: Spanish translation - Silverside: Fix UI scaling bug for vertical text - shiuanyue: Chinese (traditional) translation - notfood: Implement techprint requirements - HanYaodong: Add simplified Chinese translation 
-
-[h2]License[/h2]
-All original code in this mod is licensed under the [url=https://opensource.org/licenses/MIT]MIT license[/url]. Do what you want, but give me credit. All original content (e.g. text, imagery, sounds) in this mod is licensed under the [url=http://creativecommons.org/licenses/by-sa/4.0/]CC-BY-SA 4.0 license[/url].
-
-Parts of the code in this mod, and some content may be licensed by their original authors. If this is the case, the original author and license will either be given in the source code, or be in a LICENSE file next to the content. Please do not decompile my mods, but use the original source code available on [url=https://github.com/fluffy-mods/ResearchTree/]GitHub[/url], so license information in the source code is preserved.
-
-[img]https://i.imgur.com/PwoNOj4.png[/img]
-[list]
-[*] See if the the error persists if you just have this mod and its requirements active.
-[*] If not, try adding your other mods until it happens again.
-[*] Post your error-log using the [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873415404]Log Uploader[/url] or the standalone [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873415404]Uploader[/url] and command Ctrl+F12
-[*] For best support, please use the Discord-channel for error-reporting.
-[*] Do not report errors by making a discussion-thread, I get no notification of that.
-[*] If you have the solution for a problem, please post it to the GitHub repository.
-[*] Use [url=https://github.com/RimSort/RimSort/releases/latest]RimSort[/url] to sort your mods
-[/list] 
-
-[url=https://steamcommunity.com/sharedfiles/filedetails/changelog/3030499331][img]https://img.shields.io/github/v/release/emipa606/ResearchTree?label=latest%20version&amp;style=plastic&amp;color=9f1111&amp;labelColor=black[/img][/url] | tags:  queue,  tree</description>
-  <modVersion IgnoreIfNoMatchingField="True">1.6.1</modVersion>
+    <name>Research Tree (Continued)</name>
+    <packageId>Mlie.researchtree</packageId>
+    <author>Fluffy,Mlie,Baiyin</author>
+    <supportedVersions>
+        <li>1.6</li>
+    </supportedVersions>
+    <modDependencies>
+        <li>
+            <packageId>brrainz.harmony</packageId>
+            <displayName>Harmony</displayName>
+            <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+            <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+        </li>
+    </modDependencies>
+    <loadAfter>
+        <li>brrainz.harmony</li>
+        <li>m00nl1ght.WorldTechLevel</li>
+    </loadAfter>
+    <description>
+1.Fixed an issue where using it alongside the Organized Research Tab (Continued) would cause two research tabs to appear.
+2.Optimized the speed of generating the research tree, significantly improving generation speed in scenarios with multiple mods.
+3.Improved the responsiveness of dragging (including mouse and WASD) and zooming, making operations more immediate and smoother.
+4.Added a feature to hide completed projects.
+    </description>
+    <modVersion IgnoreIfNoMatchingField="True">1.6.1</modVersion>
 </ModMetaData>
