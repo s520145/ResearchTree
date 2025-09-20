@@ -67,4 +67,18 @@ Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Prob
   <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>Die World Tech Level-Einstellungen erlauben diese Technologie nicht</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.LoadingWait>Baum nicht fertig generiert, klicken Sie, um den Vanille-Baum zu öffnen</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>Anomalieforschung</Fluffy.ResearchTree.Anomaly>
+  <Fluffy.ResearchTree.SkipCompleted>Abgeschlossene Projekte bei der Generierung überspringen</Fluffy.ResearchTree.SkipCompleted>
+  <Fluffy.ResearchTree.VisualGroupByTab>Nach Forschungs-Tags gruppieren</Fluffy.ResearchTree.VisualGroupByTab>
+  <Fluffy.ResearchTree.RequestRebuild>Forschungsbaum neu aufbauen</Fluffy.ResearchTree.RequestRebuild>
+  <Fluffy.ResearchTree.AllTabsCache>Zu generierende Forschungstags auswählen</Fluffy.ResearchTree.AllTabsCache>
+  <Fluffy.ResearchTree.Building>Wird erzeugt</Fluffy.ResearchTree.Building>
+  <Fluffy.ResearchTree.invisible>Unvollständige Projekte ausblenden</Fluffy.ResearchTree.invisible>
+  <Fluffy.ResearchTree.visible>Unvollständige Projekte anzeigen</Fluffy.ResearchTree.visible>
+  <Fluffy.ResearchTree.filter>Forschungstags auswählen</Fluffy.ResearchTree.filter>
+  <Fluffy.ResearchTree.selectAll>Alle auswählen</Fluffy.ResearchTree.selectAll>
+  <Fluffy.ResearchTree.selectNone>Keine auswählen</Fluffy.ResearchTree.selectNone>
+  <Fluffy.ResearchTree.selectInvert>Auswahl umkehren</Fluffy.ResearchTree.selectInvert>
+  <Fluffy.ResearchTree.cancel>Abbrechen</Fluffy.ResearchTree.cancel>
+  <Fluffy.ResearchTree.rebuild>Neu aufbauen</Fluffy.ResearchTree.rebuild>
+  <Fluffy.ResearchTree.refresh>Forschungstag-Filter angewendet und Aktualisierung des Forschungsbaums angefordert</Fluffy.ResearchTree.refresh>
 </LanguageData>
