@@ -66,4 +66,18 @@
   <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>Настройки мирового уровня техники не позволяют использовать эту технику</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.LoadingWait>Генерация дерева не завершена, нажмите, чтобы открыть ванильное дерево</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>Исследование аномалий</Fluffy.ResearchTree.Anomaly>
+  <Fluffy.ResearchTree.SkipCompleted>Пропускать завершённые проекты при генерации</Fluffy.ResearchTree.SkipCompleted>
+  <Fluffy.ResearchTree.VisualGroupByTab>Группировать по тегам исследований</Fluffy.ResearchTree.VisualGroupByTab>
+  <Fluffy.ResearchTree.RequestRebuild>Перестроить дерево исследований</Fluffy.ResearchTree.RequestRebuild>
+  <Fluffy.ResearchTree.AllTabsCache>Выберите теги исследований для генерации</Fluffy.ResearchTree.AllTabsCache>
+  <Fluffy.ResearchTree.Building>Генерация</Fluffy.ResearchTree.Building>
+  <Fluffy.ResearchTree.invisible>Скрыть незавершённые проекты</Fluffy.ResearchTree.invisible>
+  <Fluffy.ResearchTree.visible>Показать незавершённые проекты</Fluffy.ResearchTree.visible>
+  <Fluffy.ResearchTree.filter>Выбрать теги исследований</Fluffy.ResearchTree.filter>
+  <Fluffy.ResearchTree.selectAll>Выбрать всё</Fluffy.ResearchTree.selectAll>
+  <Fluffy.ResearchTree.selectNone>Снять выбор</Fluffy.ResearchTree.selectNone>
+  <Fluffy.ResearchTree.selectInvert>Инвертировать выбор</Fluffy.ResearchTree.selectInvert>
+  <Fluffy.ResearchTree.cancel>Отмена</Fluffy.ResearchTree.cancel>
+  <Fluffy.ResearchTree.rebuild>Перестроить</Fluffy.ResearchTree.rebuild>
+  <Fluffy.ResearchTree.refresh>Применён фильтр тегов и запрошено обновление дерева исследований</Fluffy.ResearchTree.refresh>
 </LanguageData>

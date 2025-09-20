@@ -66,5 +66,19 @@
   <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>La configuración del nivel técnico mundial no permite esta tecnología</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.LoadingWait>Árbol no terminado de generar, haga clic para abrir el árbol de vainilla</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>Investigación de anomalías</Fluffy.ResearchTree.Anomaly>
+  <Fluffy.ResearchTree.SkipCompleted>Omitir proyectos completados durante la generación</Fluffy.ResearchTree.SkipCompleted>
+  <Fluffy.ResearchTree.VisualGroupByTab>Agrupar por etiquetas de investigación</Fluffy.ResearchTree.VisualGroupByTab>
+  <Fluffy.ResearchTree.RequestRebuild>Reconstruir el árbol de investigación</Fluffy.ResearchTree.RequestRebuild>
+  <Fluffy.ResearchTree.AllTabsCache>Seleccionar etiquetas de investigación a generar</Fluffy.ResearchTree.AllTabsCache>
+  <Fluffy.ResearchTree.Building>Generando</Fluffy.ResearchTree.Building>
+  <Fluffy.ResearchTree.invisible>Ocultar proyectos incompletos</Fluffy.ResearchTree.invisible>
+  <Fluffy.ResearchTree.visible>Mostrar proyectos incompletos</Fluffy.ResearchTree.visible>
+  <Fluffy.ResearchTree.filter>Seleccionar etiquetas de investigación</Fluffy.ResearchTree.filter>
+  <Fluffy.ResearchTree.selectAll>Seleccionar todo</Fluffy.ResearchTree.selectAll>
+  <Fluffy.ResearchTree.selectNone>No seleccionar nada</Fluffy.ResearchTree.selectNone>
+  <Fluffy.ResearchTree.selectInvert>Invertir selección</Fluffy.ResearchTree.selectInvert>
+  <Fluffy.ResearchTree.cancel>Cancelar</Fluffy.ResearchTree.cancel>
+  <Fluffy.ResearchTree.rebuild>Reconstruir</Fluffy.ResearchTree.rebuild>
+  <Fluffy.ResearchTree.refresh>Se aplicó el filtro de etiquetas de investigación y se solicitó actualizar el árbol de investigación</Fluffy.ResearchTree.refresh>
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
 </LanguageData>

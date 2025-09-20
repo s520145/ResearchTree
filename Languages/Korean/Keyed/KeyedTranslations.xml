@@ -5,23 +5,66 @@
   <Fluffy.ResearchTree.AllowsSowingXinY>{0}을/를 {1}에 심기 가능</Fluffy.ResearchTree.AllowsSowingXinY>
   <Fluffy.ResearchTree.AllowsPlantingX>{0} 재배 가능</Fluffy.ResearchTree.AllowsPlantingX>
   <Fluffy.ResearchTree.LClickReplaceQueue>왼쪽 클릭으로 대기열을 변경합니다.</Fluffy.ResearchTree.LClickReplaceQueue>
-  <Fluffy.ResearchTree.LClickRemoveFromQueue>왼쪽 클릭으로 대기열에서 제거합니다.</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.SLClickAddToQueue>Shift-왼쪽 클릭으로 대기열에 추가합니다.</Fluffy.ResearchTree.SLClickAddToQueue>
-  <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
   <Fluffy.ResearchTree.RClickInstaFinish>(디버그) 오른쪽 클릭으로 즉시 완료</Fluffy.ResearchTree.RClickInstaFinish>
   <Fluffy.ResearchTree.Requires>요구 사항</Fluffy.ResearchTree.Requires>
   <Fluffy.ResearchTree.LeadsTo>선행 기술</Fluffy.ResearchTree.LeadsTo>
   <Fluffy.ResearchTree.QueuedNode>이미 대기열에 있는 노드입니다.</Fluffy.ResearchTree.QueuedNode>
   <Fluffy.ResearchTree.MissingFacilities>{0} 필요</Fluffy.ResearchTree.MissingFacilities>
-  <Fluffy.ResearchTree.MissingTechprints>불충분 한 기술 인쇄 {0}/{1}</Fluffy.ResearchTree.MissingTechprints>
-  <Fluffy.ResearchTree.NoResearchFound>검색 결과 없음</Fluffy.ResearchTree.NoResearchFound>
+  <Fluffy.ResearchTree.MissingTechprints>기술 인쇄 부족 {0}/{1}</Fluffy.ResearchTree.MissingTechprints>
+  <Fluffy.ResearchTree.NoResearchFound>연구를 찾을 수 없습니다</Fluffy.ResearchTree.NoResearchFound>
   <Fluffy.ResearchTree.NothingQueued>대기열에 연구 없음</Fluffy.ResearchTree.NothingQueued>
   <Fluffy.ResearchTree.NextInQueue>대기열에 있는 다음 연구: {0}</Fluffy.ResearchTree.NextInQueue>
   <Fluffy.ResearchTree.PreparingTree.Setup>연구 노드 준비</Fluffy.ResearchTree.PreparingTree.Setup>
   <Fluffy.ResearchTree.PreparingTree.CrossingReduction>겹침 줄이기</Fluffy.ResearchTree.PreparingTree.CrossingReduction>
   <Fluffy.ResearchTree.PreparingTree.Layout>레이아웃 다듬기</Fluffy.ResearchTree.PreparingTree.Layout>
   <Fluffy.ResearchTree.RestoreQueue>대기열 복원</Fluffy.ResearchTree.RestoreQueue>
+  <Fluffy.ResearchTree.None>없음</Fluffy.ResearchTree.None>
+  <Fluffy.ResearchTree.MissingStudiedThings>부족한 대상 연구: {0}</Fluffy.ResearchTree.MissingStudiedThings>
+  <Fluffy.ResearchTree.MissingMechanitorRequirement>메카니터 부족</Fluffy.ResearchTree.MissingMechanitorRequirement>
+  <Fluffy.ResearchTree.SRClickShowInfo>오른쪽 클릭으로 정보 창 표시</Fluffy.ResearchTree.SRClickShowInfo>
+  <Fluffy.ResearchTree.NotStarted>시작되지 않음, 비용 {0}</Fluffy.ResearchTree.NotStarted>
+  <Fluffy.ResearchTree.InProgress>진행 중, {1} 중 {0} 완료</Fluffy.ResearchTree.InProgress>
+  <Fluffy.ResearchTree.RClickInstaFinishNew>(디버그) Shift-오른쪽 클릭으로 즉시 완료</Fluffy.ResearchTree.RClickInstaFinishNew>
+  <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-왼쪽 클릭으로 대기열 맨 앞으로 이동</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
+  <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-왼쪽 클릭으로 대기열 맨 앞에 추가</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
+  <Fluffy.ResearchTree.CannotMoveMore>{0}은(는) 더 이상 대기열 앞쪽으로 이동할 수 없습니다.</Fluffy.ResearchTree.CannotMoveMore>
+  <Fluffy.ResearchTree.CurrentModVersion>설치된 모드 버전: {0}</Fluffy.ResearchTree.CurrentModVersion>
+  <Fluffy.ResearchTree.PauseOnOpen>연구 트리를 열 때 게임 일시정지</Fluffy.ResearchTree.PauseOnOpen>
+  <Fluffy.ResearchTree.LoadType>연구 트리를 언제 생성할까요?</Fluffy.ResearchTree.LoadType>
+  <Fluffy.ResearchTree.LoadTypeOne>게임 로딩 중</Fluffy.ResearchTree.LoadTypeOne>
+  <Fluffy.ResearchTree.LoadTypeTwo>게임 로딩 후 백그라운드에서</Fluffy.ResearchTree.LoadTypeTwo>
+  <Fluffy.ResearchTree.LoadTypeThree>연구 트리를 처음 열 때</Fluffy.ResearchTree.LoadTypeThree>
+  <Fluffy.ResearchTree.LoadTypeFour>연구 트리를 생성하지 않고 연구 대기열 유지</Fluffy.ResearchTree.LoadTypeFour>
+  <Fluffy.ResearchTree.PreparingTree.LayoutNew>연구 트리 배치 마무리</Fluffy.ResearchTree.PreparingTree.LayoutNew>
+  <Fluffy.ResearchTree.VanillaGraphics>오래된 그래픽 방식을 사용 (깜빡임이 있을 때)</Fluffy.ResearchTree.VanillaGraphics>
+  <Fluffy.ResearchTree.ShowCompletion>연구 완료 시 완료 메시지 표시</Fluffy.ResearchTree.ShowCompletion>
+  <Fluffy.ResearchTree.StillLoading>연구 트리를 처음 불러오는 중입니다. 시간이 걸릴 수 있습니다.</Fluffy.ResearchTree.StillLoading>
+  <Fluffy.ResearchTree.GenerationInProgress>연구 트리를 생성하는 중입니다. 잠시만 기다려 주세요…</Fluffy.ResearchTree.GenerationInProgress>
+  <Fluffy.ResearchTree.UIScaleWarning>UI 배율이 1x보다 크면 백그라운드 로딩 옵션을 사용할 때 연구 레이블이 잘릴 수 있습니다.
+이런 문제가 발생하면 '처음 열 때 로딩'을 사용하세요.</Fluffy.ResearchTree.UIScaleWarning>
+  <Fluffy.ResearchTree.CtrlFunctionScroll>Ctrl 키로 연구 트리를 세로로 스크롤합니다.</Fluffy.ResearchTree.CtrlFunctionScroll>
+  <Fluffy.ResearchTree.CtrlFunctionZoom>Ctrl 키로 연구 트리를 확대/축소합니다.</Fluffy.ResearchTree.CtrlFunctionZoom>
+  <Fluffy.ResearchTree.ResolutionChange>ResearchTree: 그래픽 변경을 감지했습니다. 연구 트리를 다시 생성합니다.</Fluffy.ResearchTree.ResolutionChange>
+  <Fluffy.ResearchTree.StorytellerDoesNotAllow>스토리텔러가 이 기술을 허용하지 않습니다.</Fluffy.ResearchTree.StorytellerDoesNotAllow>
+  <Fluffy.ResearchTree.RimedievalDoesNotAllow>Rimedieval 설정에서 이 기술을 허용하지 않습니다.</Fluffy.ResearchTree.RimedievalDoesNotAllow>
+  <ResearchPal.BuildingResearchTreeAsync>연구 트리를 구성하는 중</ResearchPal.BuildingResearchTreeAsync>
   <Fluffy.ResearchTree.OverrideResearch>연구 트리를 기본 연구 탭으로 만듭니다.\n(바닐라를 열려면 Shift 키를 누르세요)</Fluffy.ResearchTree.OverrideResearch>
+  <Fluffy.ResearchTree.HoldForClassic>SHIFT를 누르고 있으면 기본 연구 창을 엽니다.</Fluffy.ResearchTree.HoldForClassic>
+  <Fluffy.ResearchTree.HoldForNew>SHIFT를 누르고 있으면 새로운 연구 창을 엽니다.</Fluffy.ResearchTree.HoldForNew>
+  <Fluffy.ResearchTree.VerboseLogging>자세한 로그 기록</Fluffy.ResearchTree.VerboseLogging>
+  <Fluffy.ResearchTree.NoIdeologyPopup>이념 경고 숨기기</Fluffy.ResearchTree.NoIdeologyPopup>
+  <Fluffy.ResearchTree.NoIdeologyPopupTT>연구를 선택할 때 현재 이념이 허용하지 않는 항목을 해제한다는 경고 팝업을 표시하지 않습니다.</Fluffy.ResearchTree.NoIdeologyPopupTT>
+  <Fluffy.ResearchTree.HideNodesBlockedByTechLevel>기술 수준 제한으로 막힌 연구 숨기기</Fluffy.ResearchTree.HideNodesBlockedByTechLevel>
+  <Fluffy.ResearchTree.SemiRandomResearchLoaded>세미 랜덤 연구 모드에서는 자유롭게 연구를 선택할 수 없습니다.</Fluffy.ResearchTree.SemiRandomResearchLoaded>
+  <Fluffy.ResearchTree.Reset>초기화</Fluffy.ResearchTree.Reset>
+  <Fluffy.ResearchTree.ResetLabel>모든 설정 초기화</Fluffy.ResearchTree.ResetLabel>
+  <Fluffy.ResearchTree.BackgroundColor>배경색</Fluffy.ResearchTree.BackgroundColor>
+  <Fluffy.ResearchTree.LClickRemoveFromQueue>Shift-왼쪽 클릭으로 대기열에서 제거합니다.</Fluffy.ResearchTree.LClickRemoveFromQueue>
+  <Fluffy.ResearchTree.GrimworldDoesNotAllow>Grimworld 연구 요구 사항을 충족하지 않았습니다. 자세한 정보를 보려면 오른쪽 클릭하세요.</Fluffy.ResearchTree.GrimworldDoesNotAllow>
+  <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>세계 기술 수준 설정이 이 기술을 허용하지 않습니다.</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
+  <Fluffy.ResearchTree.LoadingWait>연구 트리가 아직 생성되지 않았습니다. 클릭하면 기본 연구 트리를 엽니다.</Fluffy.ResearchTree.LoadingWait>
+  <Fluffy.ResearchTree.Anomaly>이상 연구</Fluffy.ResearchTree.Anomaly>
   <Fluffy.ResearchTree.SkipCompleted>생성 중 완료된 프로젝트 건너뛰기</Fluffy.ResearchTree.SkipCompleted>
   <Fluffy.ResearchTree.VisualGroupByTab>연구 태그별 그룹화</Fluffy.ResearchTree.VisualGroupByTab>
   <Fluffy.ResearchTree.RequestRebuild>연구 트리 다시 빌드</Fluffy.ResearchTree.RequestRebuild>
@@ -29,5 +72,11 @@
   <Fluffy.ResearchTree.Building>생성 중</Fluffy.ResearchTree.Building>
   <Fluffy.ResearchTree.invisible>미완료 프로젝트 숨기기</Fluffy.ResearchTree.invisible>
   <Fluffy.ResearchTree.visible>미완료 프로젝트 표시</Fluffy.ResearchTree.visible>
-  <Fluffy.ResearchTree.GenerationInProgress>연구 트리를 생성하는 중입니다. 잠시만 기다려 주세요…</Fluffy.ResearchTree.GenerationInProgress>
+  <Fluffy.ResearchTree.filter>연구 태그 선택</Fluffy.ResearchTree.filter>
+  <Fluffy.ResearchTree.selectAll>모두 선택</Fluffy.ResearchTree.selectAll>
+  <Fluffy.ResearchTree.selectNone>선택 해제</Fluffy.ResearchTree.selectNone>
+  <Fluffy.ResearchTree.selectInvert>선택 반전</Fluffy.ResearchTree.selectInvert>
+  <Fluffy.ResearchTree.cancel>취소</Fluffy.ResearchTree.cancel>
+  <Fluffy.ResearchTree.rebuild>다시 빌드</Fluffy.ResearchTree.rebuild>
+  <Fluffy.ResearchTree.refresh>연구 태그 필터를 적용했고 연구 트리 새로 고침을 요청했습니다.</Fluffy.ResearchTree.refresh>
 </LanguageData>

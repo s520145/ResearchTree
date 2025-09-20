@@ -7,6 +7,7 @@
   <Fluffy.ResearchTree.AllowsSowingXinY>Permite plantar {0} en {1}</Fluffy.ResearchTree.AllowsSowingXinY>
   <Fluffy.ResearchTree.AllowsPlantingX>Permite cultivar {0}</Fluffy.ResearchTree.AllowsPlantingX>
   <Fluffy.ResearchTree.LClickReplaceQueue>Clic izquierdo para reemplazar la cola</Fluffy.ResearchTree.LClickReplaceQueue>
+  <Fluffy.ResearchTree.LClickRemoveFromQueue>Mayús+Clic para eliminar de la cola</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl+Clic izquierdo para mover al principio de la cola</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.SLClickAddToQueue>Shift+Clic izquierdo para añadir a la cola</Fluffy.ResearchTree.SLClickAddToQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl+Clic izquierdo para añadir al principio de la cola</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
@@ -57,4 +58,25 @@
   <Fluffy.ResearchTree.ResolutionChange>ResearchTree: Cambio gráfico detectado, se regenerará el árbol de investigación</Fluffy.ResearchTree.ResolutionChange>
   <Fluffy.ResearchTree.UIScaleWarning>Si utilizas una escala de interfaz mayor a 1x, puede que las etiquetas de investigación se corten si usas la opción de carga en segundo plano. Usa la carga al abrir por primera vez si experimentas esto.</Fluffy.ResearchTree.UIScaleWarning>
   <Fluffy.ResearchTree.OverrideResearch>Haz que el árbol de investigación sea la pestaña de investigación por defecto \n(mantén Shift para abrir la versión clásica)</Fluffy.ResearchTree.OverrideResearch>
+  <Fluffy.ResearchTree.Reset>Restablecer</Fluffy.ResearchTree.Reset>
+  <Fluffy.ResearchTree.ResetLabel>Restablecer todos los ajustes</Fluffy.ResearchTree.ResetLabel>
+  <Fluffy.ResearchTree.BackgroundColor>Color de fondo</Fluffy.ResearchTree.BackgroundColor>
+  <Fluffy.ResearchTree.GrimworldDoesNotAllow>No se cumple el requisito de estudio de Grimworld, haz clic con el botón derecho para mostrar información detallada</Fluffy.ResearchTree.GrimworldDoesNotAllow>
+  <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>La configuración del nivel técnico mundial no permite esta tecnología</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
+  <Fluffy.ResearchTree.LoadingWait>Árbol no terminado de generar, haz clic para abrir el árbol clásico</Fluffy.ResearchTree.LoadingWait>
+  <Fluffy.ResearchTree.Anomaly>Investigación de anomalías</Fluffy.ResearchTree.Anomaly>
+  <Fluffy.ResearchTree.SkipCompleted>Omitir proyectos completados durante la generación</Fluffy.ResearchTree.SkipCompleted>
+  <Fluffy.ResearchTree.VisualGroupByTab>Agrupar por etiquetas de investigación</Fluffy.ResearchTree.VisualGroupByTab>
+  <Fluffy.ResearchTree.RequestRebuild>Reconstruir el árbol de investigación</Fluffy.ResearchTree.RequestRebuild>
+  <Fluffy.ResearchTree.AllTabsCache>Seleccionar etiquetas de investigación a generar</Fluffy.ResearchTree.AllTabsCache>
+  <Fluffy.ResearchTree.Building>Generando</Fluffy.ResearchTree.Building>
+  <Fluffy.ResearchTree.invisible>Ocultar proyectos incompletos</Fluffy.ResearchTree.invisible>
+  <Fluffy.ResearchTree.visible>Mostrar proyectos incompletos</Fluffy.ResearchTree.visible>
+  <Fluffy.ResearchTree.filter>Seleccionar etiquetas de investigación</Fluffy.ResearchTree.filter>
+  <Fluffy.ResearchTree.selectAll>Seleccionar todo</Fluffy.ResearchTree.selectAll>
+  <Fluffy.ResearchTree.selectNone>No seleccionar nada</Fluffy.ResearchTree.selectNone>
+  <Fluffy.ResearchTree.selectInvert>Invertir selección</Fluffy.ResearchTree.selectInvert>
+  <Fluffy.ResearchTree.cancel>Cancelar</Fluffy.ResearchTree.cancel>
+  <Fluffy.ResearchTree.rebuild>Reconstruir</Fluffy.ResearchTree.rebuild>
+  <Fluffy.ResearchTree.refresh>Se aplicó el filtro de etiquetas de investigación y se solicitó actualizar el árbol de investigación</Fluffy.ResearchTree.refresh>
 </LanguageData>

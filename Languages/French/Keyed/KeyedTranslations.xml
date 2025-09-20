@@ -66,5 +66,19 @@ Veuillez utiliser l'option de chargement à la première ouverture si vous renco
   <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>Les paramètres du niveau technologique mondial ne permettent pas l'utilisation de cette technologie</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.LoadingWait>L'arbre n'a pas fini d'être généré, cliquez pour ouvrir l'arbre vanille</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>Recherche sur les anomalies</Fluffy.ResearchTree.Anomaly>
+  <Fluffy.ResearchTree.SkipCompleted>Ignorer les projets terminés lors de la génération</Fluffy.ResearchTree.SkipCompleted>
+  <Fluffy.ResearchTree.VisualGroupByTab>Regrouper par étiquettes de recherche</Fluffy.ResearchTree.VisualGroupByTab>
+  <Fluffy.ResearchTree.RequestRebuild>Reconstruire l'arbre de recherche</Fluffy.ResearchTree.RequestRebuild>
+  <Fluffy.ResearchTree.AllTabsCache>Sélectionner les étiquettes de recherche à générer</Fluffy.ResearchTree.AllTabsCache>
+  <Fluffy.ResearchTree.Building>Génération</Fluffy.ResearchTree.Building>
+  <Fluffy.ResearchTree.invisible>Masquer les projets inachevés</Fluffy.ResearchTree.invisible>
+  <Fluffy.ResearchTree.visible>Afficher les projets inachevés</Fluffy.ResearchTree.visible>
+  <Fluffy.ResearchTree.filter>Sélectionner les étiquettes de recherche</Fluffy.ResearchTree.filter>
+  <Fluffy.ResearchTree.selectAll>Tout sélectionner</Fluffy.ResearchTree.selectAll>
+  <Fluffy.ResearchTree.selectNone>Ne rien sélectionner</Fluffy.ResearchTree.selectNone>
+  <Fluffy.ResearchTree.selectInvert>Inverser la sélection</Fluffy.ResearchTree.selectInvert>
+  <Fluffy.ResearchTree.cancel>Annuler</Fluffy.ResearchTree.cancel>
+  <Fluffy.ResearchTree.rebuild>Reconstruire</Fluffy.ResearchTree.rebuild>
+  <Fluffy.ResearchTree.refresh>Filtre d'étiquettes de recherche appliqué et actualisation de l'arbre demandée</Fluffy.ResearchTree.refresh>
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
 </LanguageData>
