@@ -12,6 +12,10 @@ namespace FluffyResearchTree;
 
 public class ResearchNode : Node
 {
+    private static readonly HashSet<ResearchNode> HoverHighlightedNodes = [];
+
+    private static ResearchNode _currentHoverSource;
+
     private static readonly Dictionary<ResearchProjectDef, bool> _buildingPresentCache = [];
 
     private static readonly Dictionary<ResearchProjectDef, List<ThingDef>> _missingFacilitiesCache = [];
@@ -60,6 +64,43 @@ public class ResearchNode : Node
         for (int i = 0; i < benches.Count; i++)
             defs.Add(benches[i].def);
         _benchDefsCached = defs;
+    }
+
+    private static void RegisterHoverHighlight(ResearchNode node)
+    {
+        if (node == null)
+        {
+            return;
+        }
+
+        node.Highlighted = true;
+        HoverHighlightedNodes.Add(node);
+    }
+
+    private static void ClearHoverHighlights()
+    {
+        if (HoverHighlightedNodes.Count == 0)
+        {
+            return;
+        }
+
+        var instance = MainTabWindow_ResearchTree.Instance;
+        foreach (var node in HoverHighlightedNodes)
+        {
+            if (node == null)
+            {
+                continue;
+            }
+
+            if (instance != null && instance.IsHighlighted(node.Research))
+            {
+                continue;
+            }
+
+            node.Highlighted = false;
+        }
+
+        HoverHighlightedNodes.Clear();
     }
 
     public ResearchNode(ResearchProjectDef research, int order)
@@ -397,6 +438,12 @@ public class ResearchNode : Node
             mouseOver = false;
         }
 
+        if (!mouseOver && _currentHoverSource == this)
+        {
+            ClearHoverHighlights();
+            _currentHoverSource = null;
+        }
+
         if (Event.current.type == EventType.Repaint)
         {
             // researches that are completed or could be started immediately, and that have the required building(s) available
@@ -497,19 +544,22 @@ public class ResearchNode : Node
 
             if (mouseOver)
             {
+                ClearHoverHighlights();
+                _currentHoverSource = this;
+
                 if (Completed)
                 {
                     foreach (var child in Children)
                     {
-                        child.Highlighted = true;
+                        RegisterHoverHighlight(child);
                     }
                 }
                 else
                 {
-                    Highlighted = true;
+                    RegisterHoverHighlight(this);
                     foreach (var item in GetMissingRequiredRecursive())
                     {
-                        item.Highlighted = true;
+                        RegisterHoverHighlight(item);
                     }
                 }
             }
