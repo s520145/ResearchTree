@@ -573,20 +573,29 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        foreach (var researchProject in VisibleResearchProjects.Where(researchProject => !researchProject.IsHidden &&
-                     (_quickSearchWidget.filter.Matches(researchProject.LabelCap) ||
-                      matchesUnlockedDefs(researchProject))))
+        var matchedNodes = new List<ResearchNode>();
+        foreach (var node in Tree.Nodes.OfType<ResearchNode>())
         {
+            var researchProject = node.Research;
+            if (researchProject.IsHidden)
+            {
+                continue;
+            }
+
+            if (!_quickSearchWidget.filter.Matches(researchProject.LabelCap) && !matchesUnlockedDefs(researchProject))
+            {
+                continue;
+            }
+
             _matchingProjects.Add(researchProject);
+            matchedNodes.Add(node);
         }
 
-        _quickSearchWidget.noResultsMatched = !_matchingProjects.Any();
+        _quickSearchWidget.noResultsMatched = matchedNodes.Count == 0;
 
         var somethingHighlighted = true;
         var list = new List<FloatMenuOption>();
-        foreach (var node in Tree.Nodes.OfType<ResearchNode>()
-                     .Where(n => _matchingProjects.Contains(n.Research))
-                     .OrderBy(n => n.Research.ResearchViewX))
+        foreach (var node in matchedNodes.OrderBy(n => n.Research.ResearchViewX))
         {
             list.Add(new FloatMenuOption(
                 node.Label,
