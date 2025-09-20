@@ -363,10 +363,9 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     }
     private void drawTopBar(Rect canvas)
     {
-        bool anomalyActive = ModsConfig.AnomalyActive;
-        int buttonCount = 2 + (anomalyActive ? 1 : 0); // Tabs + Toggle + (Anomaly)
         float buttonWidth = CalculateTopBarButtonWidth();
-        float innerRequiredWidth = buttonCount * buttonWidth + buttonCount * TopBarControlGap + TopBarMinSearchWidth;
+        float rightColumnMinWidth = Mathf.Max(TopBarMinSearchWidth, buttonWidth);
+        float innerRequiredWidth = buttonWidth + TopBarControlGap + rightColumnMinWidth;
         float leftWidth = Mathf.Min(canvas.width, innerRequiredWidth + (Constants.Margin * 2f));
 
         var left = new Rect(canvas.x, canvas.y, leftWidth, canvas.height);
@@ -379,36 +378,39 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private void DrawSearchBar(Rect canvas)
     {
-        float height = Mathf.Min(Constants.QueueLabelSize, canvas.height);
-        float y = canvas.yMin + Mathf.Max(0f, (canvas.height - height) / 2f);
-
         bool skipCompleted = FluffyResearchTreeMod.instance.Settings.SkipCompleted;
+        bool anomalyActive = ModsConfig.AnomalyActive;
         string anomalyLabel = "Fluffy.ResearchTree.Anomaly".Translate();
         string toggleLabel = skipCompleted ? "Fluffy.ResearchTree.invisible".Translate()
                                            : "Fluffy.ResearchTree.visible".Translate();
         string tabsLabel = "Fluffy.ResearchTree.filter".Translate();
 
         float buttonWidth = CalculateTopBarButtonWidth();
-        int buttonCount = 2 + (ModsConfig.AnomalyActive ? 1 : 0);
+        const int rowCount = 2;
+        float verticalGap = TopBarControlGap;
+        float maxContentHeight = Mathf.Min(canvas.height, rowCount * Constants.QueueLabelSize + verticalGap);
+        float rowHeight = Mathf.Max(0f, (maxContentHeight - verticalGap) / rowCount);
+        float contentHeight = rowHeight * rowCount + verticalGap;
+        float startY = canvas.yMin + Mathf.Max(0f, (canvas.height - contentHeight) / 2f);
 
-        float currentX = canvas.xMin;
+        float leftColumnWidth = buttonWidth;
+        float rightColumnX = canvas.xMin + leftColumnWidth + TopBarControlGap;
+        float rightColumnWidth = Mathf.Max(0f, canvas.xMax - rightColumnX);
 
-        var tabsRect = new Rect(currentX, y, buttonWidth, height);
-        currentX = tabsRect.xMax + TopBarControlGap;
+        var tabsRect = new Rect(canvas.xMin, startY, leftColumnWidth, rowHeight);
+        var searchRect = new Rect(rightColumnX, startY, rightColumnWidth, rowHeight);
+
+        float secondRowY = startY + rowHeight + verticalGap;
 
         Rect? anomalyRect = null;
-        if (ModsConfig.AnomalyActive)
+        if (anomalyActive)
         {
-            anomalyRect = new Rect(currentX, y, buttonWidth, height);
-            currentX = anomalyRect.Value.xMax + TopBarControlGap;
+            anomalyRect = new Rect(canvas.xMin, secondRowY, leftColumnWidth, rowHeight);
         }
 
-        var toggleRect = new Rect(currentX, y, buttonWidth, height);
-        currentX = toggleRect.xMax + TopBarControlGap;
-
-        currentX = Mathf.Min(currentX, canvas.xMax);
-        float searchWidth = Mathf.Max(0f, canvas.width - (buttonCount * buttonWidth + buttonCount * TopBarControlGap));
-        var searchRect = new Rect(currentX, y, searchWidth, height);
+        float toggleX = rightColumnX;
+        float toggleWidth = Mathf.Max(0f, rightColumnWidth);
+        var toggleRect = new Rect(toggleX, secondRowY, toggleWidth, rowHeight);
 
         if (Widgets.ButtonText(tabsRect, tabsLabel))
         {
