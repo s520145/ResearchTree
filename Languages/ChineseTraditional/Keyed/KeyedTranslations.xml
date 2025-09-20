@@ -22,4 +22,5 @@
   <Fluffy.ResearchTree.PreparingTree.Layout>完成佈局</Fluffy.ResearchTree.PreparingTree.Layout>
   <Fluffy.ResearchTree.RestoreQueue>回復隊列</Fluffy.ResearchTree.RestoreQueue>
   <Fluffy.ResearchTree.OverrideResearch>將研究樹設定為預設研究標籤\n（按住 Shift 即可開啟原版）</Fluffy.ResearchTree.OverrideResearch>
+  <Fluffy.ResearchTree.GenerationInProgress>研究樹尚未生成完成，請稍候……</Fluffy.ResearchTree.GenerationInProgress>
 </LanguageData>

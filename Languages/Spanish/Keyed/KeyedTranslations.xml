@@ -29,6 +29,7 @@
   <Fluffy.ResearchTree.None>ninguno</Fluffy.ResearchTree.None>
   <Fluffy.ResearchTree.ShowCompletion>Mostrar mensaje de finalización para la investigación terminada</Fluffy.ResearchTree.ShowCompletion>
   <Fluffy.ResearchTree.StillLoading>El árbol se está cargando por primera vez, esto puede tardar un poco</Fluffy.ResearchTree.StillLoading>
+  <Fluffy.ResearchTree.GenerationInProgress>La generación del árbol de investigación aún no ha finalizado, espera un momento…</Fluffy.ResearchTree.GenerationInProgress>
   <Fluffy.ResearchTree.CurrentModVersion>Versión instalada del mod: {0}</Fluffy.ResearchTree.CurrentModVersion>
   <Fluffy.ResearchTree.PauseOnOpen>Pausar el juego al abrir el árbol de investigación</Fluffy.ResearchTree.PauseOnOpen>
   <Fluffy.ResearchTree.VanillaGraphics>Usar los métodos gráficos antiguos (si parpadea)</Fluffy.ResearchTree.VanillaGraphics>

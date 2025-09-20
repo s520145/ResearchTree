@@ -19,6 +19,7 @@
   <Fluffy.ResearchTree.None>нет</Fluffy.ResearchTree.None>
   <Fluffy.ResearchTree.ShowCompletion>Показать сообщение о завершении исследования</Fluffy.ResearchTree.ShowCompletion>
   <Fluffy.ResearchTree.StillLoading>Древо исследований загружается в первый раз, это может занять некоторое время</Fluffy.ResearchTree.StillLoading>
+  <Fluffy.ResearchTree.GenerationInProgress>Генерация древа исследований ещё не завершена, пожалуйста, подождите…</Fluffy.ResearchTree.GenerationInProgress>
   <Fluffy.ResearchTree.CurrentModVersion>Установленная версия мода: {0}</Fluffy.ResearchTree.CurrentModVersion>
   <Fluffy.ResearchTree.PauseOnOpen>Приостанавливать игру при открытии дерева исследований</Fluffy.ResearchTree.PauseOnOpen>
   <Fluffy.ResearchTree.VanillaGraphics>Использовать старые графические методы (при наличии мерцания)</Fluffy.ResearchTree.VanillaGraphics>

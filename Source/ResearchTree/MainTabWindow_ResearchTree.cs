@@ -155,8 +155,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public void Notify_TreeInitialized()
     {
-        Queue.Notify_TreeReinitialized();
         setRects();
+        ApplyTreeInitializedState();
     }
 
     public override void PreOpen()
@@ -171,13 +171,34 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         setRects();
         Tree.WaitForInitialization();
         Assets.RefreshResearch = true;
-        if (Tree.FirstLoadDone)
+        _dragging = false;
+        closeOnClickedOutside = false;
+
+        _cachedUnlockedDefsGroupedByPrerequisites = null;
+        _cachedVisibleResearchProjects = null;
+        _quickSearchWidget.Reset();
+        updateSearchResults();
+
+        ApplyTreeInitializedState();
+    }
+
+    public override void WindowOnGUI()
+    {
+        base.WindowOnGUI();
+        Assets.DrawWindowBackground(windowRect, FluffyResearchTreeMod.instance.Settings.BackgroundColor);
+    }
+
+    private void ApplyTreeInitializedState()
+    {
+        if (!Tree.Initialized)
+        {
+            return;
+        }
+
+        var firstLoad = !Tree.FirstLoadDone;
+        if (!firstLoad)
         {
             Tree.ResetNodeAvailabilityCache();
-        }
-        else
-        {
-            Tree.FirstLoadDone = true;
         }
 
         if (Assets.SemiRandomResearchLoaded)
@@ -192,20 +213,23 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             }
         }
 
-        Queue.RefreshQueue();
-        _dragging = false;
-        closeOnClickedOutside = false;
+        if (firstLoad)
+        {
+            Queue.Notify_TreeReinitialized();
+        }
 
+        Queue.RefreshQueue();
         _cachedUnlockedDefsGroupedByPrerequisites = null;
         _cachedVisibleResearchProjects = null;
-        _quickSearchWidget.Reset();
         updateSearchResults();
-    }
 
-    public override void WindowOnGUI()
-    {
-        base.WindowOnGUI();
-        Assets.DrawWindowBackground(windowRect, FluffyResearchTreeMod.instance.Settings.BackgroundColor);
+        ViewRectDirty = true;
+        ViewRectInnerDirty = true;
+
+        if (firstLoad)
+        {
+            Tree.FirstLoadDone = true;
+        }
     }
 
     private void setRects()
@@ -238,8 +262,13 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         if (!Tree.Initialized)
         {
-            Close();
+            DrawGenerationInProgressMessage(canvas);
             return;
+        }
+
+        if (!Tree.FirstLoadDone)
+        {
+            ApplyTreeInitializedState();
         }
 
         // 先处理输入（同帧生效）
@@ -257,6 +286,33 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         ResetZoomLevel();
         GUI.color = Color.white;
         Text.Anchor = TextAnchor.UpperLeft;
+    }
+
+    private void DrawGenerationInProgressMessage(Rect canvas)
+    {
+        var messageRect = new Rect(
+            canvas.xMin,
+            canvas.yMin + Constants.TopBarHeight,
+            canvas.width,
+            Mathf.Max(0f, canvas.height - Constants.TopBarHeight));
+
+        if (messageRect.height <= 0f)
+        {
+            return;
+        }
+
+        messageRect = messageRect.ContractedBy(Constants.Margin);
+        if (messageRect.height <= 0f)
+        {
+            return;
+        }
+
+        var previousColor = GUI.color;
+        GUI.color = Color.yellow;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Widgets.Label(messageRect, "Fluffy.ResearchTree.GenerationInProgress".Translate());
+        Text.Anchor = TextAnchor.UpperLeft;
+        GUI.color = previousColor;
     }
 
 
@@ -512,7 +568,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         _matchingProjects.Clear();
         Find.WindowStack.FloatMenu?.Close(false);
 
-        if (!IsQuickSearchWidgetActive())
+        if (!IsQuickSearchWidgetActive() || !Tree.Initialized)
         {
             return;
         }
