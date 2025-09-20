@@ -29,4 +29,5 @@
   <Fluffy.ResearchTree.Building>생성 중</Fluffy.ResearchTree.Building>
   <Fluffy.ResearchTree.invisible>미완료 프로젝트 숨기기</Fluffy.ResearchTree.invisible>
   <Fluffy.ResearchTree.visible>미완료 프로젝트 표시</Fluffy.ResearchTree.visible>
+  <Fluffy.ResearchTree.GenerationInProgress>연구 트리를 생성하는 중입니다. 잠시만 기다려 주세요…</Fluffy.ResearchTree.GenerationInProgress>
 </LanguageData>

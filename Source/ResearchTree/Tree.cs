@@ -1697,10 +1697,6 @@ public static class Tree
 
         if (_initializing)
         {
-            while (_initializing)
-            {
-            }
-
             return;
         }
 
