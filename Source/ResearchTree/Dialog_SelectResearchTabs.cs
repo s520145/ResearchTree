@@ -211,6 +211,9 @@ namespace FluffyResearchTree
             // 触发刷新（现有窗口与绘制管线会据此刷新/重建）
             Assets.RefreshResearch = true;
             bool wasResearchOpen = Find.MainTabsRoot.OpenTab == MainButtonDefOf.Research;
+
+            // 先关闭当前窗口，避免在重建过程中卡着等待
+            Close(doCloseSound: true);
             if (wasResearchOpen)
             {
                 Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research);
@@ -219,7 +222,6 @@ namespace FluffyResearchTree
             Tree.RequestRebuild(resetZoom: true, reopenResearchTab: false);
 
             Messages.Message("Fluffy.ResearchTree.refresh".Translate(), MessageTypeDefOf.TaskCompletion, historical: false);
-            Close(doCloseSound: true);
         }
 
         // ====== 小工具：GUI 颜色域 ======
