@@ -192,12 +192,9 @@ namespace FluffyResearchTree
                 return;
             }
 
-            using (new GuiColorScope(new Color(0.12f, 0.55f, 0.12f)))
+            if (Widgets.ButtonText(rebuild, "Fluffy.ResearchTree.rebuild".Translate()))
             {
-                if (Widgets.ButtonText(rebuild, "Fluffy.ResearchTree.rebuild".Translate()))
-                {
-                    ApplyAndRequestRebuild();
-                }
+                ApplyAndRequestRebuild();
             }
         }
 
