@@ -1,12 +1,13 @@
 ﻿// Tree.cs
 // Copyright Karel Kroeze, 2020-2020
 
+using HarmonyLib;
+using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -134,7 +135,6 @@ public static class Tree
 
         return leftDone || rightDone;
     }
-
 
     public static List<Node> Nodes
     {
@@ -949,37 +949,46 @@ public static class Tree
         return returnValue;
     }
 
+
+    private static ResearchTabDef TryGetProjectTab(ResearchProjectDef def)
+    {
+        // 兼容不同字段名：tab / researchTab
+        var f = AccessTools.Field(typeof(ResearchProjectDef), "tab")
+                ?? AccessTools.Field(typeof(ResearchProjectDef), "researchTab");
+        return f?.GetValue(def) as ResearchTabDef;
+    }
+
     private static void populateNodes()
     {
-        // Filter Anomaly DLC research
+        // Filter Anomaly DLC research（你原有前两段保持）
         var allDefsListForReading =
             DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def => def.knowledgeCategory == null).ToArray();
         var hidden = allDefsListForReading.Where(p => p.prerequisites?.Contains(p) ?? false);
         var second = allDefsListForReading.Where(p => p.Ancestors().Intersect(hidden).Any());
         var researchList = allDefsListForReading.Except(hidden).Except(second).ToList();
 
-        // ===== 按来源（ResearchTabDef）过滤：Settings.IncludedTabs 为空 => 表示“全部” =====
+        // ===== 按来源（ResearchTabDef）过滤：Settings.IncludedTabs 为空 => “全部” =====
         var st = FluffyResearchTreeMod.instance?.Settings;
         if (st != null)
         {
-            st.EnsureTabCache(); //用于处理中途增/减 mod 的 tab 集合
+            st.EnsureTabCache(); // 用于处理中途增/减 mod 的 tab 集合  :contentReference[oaicite:2]{index=2}
 
-            // 仅当“选中了具体子集”时才做过滤；空集表示“全部”
             if (st.IncludedTabs != null && st.IncludedTabs.Count > 0)
             {
                 researchList = researchList.Where(def =>
                 {
-                    var tab = GetProjectTab(def);    // 兼容不同字段名
-                    return st.TabIncluded(tab);      // 由你的 Settings 决定是否包含
+                    var tab = TryGetProjectTab(def);
+                    // 若取不到 Tab，保守地不做项目级过滤（避免误杀）
+                    if (tab == null) return true;
+                    return st.TabIncluded(tab); // settings 决定是否包含  :contentReference[oaicite:3]{index=3}
                 }).ToList();
             }
         }
 
-        // —— 接着进入并行创建节点 —— //
+        // —— 并行创建节点 —— //
         _nodes = [];
         Assets.TotalAmountOfResearch = researchList.Count;
 
-        // Parallelize node creation
         Parallel.ForEach(researchList, (def, _, index) =>
         {
             var researchNode = new ResearchNode(def, (int)index);
@@ -989,6 +998,41 @@ public static class Tree
                 ResearchToNodesCache[def] = researchNode;
             }
         });
+    }
+
+    // Tree.cs 里（Tree 类内）新增：
+    public static void RequestRebuild(bool resetZoom = true, bool reopenResearchTab = false)
+    {
+        // 1) 关闭刷新标志（避免重复重建），并重置所有缓存&尺寸
+        Assets.RefreshResearch = false;
+
+        // Reset() 已负责：Size/_nodes/_edges/缓存清空、窗口脏标记，
+        // 且在“后台模式”会自动 QueueLongEvent(Initialize, ...)，非后台不会。
+        Reset(alsoZoom: resetZoom);
+
+        // 2) 非后台模式：立即初始化；后台模式：Reset 已经排队了 Initialize
+        var st = FluffyResearchTreeMod.instance?.Settings;
+        if (st == null || st.LoadType != Constants.LoadTypeLoadInBackground)
+        {
+            Initialize(); // 立刻按现有管线重建
+                          // 非后台分支里，Initialize 自己会 Queue Notify_TreeInitialized（你现有实现已包含）
+        }
+        else
+        {
+            // 后台模式：Reset() 只排了 Initialize，这里再排一个“初始化完成后的通知”，保证窗口收到
+            LongEventHandler.QueueLongEvent(
+                MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized,
+                "Fluffy.ResearchTree.RestoreQueue",
+                false, null
+            );
+        }
+
+        // 3) 可选：重开研究面板（比如你是在对话框里点“重新生成”后希望直接看到新树）
+        if (reopenResearchTab)
+        {
+            // 如果当前没打开，打开研究页签；已经打开不会打断
+            Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research);
+        }
     }
 
     private static void collapse()

@@ -370,17 +370,19 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private void DrawSearchBar(Rect canvas)
     {
-        // 统一高度/间距
+        // 尺寸 & 间距
         float h = Constants.QueueLabelSize;
-        float gap = 6f;                     // 垂直/水平间距
-        float pad = 24f;                    // 按钮文字左右内边距
+        float gap = 6f;          // 控件间距
+        float pad = 24f;         // 按钮文字左右内边距
 
-        // 文本 & 尺寸测量
+        // 文本
         bool isShow = FluffyResearchTreeMod.instance.Settings.SkipCompleted;
         string anomalyLabel = "Fluffy.ResearchTree.Anomaly".Translate();
         string toggleLabel = isShow ? "Fluffy.ResearchTree.invisible".Translate()
-                                     : "Fluffy.ResearchTree.visible".Translate();
+                                      : "Fluffy.ResearchTree.visible".Translate();
+        string tabsLabel = "选择研究标签";
 
+        // 预计算按钮文本尺寸（用于下排按钮）
         var oldFont = Text.Font;
         Text.Font = GameFont.Small;
         Vector2 szAnomaly = Text.CalcSize(anomalyLabel);
@@ -388,34 +390,41 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         Text.Font = oldFont;
 
         float btnH = h;
-        float btnW1 = Mathf.Max(120f, szAnomaly.x + pad);
-        float btnW2 = Mathf.Max(200f, szToggle.x + pad);
+        float btnW1 = Mathf.Max(120f, szAnomaly.x + pad); // Anomaly
+        float btnW2 = Mathf.Max(140f, szToggle.x + pad); // Toggle
+        float tabsW = 200f;                               // 你要求的固定宽
+        float topY = canvas.yMin;                        // 顶部一行 Y
+        float botY = topY + h + gap;                     // 底部一行 Y
 
-        // —— 布局：搜索框固定在上，占整行；按钮在下并排 —— //
-        // 第一行：搜索框（整行）
-        var searchRect = new Rect(
-            canvas.xMin,
-            canvas.yMin,            // 顶部
-            canvas.width,
-            h
-        );
+        // —— 顶部一行：[ Tabs(200) ][ Search(剩余) ] ——
+        var tabsBtnRect = new Rect(canvas.xMin, topY, tabsW, h);
 
-        // 第二行：按钮区域
-        float buttonsY = searchRect.yMax + gap;
+        float searchX = tabsBtnRect.xMax + gap;
+        float searchW = Mathf.Max(100f, canvas.xMax - searchX); // 留个最小值防御
+        var searchRect = new Rect(searchX, topY, searchW, h);
 
-        // 右对齐两按钮：[  ...  ][ Anomaly ][ Toggle ]
-        var toggleBtnRect = new Rect(canvas.xMax - btnW2, buttonsY, btnW2, btnH);
-        var anomalyBtnRect = new Rect(toggleBtnRect.x - gap - btnW1, buttonsY, btnW1, btnH);
+        // —— 底部一行：右对齐 [ Anomaly ][ Toggle ] ——
+        var toggleBtnRect = new Rect(canvas.xMax - btnW2, botY, btnW2, btnH);
+        var anomalyBtnRect = new Rect(toggleBtnRect.x - gap - btnW1, botY, btnW1, btnH);
 
-        // 若画布过窄（极端情况下），自动堆叠按钮以避免重叠
+        // 若宽度极窄则把 Toggle 堆到 Anomaly 下方，避免重叠
         if (anomalyBtnRect.x < canvas.xMin)
         {
-            // 竖直堆叠，右对齐
-            anomalyBtnRect = new Rect(canvas.xMax - btnW1, buttonsY, btnW1, btnH);
+            anomalyBtnRect = new Rect(canvas.xMax - btnW1, botY, btnW1, btnH);
             toggleBtnRect = new Rect(canvas.xMax - btnW2, anomalyBtnRect.yMax + gap, btnW2, btnH);
         }
 
-        // ---- Anomaly 按钮 ----
+        // ---- 顶部：Tabs 按钮（弹出二级菜单）----
+        if (Widgets.ButtonText(tabsBtnRect, tabsLabel))
+        {
+            FluffyResearchTreeMod.instance.Settings.EnsureTabCache();
+            Find.WindowStack.Add(new Dialog_SelectResearchTabs());
+        }
+
+        // ---- 顶部：搜索框（逻辑不变）----
+        _quickSearchWidget.OnGUI(searchRect, () => updateSearchResults(canvas));
+
+        // ---- 底部：Anomaly ----
         if (ModsConfig.AnomalyActive && Widgets.ButtonText(anomalyBtnRect, anomalyLabel))
         {
             ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
@@ -423,13 +432,20 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        // ---- 切换按钮（暗绿/暗红 + 白字）----
+        // ---- 底部：切换按钮（暗绿/暗红 + 自适应文字）----
         var bg = isShow ? new Color(0.1f, 0.5f, 0.1f) : new Color(0.6f, 0.1f, 0.1f);
         Widgets.DrawBoxSolid(toggleBtnRect, bg);
 
         var oldAnchor = Text.Anchor; var oldColor = GUI.color;
         Text.Anchor = TextAnchor.MiddleCenter; GUI.color = Color.white;
-        Widgets.Label(toggleBtnRect, toggleLabel);
+        {
+            var prevFont = Text.Font;
+            Text.Font = GameFont.Small;
+            var sz = Text.CalcSize(toggleLabel);
+            if (sz.x > toggleBtnRect.width - 8f) Text.Font = GameFont.Tiny; // 简易自适应
+            Widgets.Label(toggleBtnRect, toggleLabel);
+            Text.Font = prevFont;
+        }
         Text.Anchor = oldAnchor; GUI.color = oldColor;
 
         if (Widgets.ButtonInvisible(toggleBtnRect, doMouseoverSound: true))
@@ -438,9 +454,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             Tree.ResetNodeAvailabilityCache();
             Assets.RefreshResearch = true;
         }
-
-        // ---- 搜索框 ----
-        _quickSearchWidget.OnGUI(searchRect, () => updateSearchResults(canvas));
     }
 
 

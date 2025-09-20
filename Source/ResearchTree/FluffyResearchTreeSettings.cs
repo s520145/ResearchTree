@@ -75,10 +75,15 @@ internal class FluffyResearchTreeSettings : ModSettings
 
     public void EnsureTabCache()
     {
-        Logging.Message($"[ResearchTree]:EnsureTabCache");
+        Logging.Message("[ResearchTree]:EnsureTabCache");
         if (AllTabsCache != null) return;
-        // 从所有研究项目收集“出现过的 tab”
-        AllTabsCache = [.. DefDatabase<ResearchTabDef>.AllDefsListForReading.OrderBy(t => t.defName)];
+
+        // 从所有研究项目收集“出现过的 tab”，但排除 Anomaly
+        AllTabsCache = DefDatabase<ResearchTabDef>.AllDefsListForReading
+            .Where(t => !string.Equals(t.tutorTag, "Research-Tab-Anomaly", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(t => t.defName)
+            .ToList();
+
         foreach (var tab in AllTabsCache)
         {
             IncludedTabs.Add(tab.defName);
