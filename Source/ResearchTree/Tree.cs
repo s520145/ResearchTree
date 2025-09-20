@@ -1183,13 +1183,11 @@ public static class Tree
         {
             if (NodeHiddenBySkipCompleted(node))
             {
-                clearHighlight(node);
                 continue;
             }
 
             if (!node.IsWithinViewport(visibleRect))
             {
-                clearHighlight(node);
                 continue;
             }
 
@@ -1311,16 +1309,6 @@ public static class Tree
         }
     }
 
-    private static void clearHighlight(Node node)
-    {
-        if (node is DummyNode)
-        {
-            return;
-        }
-
-        node.Highlighted = false;
-    }
-
     private static void collectVisibleNodes(Rect visibleRect, int minLayer, int maxLayer, int minRow, int maxRow)
     {
         VisibleNodesBuffer.Clear();
@@ -1332,13 +1320,11 @@ public static class Tree
             {
                 if (!node.IsVisible || NodeHiddenBySkipCompleted(node))
                 {
-                    clearHighlight(node);
                     continue;
                 }
 
                 if (!node.IsWithinViewport(visibleRect))
                 {
-                    clearHighlight(node);
                     continue;
                 }
 
@@ -1375,13 +1361,11 @@ public static class Tree
 
                 if (!node.IsVisible || NodeHiddenBySkipCompleted(node))
                 {
-                    clearHighlight(node);
                     continue;
                 }
 
                 if (!node.IsWithinViewport(visibleRect))
                 {
-                    clearHighlight(node);
                     continue;
                 }
 
