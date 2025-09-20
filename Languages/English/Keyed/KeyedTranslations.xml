@@ -72,4 +72,11 @@ Please use the load on first time opening if you experience this.</Fluffy.Resear
   <Fluffy.ResearchTree.Building>Generating</Fluffy.ResearchTree.Building>
   <Fluffy.ResearchTree.invisible>Hide incomplete projects</Fluffy.ResearchTree.invisible>
   <Fluffy.ResearchTree.visible>Show incomplete projects</Fluffy.ResearchTree.visible>
+  <Fluffy.ResearchTree.filter>Select research tags</Fluffy.ResearchTree.filter>
+  <Fluffy.ResearchTree.selectAll>Select all</Fluffy.ResearchTree.selectAll>
+  <Fluffy.ResearchTree.selectNone>Select none</Fluffy.ResearchTree.selectNone>
+  <Fluffy.ResearchTree.selectInvert>Invert selection</Fluffy.ResearchTree.selectInvert>
+  <Fluffy.ResearchTree.cancel>Cancel</Fluffy.ResearchTree.cancel>
+  <Fluffy.ResearchTree.rebuild>Rebuild</Fluffy.ResearchTree.rebuild>
+  <Fluffy.ResearchTree.refresh>Applied research tag filter and requested research tree refresh.</Fluffy.ResearchTree.refresh>
 </LanguageData>

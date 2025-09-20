@@ -47,7 +47,7 @@ namespace FluffyResearchTree
         {
             // 标题
             Text.Anchor = TextAnchor.MiddleLeft;
-            Widgets.Label(new Rect(inRect.x, inRect.y, inRect.width, 30f), "选择研究标签");
+            Widgets.Label(new Rect(inRect.x, inRect.y, inRect.width, 30f), "Fluffy.ResearchTree.filter".Translate());
             Text.Anchor = TextAnchor.UpperLeft;
 
             // 工具条：全选/全不选/反选 + 统计
@@ -72,21 +72,21 @@ namespace FluffyResearchTree
             float x = rect.xMin;
             float w = 110f;
 
-            if (Widgets.ButtonText(new Rect(x, rect.y, w, rect.height), "全选"))
+            if (Widgets.ButtonText(new Rect(x, rect.y, w, rect.height), "Fluffy.ResearchTree.selectAll".Translate()))
             {
                 foreach (var t in _allTabs) _workingIncluded.Add(t.defName);
                 SoundDefOf.Checkbox_TurnedOn.PlayOneShotOnCamera();
             }
             x += w + Gap;
 
-            if (Widgets.ButtonText(new Rect(x, rect.y, w, rect.height), "全不选"))
+            if (Widgets.ButtonText(new Rect(x, rect.y, w, rect.height), "Fluffy.ResearchTree.selectNone".Translate()))
             {
                 _workingIncluded.Clear();
                 SoundDefOf.Checkbox_TurnedOff.PlayOneShotOnCamera();
             }
             x += w + Gap;
 
-            if (Widgets.ButtonText(new Rect(x, rect.y, w, rect.height), "反选"))
+            if (Widgets.ButtonText(new Rect(x, rect.y, w, rect.height), "Fluffy.ResearchTree.selectInvert".Translate()))
             {
                 foreach (var t in _allTabs)
                 {
@@ -186,7 +186,7 @@ namespace FluffyResearchTree
                 rebuild.x = Mathf.Min(rect.xMax - btnW, cancel.xMax + gap);
             }
 
-            if (Widgets.ButtonText(cancel, "取消"))
+            if (Widgets.ButtonText(cancel, "Fluffy.ResearchTree.cancel".Translate()))
             {
                 Close(doCloseSound: true);
                 return;
@@ -194,7 +194,7 @@ namespace FluffyResearchTree
 
             using (new GuiColorScope(new Color(0.12f, 0.55f, 0.12f)))
             {
-                if (Widgets.ButtonText(rebuild, "重新生成"))
+                if (Widgets.ButtonText(rebuild, "Fluffy.ResearchTree.rebuild".Translate()))
                 {
                     ApplyAndRequestRebuild();
                 }
@@ -218,7 +218,7 @@ namespace FluffyResearchTree
 
             Tree.RequestRebuild(resetZoom: true, reopenResearchTab: false);
 
-            Messages.Message("已应用研究标签筛选并请求刷新研究树。", MessageTypeDefOf.TaskCompletion, historical: false);
+            Messages.Message("Fluffy.ResearchTree.refresh".Translate(), MessageTypeDefOf.TaskCompletion, historical: false);
             Close(doCloseSound: true);
         }
 

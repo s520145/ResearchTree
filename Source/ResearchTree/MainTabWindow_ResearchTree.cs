@@ -386,7 +386,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         string anomalyLabel = "Fluffy.ResearchTree.Anomaly".Translate();
         string toggleLabel = skipCompleted ? "Fluffy.ResearchTree.invisible".Translate()
                                            : "Fluffy.ResearchTree.visible".Translate();
-        string tabsLabel = "选择研究标签";
+        string tabsLabel = "Fluffy.ResearchTree.filter".Translate();
 
         float buttonWidth = CalculateTopBarButtonWidth();
         int buttonCount = 2 + (ModsConfig.AnomalyActive ? 1 : 0);
@@ -460,7 +460,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         var oldFont = Text.Font;
         Text.Font = GameFont.Small;
 
-        buttonWidth = Mathf.Max(buttonWidth, Text.CalcSize("选择研究标签").x + TopBarLabelPadding);
+        buttonWidth = Mathf.Max(buttonWidth, Text.CalcSize("Fluffy.ResearchTree.filter".Translate()).x + TopBarLabelPadding);
 
         string toggleLabel = FluffyResearchTreeMod.instance.Settings.SkipCompleted
             ? "Fluffy.ResearchTree.invisible".Translate()

@@ -72,5 +72,12 @@
   <Fluffy.ResearchTree.Building>生成中</Fluffy.ResearchTree.Building>
   <Fluffy.ResearchTree.invisible>隐藏未完成项目</Fluffy.ResearchTree.invisible>
   <Fluffy.ResearchTree.visible>显示未完成项目</Fluffy.ResearchTree.visible>
+  <Fluffy.ResearchTree.filter>选择研究标签</Fluffy.ResearchTree.filter>
+  <Fluffy.ResearchTree.selectAll>全选</Fluffy.ResearchTree.selectAll>
+  <Fluffy.ResearchTree.selectNone>全不选</Fluffy.ResearchTree.selectNone>
+  <Fluffy.ResearchTree.selectInvert>反选</Fluffy.ResearchTree.selectInvert>
+  <Fluffy.ResearchTree.cancel>取消</Fluffy.ResearchTree.cancel>
+  <Fluffy.ResearchTree.rebuild>重新生成</Fluffy.ResearchTree.rebuild>
+  <Fluffy.ResearchTree.refresh>已应用研究标签筛选并请求刷新研究树</Fluffy.ResearchTree.refresh>
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
 </LanguageData>
