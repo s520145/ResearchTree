@@ -54,13 +54,16 @@ namespace FluffyResearchTree
             var toolbar = new Rect(inRect.x, inRect.y + 34f, inRect.width, 30f);
             DrawToolbar(toolbar);
 
+            float listTop = toolbar.yMax + Gap;
+            float footerTop = inRect.yMax - Pad - BtnH;
+            float listHeight = Mathf.Max(0f, footerTop - listTop - Gap);
+
             // 列表（滚动）
-            var listRect = new Rect(inRect.x + Pad, toolbar.yMax + Gap, inRect.width - Pad * 2,
-                                    inRect.height - (toolbar.height + BtnH + Pad * 2 + Gap));
+            var listRect = new Rect(inRect.x + Pad, listTop, inRect.width - Pad * 2, listHeight);
             DrawTabList(listRect);
 
             // 底部：取消 / 重新生成
-            var bottom = new Rect(inRect.x, inRect.yMax - (BtnH + Pad), inRect.width, BtnH + Pad);
+            var bottom = new Rect(inRect.x + Pad, footerTop, inRect.width - Pad * 2, BtnH);
             DrawFooter(bottom);
         }
 
@@ -172,9 +175,16 @@ namespace FluffyResearchTree
 
         private void DrawFooter(Rect rect)
         {
-            float btnW = 140f;
-            var cancel = new Rect(rect.xMax - Pad - btnW * 2 - Gap, rect.y + (rect.height - BtnH) / 2f, btnW, BtnH);
-            var rebuild = new Rect(rect.xMax - Pad - btnW, rect.y + (rect.height - BtnH) / 2f, btnW, BtnH);
+            float btnW = 150f;
+            float gap = Gap;
+            var rebuild = new Rect(rect.xMax - btnW, rect.y, btnW, rect.height);
+            var cancel = new Rect(rebuild.xMin - gap - btnW, rect.y, btnW, rect.height);
+
+            if (cancel.xMin < rect.xMin)
+            {
+                cancel.x = rect.xMin;
+                rebuild.x = Mathf.Min(rect.xMax - btnW, cancel.xMax + gap);
+            }
 
             if (Widgets.ButtonText(cancel, "取消"))
             {
@@ -200,11 +210,13 @@ namespace FluffyResearchTree
 
             // 触发刷新（现有窗口与绘制管线会据此刷新/重建）
             Assets.RefreshResearch = true;
-            Tree.RequestRebuild(resetZoom: true, reopenResearchTab: false);
-
-            // 关闭当前研究页签
-            if (Find.MainTabsRoot.OpenTab == MainButtonDefOf.Research)
+            bool wasResearchOpen = Find.MainTabsRoot.OpenTab == MainButtonDefOf.Research;
+            if (wasResearchOpen)
+            {
                 Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research);
+            }
+
+            Tree.RequestRebuild(resetZoom: true, reopenResearchTab: false);
 
             Messages.Message("已应用研究标签筛选并请求刷新研究树。", MessageTypeDefOf.TaskCompletion, historical: false);
             Close(doCloseSound: true);

@@ -41,6 +41,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     private bool _panning;                 // 是否已进入平移
     private Vector2 _dragStart;            // 按下时坐标
     private const float PanThreshold = 4f; // 启动平移的像素阈值（避免轻点触发）
+    private const float TopBarControlGap = 6f;
+    private const float TopBarLabelPadding = 24f;
+    private const float TopBarMinSearchWidth = 220f;
+    private const float TopBarMinButtonWidth = 140f;
 
     public bool ViewRectDirty = true;
 
@@ -359,11 +363,15 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     }
     private void drawTopBar(Rect canvas)
     {
-        // 左侧固定 400 宽作为“搜索 + 按钮”区域
-        var left = new Rect(canvas.x, canvas.y, 400f, canvas.height);
-        // 右侧队列区域：从左栏右侧再加一个通用间距
+        bool anomalyActive = ModsConfig.AnomalyActive;
+        int buttonCount = 2 + (anomalyActive ? 1 : 0); // Tabs + Toggle + (Anomaly)
+        float buttonWidth = CalculateTopBarButtonWidth();
+        float innerRequiredWidth = buttonCount * buttonWidth + buttonCount * TopBarControlGap + TopBarMinSearchWidth;
+        float leftWidth = Mathf.Min(canvas.width, innerRequiredWidth + (Constants.Margin * 2f));
+
+        var left = new Rect(canvas.x, canvas.y, leftWidth, canvas.height);
         var right = canvas;
-        right.xMin = left.xMax + Constants.Margin;
+        right.xMin = Mathf.Min(canvas.xMax, left.xMax + Constants.Margin);
 
         DrawSearchBar(left.ContractedBy(Constants.Margin));
         Queue.DrawQueue(right.ContractedBy(Constants.Margin), !_dragging);
@@ -371,90 +379,102 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private void DrawSearchBar(Rect canvas)
     {
-        // 尺寸 & 间距
-        float h = Constants.QueueLabelSize;
-        float gap = 6f;          // 控件间距
-        float pad = 24f;         // 按钮文字左右内边距
+        float height = Mathf.Min(Constants.QueueLabelSize, canvas.height);
+        float y = canvas.yMin + Mathf.Max(0f, (canvas.height - height) / 2f);
 
-        // 文本
-        bool isShow = FluffyResearchTreeMod.instance.Settings.SkipCompleted;
+        bool skipCompleted = FluffyResearchTreeMod.instance.Settings.SkipCompleted;
         string anomalyLabel = "Fluffy.ResearchTree.Anomaly".Translate();
-        string toggleLabel = isShow ? "Fluffy.ResearchTree.invisible".Translate()
-                                      : "Fluffy.ResearchTree.visible".Translate();
+        string toggleLabel = skipCompleted ? "Fluffy.ResearchTree.invisible".Translate()
+                                           : "Fluffy.ResearchTree.visible".Translate();
         string tabsLabel = "选择研究标签";
 
-        // 预计算按钮文本尺寸（用于下排按钮）
-        var oldFont = Text.Font;
-        Text.Font = GameFont.Small;
-        Vector2 szAnomaly = Text.CalcSize(anomalyLabel);
-        Vector2 szToggle = Text.CalcSize(toggleLabel);
-        Text.Font = oldFont;
+        float buttonWidth = CalculateTopBarButtonWidth();
+        int buttonCount = 2 + (ModsConfig.AnomalyActive ? 1 : 0);
 
-        float btnH = h;
-        float btnW1 = Mathf.Max(120f, szAnomaly.x + pad); // Anomaly
-        float btnW2 = Mathf.Max(140f, szToggle.x + pad); // Toggle
-        float tabsW = 200f;                               // 你要求的固定宽
-        float topY = canvas.yMin;                        // 顶部一行 Y
-        float botY = topY + h + gap;                     // 底部一行 Y
+        float currentX = canvas.xMin;
 
-        // —— 顶部一行：[ Tabs(200) ][ Search(剩余) ] ——
-        var tabsBtnRect = new Rect(canvas.xMin, topY, tabsW, h);
+        var tabsRect = new Rect(currentX, y, buttonWidth, height);
+        currentX = tabsRect.xMax + TopBarControlGap;
 
-        float searchX = tabsBtnRect.xMax + gap;
-        float searchW = Mathf.Max(100f, canvas.xMax - searchX); // 留个最小值防御
-        var searchRect = new Rect(searchX, topY, searchW, h);
-
-        // —— 底部一行：右对齐 [ Anomaly ][ Toggle ] ——
-        var toggleBtnRect = new Rect(canvas.xMax - btnW2, botY, btnW2, btnH);
-        var anomalyBtnRect = new Rect(toggleBtnRect.x - gap - btnW1, botY, btnW1, btnH);
-
-        // 若宽度极窄则把 Toggle 堆到 Anomaly 下方，避免重叠
-        if (anomalyBtnRect.x < canvas.xMin)
+        Rect? anomalyRect = null;
+        if (ModsConfig.AnomalyActive)
         {
-            anomalyBtnRect = new Rect(canvas.xMax - btnW1, botY, btnW1, btnH);
-            toggleBtnRect = new Rect(canvas.xMax - btnW2, anomalyBtnRect.yMax + gap, btnW2, btnH);
+            anomalyRect = new Rect(currentX, y, buttonWidth, height);
+            currentX = anomalyRect.Value.xMax + TopBarControlGap;
         }
 
-        // ---- 顶部：Tabs 按钮（弹出二级菜单）----
-        if (Widgets.ButtonText(tabsBtnRect, tabsLabel))
+        var toggleRect = new Rect(currentX, y, buttonWidth, height);
+        currentX = toggleRect.xMax + TopBarControlGap;
+
+        currentX = Mathf.Min(currentX, canvas.xMax);
+        float searchWidth = Mathf.Max(0f, canvas.width - (buttonCount * buttonWidth + buttonCount * TopBarControlGap));
+        var searchRect = new Rect(currentX, y, searchWidth, height);
+
+        if (Widgets.ButtonText(tabsRect, tabsLabel))
         {
             FluffyResearchTreeMod.instance.Settings.EnsureTabCache();
             Find.WindowStack.Add(new Dialog_SelectResearchTabs());
         }
 
-        // ---- 顶部：搜索框（逻辑不变）----
         _quickSearchWidget.OnGUI(searchRect, () => updateSearchResults(canvas));
 
-        // ---- 底部：Anomaly ----
-        if (ModsConfig.AnomalyActive && Widgets.ButtonText(anomalyBtnRect, anomalyLabel))
+        if (anomalyRect.HasValue && Widgets.ButtonText(anomalyRect.Value, anomalyLabel))
         {
             ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
             Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research);
             return;
         }
 
-        // ---- 底部：切换按钮（暗绿/暗红 + 自适应文字）----
-        var bg = isShow ? new Color(0.1f, 0.5f, 0.1f) : new Color(0.6f, 0.1f, 0.1f);
-        Widgets.DrawBoxSolid(toggleBtnRect, bg);
+        var toggleColor = skipCompleted ? new Color(0.1f, 0.5f, 0.1f) : new Color(0.6f, 0.1f, 0.1f);
+        Widgets.DrawBoxSolid(toggleRect, toggleColor);
 
-        var oldAnchor = Text.Anchor; var oldColor = GUI.color;
-        Text.Anchor = TextAnchor.MiddleCenter; GUI.color = Color.white;
+        var oldAnchor = Text.Anchor;
+        var oldColor = GUI.color;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        GUI.color = Color.white;
         {
             var prevFont = Text.Font;
             Text.Font = GameFont.Small;
-            var sz = Text.CalcSize(toggleLabel);
-            if (sz.x > toggleBtnRect.width - 8f) Text.Font = GameFont.Tiny; // 简易自适应
-            Widgets.Label(toggleBtnRect, toggleLabel);
+            var labelSize = Text.CalcSize(toggleLabel);
+            if (labelSize.x > toggleRect.width - 8f)
+            {
+                Text.Font = GameFont.Tiny;
+            }
+            Widgets.Label(toggleRect, toggleLabel);
             Text.Font = prevFont;
         }
-        Text.Anchor = oldAnchor; GUI.color = oldColor;
+        Text.Anchor = oldAnchor;
+        GUI.color = oldColor;
 
-        if (Widgets.ButtonInvisible(toggleBtnRect, doMouseoverSound: true))
+        if (Widgets.ButtonInvisible(toggleRect, doMouseoverSound: true))
         {
             FluffyResearchTreeMod.instance.Settings.SkipCompleted = !FluffyResearchTreeMod.instance.Settings.SkipCompleted;
             Tree.ResetNodeAvailabilityCache();
             Assets.RefreshResearch = true;
         }
+    }
+
+    private float CalculateTopBarButtonWidth()
+    {
+        float buttonWidth = TopBarMinButtonWidth;
+        var oldFont = Text.Font;
+        Text.Font = GameFont.Small;
+
+        buttonWidth = Mathf.Max(buttonWidth, Text.CalcSize("选择研究标签").x + TopBarLabelPadding);
+
+        string toggleLabel = FluffyResearchTreeMod.instance.Settings.SkipCompleted
+            ? "Fluffy.ResearchTree.invisible".Translate()
+            : "Fluffy.ResearchTree.visible".Translate();
+        buttonWidth = Mathf.Max(buttonWidth, Text.CalcSize(toggleLabel).x + TopBarLabelPadding);
+
+        if (ModsConfig.AnomalyActive)
+        {
+            buttonWidth = Mathf.Max(buttonWidth,
+                Text.CalcSize("Fluffy.ResearchTree.Anomaly".Translate()).x + TopBarLabelPadding);
+        }
+
+        Text.Font = oldFont;
+        return buttonWidth;
     }
 
 
