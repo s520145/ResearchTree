@@ -17,6 +17,8 @@ public static class Tree
 {
     public static bool Initialized;
 
+    private static bool _reopenResearchTabAfterInit = true;
+
     public static IntVec2 Size = IntVec2.Zero;
 
     private static List<Node> _nodes;
@@ -179,6 +181,8 @@ public static class Tree
     {
         Messages.Message("Fluffy.ResearchTree.ResolutionChange".Translate(), MessageTypeDefOf.NeutralEvent);
 
+        Queue.Notify_TreeWillReset();
+
         Size = IntVec2.Zero;
         _nodes = null;
         ResearchToNodesCache.Clear();
@@ -202,7 +206,7 @@ public static class Tree
 
         if (FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeLoadInBackground)
         {
-            LongEventHandler.QueueLongEvent(Initialize, "ResearchPal.BuildingResearchTreeAsync", true,
+            LongEventHandler.QueueLongEvent(Initialize, "ResearchPal.BuildingResearchTreeAsync", false,
                 null);
         }
     }
@@ -253,6 +257,7 @@ public static class Tree
             }
 
             _initializing = false;
+            _reopenResearchTabAfterInit = true;
             return;
         }
 
@@ -276,11 +281,17 @@ public static class Tree
                 _initializing = false;
             }, "Fluffy.ResearchTree.PreparingTree.LayoutNew",
             false, null);
+        LongEventHandler.QueueLongEvent(Queue.Notify_TreeReinitialized,
+            "Fluffy.ResearchTree.RestoreQueue", false, null);
         LongEventHandler.QueueLongEvent(MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized,
             "Fluffy.ResearchTree.RestoreQueue", false, null);
-        // open tab
-        LongEventHandler.QueueLongEvent(() => { Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research); },
-            "Fluffy.ResearchTree.RestoreQueue", false, null);
+        if (_reopenResearchTabAfterInit)
+        {
+            // open tab
+            LongEventHandler.QueueLongEvent(() => { Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research); },
+                "Fluffy.ResearchTree.RestoreQueue", false, null);
+        }
+        _reopenResearchTabAfterInit = true;
     }
 
     // 构建分层桶与分层边缓存。只依赖 Node.X / Node.InEdges / Node.OutEdges（Y 会在后续不断变化不要紧）
@@ -1047,6 +1058,8 @@ public static class Tree
         // 1) 关闭刷新标志（避免重复重建），并重置所有缓存&尺寸
         Assets.RefreshResearch = false;
 
+        _reopenResearchTabAfterInit = reopenResearchTab;
+
         // Reset() 已负责：Size/_nodes/_edges/缓存清空、窗口脏标记，
         // 且在“后台模式”会自动 QueueLongEvent(Initialize, ...)，非后台不会。
         Reset(alsoZoom: resetZoom);
@@ -1060,6 +1073,11 @@ public static class Tree
         }
         else
         {
+            LongEventHandler.QueueLongEvent(
+                Queue.Notify_TreeReinitialized,
+                "Fluffy.ResearchTree.RestoreQueue",
+                false, null
+            );
             // 后台模式：Reset() 只排了 Initialize，这里再排一个“初始化完成后的通知”，保证窗口收到
             LongEventHandler.QueueLongEvent(
                 MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized,
