@@ -32,6 +32,8 @@ public class Queue : WorldComponent
 
     private readonly List<ResearchNode> _queue = [];
 
+    private static List<ResearchProjectDef> _queueBackup;
+
     private List<ResearchProjectDef> _saveableQueue;
 
     public Queue(World world) : base(world)
@@ -309,7 +311,7 @@ public class Queue : WorldComponent
     {
         var num = 1;
 
-        if (Event.current.type != EventType.Repaint)
+        if (!Tree.Initialized || Event.current.type != EventType.Repaint)
         {
             return;
         }
@@ -479,6 +481,56 @@ public class Queue : WorldComponent
         // In case restrictions have changed, remove any projects
         // from the queue that are no longer visible in the tree
         _instance._queue.RemoveAll(n => !n.IsVisible);
+    }
+
+    public static void Notify_TreeWillReset()
+    {
+        if (_instance == null)
+        {
+            return;
+        }
+
+        _queueBackup = _instance._queue.Count > 0
+            ? _instance._queue.Select(node => node.Research).ToList()
+            : null;
+
+        foreach (var node in _instance._queue)
+        {
+            node.QueueRect = Rect.zero;
+        }
+
+        _instance._queue.Clear();
+        _draggedNode = null;
+    }
+
+    public static void Notify_TreeReinitialized()
+    {
+        if (_instance == null)
+        {
+            return;
+        }
+
+        if (_queueBackup != null)
+        {
+            foreach (var project in _queueBackup)
+            {
+                var node = Tree.ResearchToNode(project) as ResearchNode;
+                if (node == null || !node.IsVisible)
+                {
+                    continue;
+                }
+
+                if (!_instance._queue.Contains(node))
+                {
+                    _instance._queue.Add(node);
+                }
+            }
+        }
+
+        _queueBackup = null;
+
+        RefreshQueue();
+        updateNodeQueueRect();
     }
 
     private static void AttemptBeginResearch()

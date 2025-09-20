@@ -151,6 +151,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public void Notify_TreeInitialized()
     {
+        Queue.Notify_TreeReinitialized();
         setRects();
     }
 
