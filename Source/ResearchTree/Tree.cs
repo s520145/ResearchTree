@@ -45,6 +45,18 @@ public static class Tree
     // 每层的 Y 槽位数组：LayerSlots[x][y-1] => Node
     private static Node[][] LayerSlots;
 
+    private static readonly List<Node> VisibleNodesBuffer = new(256);
+
+    private static readonly List<Edge<Node, Node>>[] EdgeDrawBuckets =
+    {
+        new List<Edge<Node, Node>>(64),
+        new List<Edge<Node, Node>>(64),
+        new List<Edge<Node, Node>>(64),
+        new List<Edge<Node, Node>>(64)
+    };
+
+    private const float CullPadding = 120f;
+
     private static Dictionary<TechLevel, IntRange> TechLevelBounds
     {
         get
@@ -1127,25 +1139,262 @@ public static class Tree
             drawTechLevel(relevantTechLevel, visibleRect);
         }
 
-        // Draw edges（若端点被隐藏也不画）
-        foreach (var edge in Edges.OrderBy(e => e.DrawOrder))
+        if (Edges == null || Nodes == null || Nodes.Count == 0)
         {
-            if (EdgeHiddenBySkipCompleted(edge)) continue;        // ← 新增
-            if (IsEdgeVisible(edge, visibleRect))
+            return;
+        }
+
+        getVisibleLayerRange(visibleRect, out var minLayer, out var maxLayer);
+        var maxRow = getMaxRow();
+        getVisibleRowRange(visibleRect, maxRow, out var minRow, out var maxRowVisible);
+
+        var canUseCulling = maxLayer >= minLayer && maxRow > 0 && maxRowVisible >= minRow;
+
+        if (canUseCulling)
+        {
+            collectVisibleEdges(minLayer, maxLayer);
+            foreach (var bucket in EdgeDrawBuckets)
             {
-                edge.Draw(visibleRect);
+                for (var i = 0; i < bucket.Count; i++)
+                {
+                    bucket[i].Draw(visibleRect);
+                }
+            }
+
+            collectVisibleNodes(visibleRect, minLayer, maxLayer, minRow, maxRowVisible);
+            for (var i = 0; i < VisibleNodesBuffer.Count; i++)
+            {
+                VisibleNodesBuffer[i].Draw(visibleRect);
+            }
+            return;
+        }
+
+        foreach (var edge in Edges)
+        {
+            if (EdgeHiddenBySkipCompleted(edge))
+            {
+                continue;
+            }
+
+            edge.Draw(visibleRect);
+        }
+
+        foreach (var node in Nodes)
+        {
+            if (NodeHiddenBySkipCompleted(node))
+            {
+                continue;
+            }
+
+            if (!node.IsWithinViewport(visibleRect))
+            {
+                continue;
+            }
+
+            node.Draw(visibleRect);
+        }
+    }
+
+    private static void getVisibleLayerRange(Rect visibleRect, out int minLayer, out int maxLayer)
+    {
+        var maxLayerCount = Size.x;
+        if (maxLayerCount <= 0)
+        {
+            if (LayerSlots != null && LayerSlots.Length > 0)
+            {
+                maxLayerCount = LayerSlots.Length - 1;
+            }
+            else if (!Nodes.NullOrEmpty())
+            {
+                maxLayerCount = Nodes.Max(n => n.X);
             }
         }
 
-        // Draw nodes（隐藏已完成时跳过）
-        foreach (var node in Nodes)
+        if (maxLayerCount <= 0)
         {
-            if (NodeHiddenBySkipCompleted(node)) continue;        // ← 新增
-            if (node.IsWithinViewport(visibleRect))
+            minLayer = 1;
+            maxLayer = 0;
+            return;
+        }
+
+        var span = Constants.NodeSize.x + Constants.NodeMargins.x;
+        var padding = Mathf.Max(span, CullPadding);
+        var minX = Mathf.Max(0f, visibleRect.xMin - padding);
+        var maxX = visibleRect.xMax + padding;
+
+        minLayer = Mathf.Clamp(Mathf.FloorToInt(minX / span) + 1, 1, maxLayerCount);
+        maxLayer = Mathf.Clamp(Mathf.FloorToInt(maxX / span) + 1, minLayer, maxLayerCount);
+    }
+
+    private static int getMaxRow()
+    {
+        var maxRow = Size.z;
+        if (maxRow > 0)
+        {
+            return maxRow;
+        }
+
+        if (LayerSlots != null && LayerSlots.Length > 0)
+        {
+            for (var i = LayerSlots.Length - 1; i >= 0; i--)
             {
-                node.Draw(visibleRect);
+                var column = LayerSlots[i];
+                if (column == null || column.Length == 0)
+                {
+                    continue;
+                }
+
+                var candidate = column[column.Length - 1].Y;
+                if (candidate > 0)
+                {
+                    return candidate;
+                }
             }
         }
+
+        if (Nodes.NullOrEmpty())
+        {
+            return 0;
+        }
+
+        return Nodes.Max(n => n.Y);
+    }
+
+    private static void getVisibleRowRange(Rect visibleRect, int maxRow, out int minRow, out int maxRowVisible)
+    {
+        if (maxRow <= 0)
+        {
+            minRow = 1;
+            maxRowVisible = 0;
+            return;
+        }
+
+        var span = Constants.NodeSize.y + Constants.NodeMargins.y;
+        var padding = Mathf.Max(span, CullPadding);
+        var minY = Mathf.Max(0f, visibleRect.yMin - padding);
+        var maxY = visibleRect.yMax + padding;
+
+        minRow = Mathf.Clamp(Mathf.FloorToInt(minY / span) + 1, 1, maxRow);
+        maxRowVisible = Mathf.Clamp(Mathf.FloorToInt(maxY / span) + 1, minRow, maxRow);
+    }
+
+    private static void collectVisibleEdges(int minLayer, int maxLayer)
+    {
+        for (var i = 0; i < EdgeDrawBuckets.Length; i++)
+        {
+            EdgeDrawBuckets[i].Clear();
+        }
+
+        var edges = Edges;
+        if (edges == null)
+        {
+            return;
+        }
+
+        foreach (var edge in edges)
+        {
+            if (EdgeHiddenBySkipCompleted(edge))
+            {
+                continue;
+            }
+
+            var edgeMinLayer = Mathf.Min(edge.In.X, edge.Out.X);
+            var edgeMaxLayer = Mathf.Max(edge.In.X, edge.Out.X);
+            if (edgeMaxLayer < minLayer || edgeMinLayer > maxLayer)
+            {
+                continue;
+            }
+
+            EdgeDrawBuckets[edge.DrawOrder].Add(edge);
+        }
+    }
+
+    private static void collectVisibleNodes(Rect visibleRect, int minLayer, int maxLayer, int minRow, int maxRow)
+    {
+        VisibleNodesBuffer.Clear();
+
+        if (LayerSlots == null || LayerSlots.Length == 0)
+        {
+            var nodes = Nodes;
+            foreach (var node in nodes)
+            {
+                if (!node.IsVisible || NodeHiddenBySkipCompleted(node))
+                {
+                    continue;
+                }
+
+                if (!node.IsWithinViewport(visibleRect))
+                {
+                    continue;
+                }
+
+                VisibleNodesBuffer.Add(node);
+            }
+
+            return;
+        }
+
+        var minIndex = Mathf.Clamp(minLayer, 0, LayerSlots.Length - 1);
+        var maxIndex = Mathf.Clamp(maxLayer, minIndex, LayerSlots.Length - 1);
+
+        for (var layer = minIndex; layer <= maxIndex; layer++)
+        {
+            var column = LayerSlots[layer];
+            if (column == null || column.Length == 0)
+            {
+                continue;
+            }
+
+            var start = findFirstNodeIndex(column, minRow);
+            if (start < 0)
+            {
+                continue;
+            }
+
+            for (var i = start; i < column.Length; i++)
+            {
+                var node = column[i];
+                if (node.Y > maxRow)
+                {
+                    break;
+                }
+
+                if (!node.IsVisible || NodeHiddenBySkipCompleted(node))
+                {
+                    continue;
+                }
+
+                if (!node.IsWithinViewport(visibleRect))
+                {
+                    continue;
+                }
+
+                VisibleNodesBuffer.Add(node);
+            }
+        }
+    }
+
+    private static int findFirstNodeIndex(Node[] nodes, int minRow)
+    {
+        var low = 0;
+        var high = nodes.Length - 1;
+        var result = -1;
+
+        while (low <= high)
+        {
+            var mid = (low + high) / 2;
+            if (nodes[mid].Y >= minRow)
+            {
+                result = mid;
+                high = mid - 1;
+            }
+            else
+            {
+                low = mid + 1;
+            }
+        }
+
+        return result;
     }
 
     public static bool IsEdgeVisible<T1, T2>(Edge<T1, T2> edge, Rect visibleRect)
