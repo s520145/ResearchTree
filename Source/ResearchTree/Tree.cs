@@ -965,7 +965,8 @@ public static class Tree
             DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def => def.knowledgeCategory == null).ToArray();
         var hidden = allDefsListForReading.Where(p => p.prerequisites?.Contains(p) ?? false);
         var second = allDefsListForReading.Where(p => p.Ancestors().Intersect(hidden).Any());
-        var researchList = allDefsListForReading.Except(hidden).Except(second).ToList();
+        var baseResearchList = allDefsListForReading.Except(hidden).Except(second).ToList();
+        var researchList = baseResearchList;
 
         // ===== 按来源（ResearchTabDef）过滤：Settings.IncludedTabs 为空 => “全部” =====
         var st = FluffyResearchTreeMod.instance?.Settings;
@@ -975,13 +976,53 @@ public static class Tree
 
             if (st.IncludedTabs != null && st.IncludedTabs.Count > 0)
             {
-                researchList = researchList.Where(def =>
+                var validDefs = new HashSet<ResearchProjectDef>(baseResearchList);
+                var includedDefs = new HashSet<ResearchProjectDef>();
+
+                foreach (var def in baseResearchList)
                 {
                     var tab = TryGetProjectTab(def);
                     // 若取不到 Tab，保守地不做项目级过滤（避免误杀）
-                    if (tab == null) return true;
-                    return st.TabIncluded(tab); // settings 决定是否包含  :contentReference[oaicite:3]{index=3}
-                }).ToList();
+                    if (tab == null || st.TabIncluded(tab))
+                    {
+                        includedDefs.Add(def);
+                    }
+                }
+
+                if (includedDefs.Count > 0)
+                {
+                    var queue = new Queue<ResearchProjectDef>(includedDefs);
+
+                    void enqueuePrerequisites(IEnumerable<ResearchProjectDef> prereqs)
+                    {
+                        if (prereqs == null)
+                        {
+                            return;
+                        }
+
+                        foreach (var pre in prereqs)
+                        {
+                            if (!validDefs.Contains(pre))
+                            {
+                                continue;
+                            }
+
+                            if (includedDefs.Add(pre))
+                            {
+                                queue.Enqueue(pre);
+                            }
+                        }
+                    }
+
+                    while (queue.Count > 0)
+                    {
+                        var def = queue.Dequeue();
+                        enqueuePrerequisites(def.prerequisites);
+                        enqueuePrerequisites(def.hiddenPrerequisites);
+                    }
+                }
+
+                researchList = baseResearchList.Where(includedDefs.Contains).ToList();
             }
         }
 
