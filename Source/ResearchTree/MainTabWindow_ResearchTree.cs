@@ -2,6 +2,7 @@
 // Copyright Karel Kroeze, 2020-2020
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HarmonyLib;
 using RimWorld;
@@ -30,6 +31,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private bool _dragging;
 
+    private bool _logFirstDrawNextFrame;
+
     private Vector2 _mousePosition = Vector2.zero;
 
     private Rect _viewRect;
@@ -45,6 +48,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     private const float TopBarLabelPadding = 24f;
     private const float TopBarMinSearchWidth = 220f;
     private const float TopBarMinButtonWidth = 140f;
+    private const long PreOpenWarnThresholdMs = 250;
+    private const long FirstDrawWarnThresholdMs = 200;
 
     public bool ViewRectDirty = true;
 
@@ -161,25 +166,38 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public override void PreOpen()
     {
-        base.PreOpen();
+        var sw = Stopwatch.StartNew();
 
-        // 关键：吸收窗口周围输入，防止事件下沉到地图/底层 UI
-        absorbInputAroundWindow = true;
-        closeOnClickedOutside = false;   // 避免 RimWorld 的“点外面就关”的默认行为
-        preventCameraMotion = true;      // 避免地图摄像机因这个点击而响应
+        try
+        {
+            base.PreOpen();
 
-        setRects();
-        Tree.WaitForInitialization();
-        Assets.RefreshResearch = true;
-        _dragging = false;
-        closeOnClickedOutside = false;
+            // 关键：吸收窗口周围输入，防止事件下沉到地图/底层 UI
+            absorbInputAroundWindow = true;
+            closeOnClickedOutside = false;   // 避免 RimWorld 的“点外面就关”的默认行为
+            preventCameraMotion = true;      // 避免地图摄像机因这个点击而响应
 
-        _cachedUnlockedDefsGroupedByPrerequisites = null;
-        _cachedVisibleResearchProjects = null;
-        _quickSearchWidget.Reset();
-        updateSearchResults();
+            setRects();
+            Tree.WaitForInitialization();
+            Assets.RefreshResearch = true;
+            _dragging = false;
+            closeOnClickedOutside = false;
 
-        ApplyTreeInitializedState();
+            _cachedUnlockedDefsGroupedByPrerequisites = null;
+            _cachedVisibleResearchProjects = null;
+            _quickSearchWidget.Reset();
+            updateSearchResults();
+
+            _logFirstDrawNextFrame = true;
+
+            ApplyTreeInitializedState();
+        }
+        finally
+        {
+            sw.Stop();
+            Logging.Performance("MainTabWindow_ResearchTree.PreOpen", sw.ElapsedMilliseconds,
+                PreOpenWarnThresholdMs);
+        }
     }
 
     public override void WindowOnGUI()
@@ -285,13 +303,27 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         // 再应用缩放并绘制
         applyZoomLevel();
-        _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect, true, true); 
+        Stopwatch firstDrawTimer = null;
+        if (_logFirstDrawNextFrame)
+        {
+            firstDrawTimer = Stopwatch.StartNew();
+        }
+
+        _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect, true, true);
         Tree.Draw(VisibleRect);
         Queue.DrawLabels(VisibleRect);
         GUI.EndScrollView(false);
         ResetZoomLevel();
         GUI.color = Color.white;
         Text.Anchor = TextAnchor.UpperLeft;
+
+        if (firstDrawTimer != null)
+        {
+            firstDrawTimer.Stop();
+            Logging.Performance("MainTabWindow_ResearchTree.DoWindowContents.FirstDraw",
+                firstDrawTimer.ElapsedMilliseconds, FirstDrawWarnThresholdMs);
+            _logFirstDrawNextFrame = false;
+        }
     }
 
     private void DrawGenerationInProgressMessage(Rect canvas)
