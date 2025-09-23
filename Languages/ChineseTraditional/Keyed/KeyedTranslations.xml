@@ -42,6 +42,7 @@
   <Fluffy.ResearchTree.ShowCompletion>研究完成後彈出完成對話框</Fluffy.ResearchTree.ShowCompletion>
   <Fluffy.ResearchTree.StillLoading>研究樹首次載入，可能需要一段時間</Fluffy.ResearchTree.StillLoading>
   <Fluffy.ResearchTree.GenerationInProgress>研究樹尚未生成完成，請稍候……</Fluffy.ResearchTree.GenerationInProgress>
+  <Fluffy.ResearchTree.NoTabsSelected>目前未選擇任何研究項目</Fluffy.ResearchTree.NoTabsSelected>
   <Fluffy.ResearchTree.UIScaleWarning>如果使用背景載入選項，當使用者介面比例大於 1x 時，可能會出現研究標籤被切斷的情況。
 如果遇到這種情況，請使用首次開啟時載入。</Fluffy.ResearchTree.UIScaleWarning>
   <Fluffy.ResearchTree.CtrlFunctionScroll>使用 Ctrl 鍵垂直捲動研究樹</Fluffy.ResearchTree.CtrlFunctionScroll>

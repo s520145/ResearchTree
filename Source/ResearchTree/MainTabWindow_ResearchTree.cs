@@ -271,6 +271,12 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             ApplyTreeInitializedState();
         }
 
+        if (Tree.NoTabsSelected)
+        {
+            DrawNoTabsSelectedMessage(canvas);
+            return;
+        }
+
         // 先处理输入（同帧生效）
         handleZoom();
         handleDolly();
@@ -311,6 +317,33 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         GUI.color = Color.yellow;
         Text.Anchor = TextAnchor.MiddleCenter;
         Widgets.Label(messageRect, "Fluffy.ResearchTree.GenerationInProgress".Translate());
+        Text.Anchor = TextAnchor.UpperLeft;
+        GUI.color = previousColor;
+    }
+
+    private void DrawNoTabsSelectedMessage(Rect canvas)
+    {
+        var messageRect = new Rect(
+            canvas.xMin,
+            canvas.yMin + Constants.TopBarHeight,
+            canvas.width,
+            Mathf.Max(0f, canvas.height - Constants.TopBarHeight));
+
+        if (messageRect.height <= 0f)
+        {
+            return;
+        }
+
+        messageRect = messageRect.ContractedBy(Constants.Margin);
+        if (messageRect.height <= 0f)
+        {
+            return;
+        }
+
+        var previousColor = GUI.color;
+        GUI.color = Color.white;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Widgets.Label(messageRect, "Fluffy.ResearchTree.NoTabsSelected".Translate());
         Text.Anchor = TextAnchor.UpperLeft;
         GUI.color = previousColor;
     }
