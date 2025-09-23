@@ -27,6 +27,9 @@ internal class FluffyResearchTreeSettings : ModSettings
     // 保存：选择的 Tab defName 列表（原版科研页签）
     public HashSet<string> IncludedTabs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+    // 记录是否已初始化默认 Tab 选择（用于判定“空集合”是默认状态还是用户手动清空）
+    public bool TabsInitialized;
+
     // 选项：跳过已完成
     public bool SkipCompleted = true;
 
@@ -53,8 +56,14 @@ internal class FluffyResearchTreeSettings : ModSettings
         Scribe_Values.Look(ref BackgroundColor, "BackgroundColor", new Color(0f, 0f, 0f, 0.1f));
         Scribe_Values.Look(ref SkipCompleted, "SkipCompleted", false);
         Scribe_Values.Look(ref VisualGroupByTab, "VisualGroupByTab", true);
+        Scribe_Values.Look(ref TabsInitialized, "TabsInitialized");
         Scribe_Collections.Look(ref IncludedTabs, "IncludedTabs", LookMode.Value);
         IncludedTabs ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (!TabsInitialized && IncludedTabs.Count > 0)
+        {
+            TabsInitialized = true;
+        }
     }
 
     public void Reset()
@@ -70,7 +79,20 @@ internal class FluffyResearchTreeSettings : ModSettings
         BackgroundColor = new Color(0f, 0f, 0f, 0.1f);
         SkipCompleted = false;
         VisualGroupByTab = true;
-        IncludedTabs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        EnsureTabCache();
+
+        if (AllTabsCache != null && AllTabsCache.Count > 0)
+        {
+            IncludedTabs = new HashSet<string>(
+                AllTabsCache.Where(tab => tab != null).Select(tab => tab.defName),
+                StringComparer.OrdinalIgnoreCase);
+        }
+        else
+        {
+            IncludedTabs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        TabsInitialized = true;
     }
 
     public void EnsureTabCache()
@@ -84,9 +106,21 @@ internal class FluffyResearchTreeSettings : ModSettings
             .OrderBy(t => t.defName)
             .ToList();
 
+        IncludedTabs ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (!TabsInitialized)
+        {
+            foreach (var tab in AllTabsCache)
+            {
+                if (tab == null) continue;
+                IncludedTabs.Add(tab.defName);
+            }
+
+            TabsInitialized = true;
+        }
+
         foreach (var tab in AllTabsCache)
         {
-            IncludedTabs.Add(tab.defName);
             Logging.Message($"[ResearchTree]:{tab.defName} / {tab.LabelCap}");
         }
     }

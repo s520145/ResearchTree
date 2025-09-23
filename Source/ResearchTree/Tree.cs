@@ -17,6 +17,8 @@ public static class Tree
 {
     public static bool Initialized;
 
+    public static bool NoTabsSelected { get; private set; }
+
     private static bool _reopenResearchTabAfterInit = true;
 
     public static IntVec2 Size = IntVec2.Zero;
@@ -194,6 +196,8 @@ public static class Tree
         Messages.Message("Fluffy.ResearchTree.ResolutionChange".Translate(), MessageTypeDefOf.NeutralEvent);
 
         Queue.Notify_TreeWillReset();
+
+        NoTabsSelected = false;
 
         Size = IntVec2.Zero;
         _nodes = null;
@@ -983,6 +987,8 @@ public static class Tree
 
     private static void populateNodes()
     {
+        NoTabsSelected = false;
+
         // Filter Anomaly DLC research（你原有前两段保持）
         var allDefsListForReading =
             DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def => def.knowledgeCategory == null).ToArray();
@@ -991,14 +997,24 @@ public static class Tree
         var baseResearchList = allDefsListForReading.Except(hidden).Except(second).ToList();
         var researchList = baseResearchList;
 
-        // ===== 按来源（ResearchTabDef）过滤：Settings.IncludedTabs 为空 => “全部” =====
+        // ===== 按来源（ResearchTabDef）过滤 =====
         var st = FluffyResearchTreeMod.instance?.Settings;
         if (st != null)
         {
             st.EnsureTabCache(); // 用于处理中途增/减 mod 的 tab 集合  :contentReference[oaicite:2]{index=2}
 
-            if (st.IncludedTabs != null && st.IncludedTabs.Count > 0)
+            var hasSelection = st.IncludedTabs != null && st.IncludedTabs.Count > 0;
+            var hasKnownTabs = st.AllTabsCache != null && st.AllTabsCache.Count > 0;
+
+            if (hasKnownTabs && !hasSelection)
             {
+                NoTabsSelected = true;
+                researchList = [];
+            }
+            else if (hasSelection)
+            {
+                NoTabsSelected = false;
+
                 var validDefs = new HashSet<ResearchProjectDef>(baseResearchList);
                 var includedDefs = new HashSet<ResearchProjectDef>();
 
@@ -1046,6 +1062,10 @@ public static class Tree
                 }
 
                 researchList = baseResearchList.Where(includedDefs.Contains).ToList();
+            }
+            else
+            {
+                NoTabsSelected = false;
             }
         }
 
