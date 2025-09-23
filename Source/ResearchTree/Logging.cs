@@ -7,11 +7,28 @@ namespace FluffyResearchTree;
 
 public static class Logging
 {
+    private const string PerformancePrefix = "[Performance]";
+
     public static void Message(string message)
     {
         if (FluffyResearchTreeMod.instance.Settings.VerboseLogging)
         {
             Log.Message(format(message));
+        }
+    }
+
+    public static void Performance(string label, long elapsedMilliseconds, long warnThresholdMilliseconds = 250)
+    {
+        var formatted = format($"{PerformancePrefix} {label} took {elapsedMilliseconds} ms (threshold {warnThresholdMilliseconds} ms)");
+        if (elapsedMilliseconds >= warnThresholdMilliseconds)
+        {
+            Log.Warning(formatted);
+            return;
+        }
+
+        if (FluffyResearchTreeMod.instance?.Settings?.VerboseLogging ?? false)
+        {
+            Log.Message(formatted);
         }
     }
 

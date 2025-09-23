@@ -39,6 +39,8 @@ public static class Tree
 
     private static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache = [];
 
+    private static bool _loggedInitialDraw;
+
     // --- caches for hot paths ---
     private static List<Node>[] LayerBuckets;                 // [0..L]
     private static List<Edge<Node, Node>>[] InEdgesPerLayer;  // [0..L]
@@ -236,7 +238,7 @@ public static class Tree
         finally
         {
             sw.Stop();
-            Logging.Message($"[Profile] {name} took {sw.ElapsedMilliseconds} ms");
+            Logging.Performance($"Tree.Initialize::{name}", sw.ElapsedMilliseconds, 250);
         }
     }
 
@@ -1153,6 +1155,12 @@ public static class Tree
 
     public static void Draw(Rect visibleRect)
     {
+        Stopwatch drawTimer = null;
+        if (!_loggedInitialDraw)
+        {
+            drawTimer = Stopwatch.StartNew();
+        }
+
         // Draw tech levels（不受“隐藏已完成”影响）
         foreach (var relevantTechLevel in RelevantTechLevels)
         {
@@ -1186,6 +1194,16 @@ public static class Tree
             {
                 VisibleNodesBuffer[i].Draw(visibleRect);
             }
+
+            if (drawTimer != null)
+            {
+                drawTimer.Stop();
+                _loggedInitialDraw = true;
+                Logging.Performance(
+                    $"Tree.Draw initial cull path (nodes={Nodes.Count}, edges={Edges.Count})",
+                    drawTimer.ElapsedMilliseconds, 250);
+            }
+
             return;
         }
 
@@ -1212,6 +1230,15 @@ public static class Tree
             }
 
             node.Draw(visibleRect);
+        }
+
+        if (drawTimer != null)
+        {
+            drawTimer.Stop();
+            _loggedInitialDraw = true;
+            Logging.Performance(
+                $"Tree.Draw initial full path (nodes={Nodes.Count}, edges={Edges.Count})",
+                drawTimer.ElapsedMilliseconds, 250);
         }
     }
 
@@ -1969,6 +1996,9 @@ public static class Tree
             return;
         }
 
+        var sw = Stopwatch.StartNew();
         Initialize();
+        sw.Stop();
+        Logging.Performance("Tree.WaitForInitialization", sw.ElapsedMilliseconds, 250);
     }
 }
