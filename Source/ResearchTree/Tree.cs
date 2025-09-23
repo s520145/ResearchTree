@@ -244,7 +244,7 @@ public static class Tree
     }
 
     private static void QueueProfiledLongEvent(Action step, string label, string textKey, bool doAsynchronously = false,
-        Action extraAction = null)
+        Action<Exception> extraAction = null)
     {
         LongEventHandler.QueueLongEvent(() => ProfiledStep(label, step), textKey, doAsynchronously, extraAction);
     }
