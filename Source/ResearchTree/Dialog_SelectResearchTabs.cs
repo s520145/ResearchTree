@@ -202,8 +202,12 @@ namespace FluffyResearchTree
         {
             var settings = FluffyResearchTreeMod.instance.Settings;
 
-            // 写回选择
+            // 写回选择，并标记为已初始化（避免后续 EnsureTabCache() 把空集合当成默认状态重置）
             settings.IncludedTabs = new HashSet<string>(_workingIncluded, StringComparer.OrdinalIgnoreCase);
+            settings.TabsInitialized = true;
+
+            // 直接写盘，保证无需重新进入设置页也能持久化
+            FluffyResearchTreeMod.instance.WriteSettings();
 
             // 触发刷新（现有窗口与绘制管线会据此刷新/重建）
             Assets.RefreshResearch = true;
