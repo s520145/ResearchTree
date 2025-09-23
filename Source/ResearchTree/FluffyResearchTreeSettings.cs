@@ -108,6 +108,21 @@ internal class FluffyResearchTreeSettings : ModSettings
 
         IncludedTabs ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+        var validTabNames = new HashSet<string>(
+            AllTabsCache.Where(tab => tab != null).Select(tab => tab.defName),
+            StringComparer.OrdinalIgnoreCase);
+
+        var settingsDirty = false;
+
+        if (IncludedTabs.Count > 0)
+        {
+            var removedCount = IncludedTabs.RemoveWhere(name => !validTabNames.Contains(name));
+            if (removedCount > 0)
+            {
+                settingsDirty = true;
+            }
+        }
+
         if (!TabsInitialized)
         {
             foreach (var tab in AllTabsCache)
@@ -117,6 +132,18 @@ internal class FluffyResearchTreeSettings : ModSettings
             }
 
             TabsInitialized = true;
+        }
+
+        if (IncludedTabs.Count == 0 && validTabNames.Count > 0)
+        {
+            IncludedTabs = new HashSet<string>(validTabNames, StringComparer.OrdinalIgnoreCase);
+            TabsInitialized = true;
+            settingsDirty = true;
+        }
+
+        if (settingsDirty)
+        {
+            FluffyResearchTreeMod.instance?.WriteSettings();
         }
 
         foreach (var tab in AllTabsCache)
