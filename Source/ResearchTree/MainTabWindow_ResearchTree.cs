@@ -44,6 +44,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     private bool _panning;                 // 是否已进入平移
     private Vector2 _dragStart;            // 按下时坐标
     private const float PanThreshold = 4f; // 启动平移的像素阈值（避免轻点触发）
+    private int _capturedMouseButton = -1; // 记录始于窗口内部的鼠标按钮
     private const float TopBarControlGap = 6f;
     private const float TopBarLabelPadding = 24f;
     private const float TopBarMinSearchWidth = 220f;
@@ -180,8 +181,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         {
             base.PreOpen();
 
-            // 仅在窗口内部吸收输入，允许底部主按钮响应
-            absorbInputAroundWindow = false;
+            // 启用默认的吸收逻辑，确保地图不会在窗口上方被点击
+            absorbInputAroundWindow = true;
             closeOnClickedOutside = false;   // 避免 RimWorld 的“点外面就关”的默认行为
             preventCameraMotion = true;      // 避免地图摄像机因这个点击而响应
 
@@ -190,6 +191,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             Assets.RefreshResearch = true;
             _dragging = false;
             closeOnClickedOutside = false;
+            _capturedMouseButton = -1;
 
             _cachedUnlockedDefsGroupedByPrerequisites = null;
             _cachedVisibleResearchProjects = null;
@@ -355,7 +357,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        if (!Mouse.IsOver(windowRect))
+        var pointerOverWindow = Mouse.IsOver(windowRect);
+        var capturing = _capturedMouseButton != -1;
+
+        if (!pointerOverWindow && !capturing)
         {
             return;
         }
@@ -363,7 +368,24 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         switch (e.type)
         {
             case EventType.MouseDown:
+            case EventType.ScrollWheel:
+            case EventType.ContextClick:
+                e.Use();
+                break;
+            case EventType.MouseDrag:
+                if (!capturing || (e.button != _capturedMouseButton && _capturedMouseButton != -1))
+                {
+                    return;
+                }
+
+                e.Use();
+                break;
             case EventType.MouseUp:
+                if (capturing && e.button == _capturedMouseButton)
+                {
+                    _capturedMouseButton = -1;
+                }
+
                 e.Use();
                 break;
         }
@@ -477,23 +499,29 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         bool inWindow = Mouse.IsOver(this.windowRect);
         bool inView = inWindow && ViewRect.Contains(e.mousePosition);
 
-        if (e.type == EventType.MouseDown && e.button == 0 && inWindow)
+        if (e.type == EventType.MouseDown && inWindow)
         {
-            _dragging = inView;           // 只在视口内作为“候选拖拽”
+            if (_capturedMouseButton == -1)
+            {
+                _capturedMouseButton = e.button;
+            }
+
+            _dragging = inView && e.button == 0; // 只有左键才触发平移
             _panning = false;
             _dragStart = _mousePosition = e.mousePosition;
             // 不 Use()，保留给节点/控件
             return;
         }
 
-        if (e.type == EventType.MouseUp && e.button == 0)
+        if (e.type == EventType.MouseUp && e.button == _capturedMouseButton)
         {
             _dragging = _panning = false;
             _dragStart = _mousePosition = Vector2.zero;
+            _capturedMouseButton = -1;
             return;
         }
 
-        if (_dragging && e.type == EventType.MouseDrag && e.button == 0)
+        if (_dragging && e.type == EventType.MouseDrag && e.button == _capturedMouseButton)
         {
             if (!_panning)
             {
