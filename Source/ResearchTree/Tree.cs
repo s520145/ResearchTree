@@ -59,10 +59,6 @@ public static class Tree
         new List<Edge<Node, Node>>(64)
     };
 
-    // EdgeLengthSweep_Local plateau detection
-    private static int _edgeLengthLocalNoGainStreakIn;
-    private static int _edgeLengthLocalNoGainStreakOut;
-
     private const float CullPadding = 120f;
     private const string InitializePerformancePrefix = "Tree.Initialize::";
 
@@ -543,10 +539,6 @@ public static class Tree
         double cumRel = 0.0;               // 累计相对收益（相对于每对开始前的 denom 累加）
         var lastPairRels = new Queue<double>(PLATEAU_SPAN);
 
-        // reset plateau tracking for EdgeLengthSweep_Local (in/out)
-        _edgeLengthLocalNoGainStreakIn = 0;
-        _edgeLengthLocalNoGainStreakOut = 0;
-
         for (int pair = 0; pair < MAX_PAIR_ITERS; pair++)
         {
             // 以当前状态计算“对”的分母：in + out 的总边长（避免某一侧权重过低）
@@ -638,18 +630,10 @@ public static class Tree
     private static bool EdgeLengthSweep_Local(int iter, out int totalGain)
     {
         bool useIn = (iter & 1) == 0;
-        const int NO_GAIN_SKIP_THRESHOLD = 2;   // 连续多少轮无收益后短路
 
         totalGain = 0;
         if (LayerSlots == null || LayerSlots.Length == 0)
             return false;
-
-        int noGainStreak = useIn ? _edgeLengthLocalNoGainStreakIn : _edgeLengthLocalNoGainStreakOut;
-        if (noGainStreak >= NO_GAIN_SKIP_THRESHOLD)
-        {
-            Logging.Message($"[Profile] EdgeLengthSweep_Local iter={iter} ({(useIn ? "in" : "out")}) skipped after {noGainStreak} empty rounds");
-            return false;
-        }
 
         bool improvedAny = false;
         for (int l = 0; l < LayerSlots.Length; l++)
@@ -664,16 +648,6 @@ public static class Tree
                 totalGain += layerGain;   // 真实收益累加
             }
         }
-
-        if (useIn)
-        {
-            _edgeLengthLocalNoGainStreakIn = improvedAny ? 0 : Math.Min(NO_GAIN_SKIP_THRESHOLD + 1, _edgeLengthLocalNoGainStreakIn + 1);
-        }
-        else
-        {
-            _edgeLengthLocalNoGainStreakOut = improvedAny ? 0 : Math.Min(NO_GAIN_SKIP_THRESHOLD + 1, _edgeLengthLocalNoGainStreakOut + 1);
-        }
-
         return improvedAny;
     }
 
@@ -817,96 +791,6 @@ public static class Tree
     }
 
 
-    private static void EnforcePrerequisiteOrdering()
-    {
-        if (Nodes.NullOrEmpty())
-        {
-            return;
-        }
-
-        var indegree = new Dictionary<Node, int>(Nodes.Count);
-        var queue = new Queue<Node>();
-
-        foreach (var node in Nodes)
-        {
-            var inNodes = node.InNodes;
-            var deg = inNodes?.Count ?? 0;
-            indegree[node] = deg;
-            if (deg == 0)
-            {
-                queue.Enqueue(node);
-            }
-        }
-
-        int processed = 0;
-        while (queue.Count > 0)
-        {
-            var node = queue.Dequeue();
-            processed++;
-
-            int targetX = node.X + 1;
-            var outNodes = node.OutNodes;
-            if (outNodes.NullOrEmpty())
-            {
-                continue;
-            }
-
-            for (int i = 0; i < outNodes.Count; i++)
-            {
-                var child = outNodes[i];
-                if (child == null)
-                {
-                    continue;
-                }
-
-                if (child.X < targetX)
-                {
-                    child.X = targetX;
-                }
-
-                if (!indegree.TryGetValue(child, out var childDeg))
-                {
-                    continue;
-                }
-
-                childDeg--;
-                indegree[child] = childDeg;
-                if (childDeg <= 0)
-                {
-                    queue.Enqueue(child);
-                }
-            }
-        }
-
-        if (processed >= indegree.Count)
-        {
-            return;
-        }
-
-        // Fallback for unexpected cycles: enforce locally using current parents
-        foreach (var kvp in indegree)
-        {
-            if (kvp.Value <= 0)
-            {
-                continue;
-            }
-
-            var node = kvp.Key;
-            var parents = node.InNodes;
-            if (parents.NullOrEmpty())
-            {
-                continue;
-            }
-
-            int requiredX = parents.Max(p => p.X + 1);
-            if (node.X < requiredX)
-            {
-                node.X = requiredX;
-            }
-        }
-    }
-
-
     private static void horizontalPositions()
     {
         var relevantTechLevels = RelevantTechLevels;
@@ -935,8 +819,6 @@ public static class Tree
                 depth = enumerable.Max(n => n.X) + 1;
             }
         } while (setDepth && num++ < num2);
-
-        EnforcePrerequisiteOrdering();
 
         _techLevelBounds = new Dictionary<TechLevel, IntRange>();
         foreach (var techlevel in relevantTechLevels)
@@ -1724,12 +1606,6 @@ public static class Tree
         const int MIN_PASSES_GREEDY = 0;
         const int FAILS_QUOTA_BARY = 2;   // “出现过一次成功后，允许的失败次数”
         const int FAILS_QUOTA_GREEDY = 2;   // “允许的失败次数”
-        const double BARY_WEAK_REL_THRESHOLD = 0.0005; // 连续微小收益时提前收敛
-        const int BARY_WEAK_ABS_THRESHOLD = 1;
-        const int BARY_WEAK_STREAK_LIMIT = 6;
-        const double GREEDY_WEAK_REL_THRESHOLD = 0.0005;
-        const int GREEDY_WEAK_ABS_THRESHOLD = 1;
-        const int GREEDY_WEAK_STREAK_LIMIT = 6;
 
         // ====== 预布局：保持原逻辑 ======
         Parallel.For(1, Size.x + 1, i =>
@@ -1743,159 +1619,54 @@ public static class Tree
         var totalSw = new System.Diagnostics.Stopwatch();
         totalSw.Start();
 
-        int currentCrossings = crossings();
-
-        // 没有交叉则无需继续
-        if (currentCrossings <= 0)
-        {
-            totalSw.Stop();
-            Logging.Message("[Profile] CrossingSweep skipped sweeps (already crossing-free).");
-            Logging.Message($"[Profile] CrossingSweep took {totalSw.ElapsedMilliseconds} ms (bary=0 ms, greedy=0 ms)");
-            return;
-        }
-
-        // ====== Barymetric phase ======
+        // ====== Barymetric phase（语义等价于原：先要出现过 true，然后累计 2 次 false 即停）======
         var barySw = new System.Diagnostics.Stopwatch();
-        long baryMs = 0;
+        int pass = 0;
         int baryFailsLeft = FAILS_QUOTA_BARY;
         bool seenBarySuccess = false;
-        int baryWeakStreak = 0;
-        string baryStopReason = null;
+        long baryMs = 0;
 
-        int pass;
-        for (pass = 0; pass < MAX_PASSES_BARY; pass++)
+        while (pass < MAX_PASSES_BARY)
         {
             barySw.Restart();
-            bool improved = barymetricSweep(pass, currentCrossings, out int newCrossings);
+            bool improved = barymetricSweep(pass++);
             barySw.Stop();
             baryMs += barySw.ElapsedMilliseconds;
-
-            int delta = currentCrossings - newCrossings;
-            double rel = currentCrossings > 0 ? (double)delta / currentCrossings : 0.0;
 
             if (improved)
             {
                 if (!seenBarySuccess) seenBarySuccess = true; // 第一次成功后才开始计算失败额度
-
-                if (pass >= MIN_PASSES_BARY && delta <= BARY_WEAK_ABS_THRESHOLD && rel <= BARY_WEAK_REL_THRESHOLD)
-                {
-                    baryWeakStreak++;
-                }
-                else
-                {
-                    baryWeakStreak = 0;
-                }
             }
             else
             {
-                if (seenBarySuccess && pass >= MIN_PASSES_BARY)
-                {
-                    baryFailsLeft = Math.Max(0, baryFailsLeft - 1);
-                }
-                if (pass >= MIN_PASSES_BARY) baryWeakStreak++;
+                if (seenBarySuccess && pass > MIN_PASSES_BARY) baryFailsLeft--;
             }
 
-            currentCrossings = newCrossings;
-
-            int loggedWeak = pass >= MIN_PASSES_BARY ? baryWeakStreak : 0;
-            Logging.Message($"[Profile] CrossingSweep bary pass={pass} took {barySw.ElapsedMilliseconds} ms, improved={improved}, delta={delta}, rel={rel:P3}, weakStreak={loggedWeak}, failsLeft={(seenBarySuccess ? baryFailsLeft : FAILS_QUOTA_BARY)}");
-
-            if (currentCrossings <= 0)
-            {
-                baryStopReason = "NO_CROSSINGS";
-                break;
-            }
-
-            if (pass >= MIN_PASSES_BARY && baryWeakStreak >= BARY_WEAK_STREAK_LIMIT)
-            {
-                baryStopReason = "WEAK_IMPROVEMENT";
-                break;
-            }
+            Logging.Message($"[Profile] CrossingSweep bary pass={pass - 1} took {barySw.ElapsedMilliseconds} ms, improved={improved}, failsLeft={(seenBarySuccess ? baryFailsLeft : FAILS_QUOTA_BARY)}");
 
             if (seenBarySuccess && pass >= MIN_PASSES_BARY && baryFailsLeft <= 0)
             {
-                baryStopReason = "FAILS_QUOTA";
+                Logging.Message($"[Profile] CrossingSweep early-stop bary at pass={pass - 1} (after first success, FAILS_QUOTA reached)");
                 break;
             }
         }
 
-        if (baryStopReason != null)
-        {
-            Logging.Message($"[Profile] CrossingSweep early-stop bary at pass={pass} (reason={baryStopReason})");
-        }
-
-        if (currentCrossings <= 0)
-        {
-            totalSw.Stop();
-            Logging.Message($"[Profile] CrossingSweep took {totalSw.ElapsedMilliseconds} ms (bary={baryMs} ms, greedy=0 ms)");
-            return;
-        }
-
-        // ====== Greedy phase ======
+        // ====== Greedy phase（语义等价于原：累计 2 次 false 即停）======
         var greedySw = new System.Diagnostics.Stopwatch();
-        long greedyMs = 0;
+        pass = 0;
         int greedyFailsLeft = FAILS_QUOTA_GREEDY;
-        int greedyWeakStreak = 0;
-        string greedyStopReason = null;
+        long greedyMs = 0;
 
-        int greedyPass;
-        for (greedyPass = 0; greedyPass < MAX_PASSES_GREEDY; greedyPass++)
+        while (pass < MAX_PASSES_GREEDY && greedyFailsLeft > 0)
         {
             greedySw.Restart();
-            bool improved = greedySweep(greedyPass, currentCrossings, out int newCrossings);
+            bool improved = greedySweep(pass++);
             greedySw.Stop();
             greedyMs += greedySw.ElapsedMilliseconds;
 
-            int delta = currentCrossings - newCrossings;
-            double rel = currentCrossings > 0 ? (double)delta / currentCrossings : 0.0;
+            if (!improved && pass > MIN_PASSES_GREEDY) greedyFailsLeft--;
 
-            if (improved)
-            {
-                if (greedyPass >= MIN_PASSES_GREEDY && delta <= GREEDY_WEAK_ABS_THRESHOLD && rel <= GREEDY_WEAK_REL_THRESHOLD)
-                {
-                    greedyWeakStreak++;
-                }
-                else
-                {
-                    greedyWeakStreak = 0;
-                }
-            }
-            else
-            {
-                if (greedyPass >= MIN_PASSES_GREEDY)
-                {
-                    greedyFailsLeft = Math.Max(0, greedyFailsLeft - 1);
-                }
-                if (greedyPass >= MIN_PASSES_GREEDY) greedyWeakStreak++;
-            }
-
-            currentCrossings = newCrossings;
-
-            int loggedWeak = greedyPass >= MIN_PASSES_GREEDY ? greedyWeakStreak : 0;
-            Logging.Message($"[Profile] CrossingSweep greedy pass={greedyPass} took {greedySw.ElapsedMilliseconds} ms, improved={improved}, delta={delta}, rel={rel:P3}, weakStreak={loggedWeak}, failsLeft={greedyFailsLeft}");
-
-            if (currentCrossings <= 0)
-            {
-                greedyStopReason = "NO_CROSSINGS";
-                break;
-            }
-
-            if (greedyPass >= MIN_PASSES_GREEDY && greedyWeakStreak >= GREEDY_WEAK_STREAK_LIMIT)
-            {
-                greedyStopReason = "WEAK_IMPROVEMENT";
-                break;
-            }
-
-            if (greedyPass >= MIN_PASSES_GREEDY && greedyFailsLeft <= 0)
-            {
-                greedyStopReason = "FAILS_QUOTA";
-                break;
-            }
-        }
-
-        if (greedyStopReason != null)
-        {
-            Logging.Message($"[Profile] CrossingSweep early-stop greedy at pass={greedyPass} (reason={greedyStopReason})");
+            Logging.Message($"[Profile] CrossingSweep greedy pass={pass - 1} took {greedySw.ElapsedMilliseconds} ms, improved={improved}, failsLeft={greedyFailsLeft}");
         }
 
         totalSw.Stop();
@@ -1904,8 +1675,9 @@ public static class Tree
 
 
 
-    private static bool greedySweep(int iteration, int prevCrossings, out int newCrossings)
+    private static bool greedySweep(int iteration)
     {
+        var num = crossings();
         if (iteration % 2 == 0)
         {
             for (var i = 1; i <= Size.x; i++)
@@ -1921,8 +1693,7 @@ public static class Tree
             }
         }
 
-        newCrossings = crossings();
-        return newCrossings < prevCrossings;
+        return crossings() < num;
     }
 
     private static void GreedySweep_Layer(int l)
@@ -1998,8 +1769,9 @@ public static class Tree
     }
 
 
-    private static bool barymetricSweep(int iteration, int prevCrossings, out int newCrossings)
+    private static bool barymetricSweep(int iteration)
     {
+        var num = crossings();
         if (iteration % 2 == 0)
         {
             for (var i = 2; i <= Size.x; i++)
@@ -2015,8 +1787,7 @@ public static class Tree
             }
         }
 
-        newCrossings = crossings();
-        return newCrossings < prevCrossings;
+        return crossings() < num;
     }
 
     private static void BarymetricSweep_Layer(int layer, bool left)
