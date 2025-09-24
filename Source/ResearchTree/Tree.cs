@@ -212,6 +212,7 @@ public static class Tree
         Initialized = false;
         OrderDirty = false;
         FirstLoadDone = false;
+        MainTabWindow_ResearchTree.InvalidateTreeRectCache();
         if (MainTabWindow_ResearchTree.Instance != null)
         {
             if (alsoZoom)

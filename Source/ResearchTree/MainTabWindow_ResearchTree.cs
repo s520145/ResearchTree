@@ -132,6 +132,11 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         }
     }
 
+    internal static void InvalidateTreeRectCache()
+    {
+        _treeRect = default;
+    }
+
     private Rect VisibleRect => new(_scrollPosition.x, _scrollPosition.y, ViewRect_Inner.width, ViewRect_Inner.height);
 
     private float MaxZoomLevel
@@ -161,8 +166,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     public void Notify_TreeInitialized()
     {
         Assets.RefreshResearch = true;
+        InvalidateTreeRectCache();
         setRects();
         ApplyTreeInitializedState();
+        ClampScroll();
     }
 
     public override void PreOpen()
@@ -173,8 +180,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         {
             base.PreOpen();
 
-            // 关键：吸收窗口周围输入，防止事件下沉到地图/底层 UI
-            absorbInputAroundWindow = true;
+            // 仅在窗口内部吸收输入，允许底部主按钮响应
+            absorbInputAroundWindow = false;
             closeOnClickedOutside = false;   // 避免 RimWorld 的“点外面就关”的默认行为
             preventCameraMotion = true;      // 避免地图摄像机因这个点击而响应
 
