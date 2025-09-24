@@ -527,15 +527,15 @@ public static class Tree
     private static void minimizeEdgeLength()
     {
         // ====== 可调参数======
-        const int MAX_PAIR_ITERS = 12;   // 最多做多少“对”（= 2*此值 次 Local）
-        const int MIN_PAIR_ITERS = 2;    // 至少做多少“对”，避免过早停
-        const double PAIR_REL_EPS = 0.04; // 每对相对收益阈值（4%）；更快停可设 0.06~0.08
-        const int PAIR_ABS_EPS = 600;  // 每对绝对收益阈值（单位：Y 差总和）
-        const double TARGET_CUM_REL = 0.65; // 累计相对收益达到 65% 即停；更快停可设 0.5~0.6
+        const int MAX_PAIR_ITERS = 10;   // 最多做多少“对”（= 2*此值 次 Local）
+        const int MIN_PAIR_ITERS = 3;    // 至少做多少“对”，避免过早停
+        const double PAIR_REL_EPS = 0.03; // 每对相对收益阈值（4%）；更快停可设 0.06~0.08
+        const int PAIR_ABS_EPS = 800;  // 每对绝对收益阈值（单位：Y 差总和）
+        const double TARGET_CUM_REL = 0.55; // 累计相对收益达到 65% 即停；更快停可设 0.5~0.6
 
         // “收益稳定”（平台期）检测：最近 N 对的相对收益波动很小则停
-        const int PLATEAU_SPAN = 3;    // 检测窗口（对数）
-        const double PLATEAU_DELTA = 0.05; // 波动阈值（5% 相对波动）
+        const int PLATEAU_SPAN = 4;    // 检测窗口（对数）
+        const double PLATEAU_DELTA = 0.06; // 波动阈值（5% 相对波动）
 
         // ====== 运行时统计 ======
         var sw = new Stopwatch();
@@ -1720,16 +1720,16 @@ public static class Tree
         // ====== 可调参数======
         const int MAX_PASSES_BARY = 50;  // 与原版一致：最多尝试 50 次
         const int MAX_PASSES_GREEDY = 50;
-        const int MIN_PASSES_BARY = 0;   // 如需更保守可设 2~3；0 表示与原版一致
-        const int MIN_PASSES_GREEDY = 0;
-        const int FAILS_QUOTA_BARY = 2;   // “出现过一次成功后，允许的失败次数”
-        const int FAILS_QUOTA_GREEDY = 2;   // “允许的失败次数”
-        const double BARY_WEAK_REL_THRESHOLD = 0.0005; // 连续微小收益时提前收敛
-        const int BARY_WEAK_ABS_THRESHOLD = 1;
-        const int BARY_WEAK_STREAK_LIMIT = 6;
-        const double GREEDY_WEAK_REL_THRESHOLD = 0.0005;
-        const int GREEDY_WEAK_ABS_THRESHOLD = 1;
-        const int GREEDY_WEAK_STREAK_LIMIT = 6;
+        const int MIN_PASSES_BARY = 2;   // 如需更保守可设 2~3；0 表示与原版一致
+        const int MIN_PASSES_GREEDY = 2;
+        const int FAILS_QUOTA_BARY = 3;   // “出现过一次成功后，允许的失败次数”
+        const int FAILS_QUOTA_GREEDY = 3;   // “允许的失败次数”
+        const double BARY_WEAK_REL_THRESHOLD = 0.0003; // 连续微小收益时提前收敛
+        const int BARY_WEAK_ABS_THRESHOLD = 2;
+        const int BARY_WEAK_STREAK_LIMIT = 8;
+        const double GREEDY_WEAK_REL_THRESHOLD = 0.0003;
+        const int GREEDY_WEAK_ABS_THRESHOLD = 2;
+        const int GREEDY_WEAK_STREAK_LIMIT = 8;
 
         // ====== 预布局：保持原逻辑 ======
         Parallel.For(1, Size.x + 1, i =>
