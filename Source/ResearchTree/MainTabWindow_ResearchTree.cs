@@ -267,18 +267,15 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         var startPosition = new Vector2(marginScaled,
             Constants.TopBarHeight + Constants.Margin + marginScaled);
 
-        var bottomPaddingView = marginScaled;
         var size = new Vector2((Screen.width - (StandardMargin * 2f)) / uiScale,
-            Mathf.Max(0f, UI.screenHeight - MainButtonDef.ButtonHeight - bottomPaddingView - startPosition.y));
+            Mathf.Max(0f, UI.screenHeight - MainButtonDef.ButtonHeight - startPosition.y));
 
         _baseViewRect = new Rect(startPosition, size);
         _baseViewRectInner = _baseViewRect.ContractedBy(Constants.Margin / uiScale);
         windowRect.x = 0f;
         windowRect.y = 0f;
         windowRect.width = UI.screenWidth;
-        var bottomPaddingWindow = Mathf.Max(0f, StandardMargin * uiScale);
-        windowRect.height = Mathf.Max(0f,
-            UI.screenHeight - MainButtonDef.ButtonHeight - bottomPaddingWindow);
+        windowRect.height = Mathf.Max(0f, UI.screenHeight - MainButtonDef.ButtonHeight);
     }
     private void ClampScroll()
     {
