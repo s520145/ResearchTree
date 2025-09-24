@@ -10,6 +10,7 @@ public class Dialog_ResearchInfoCard : Window
     private static readonly Color alternateBackground = new(0.2f, 0.2f, 0.2f, 0.5f);
     private readonly ResearchProjectDef researchProjectDef;
     private Vector2 scrollPosition = Vector2.zero;
+    private bool _previousTooltipDisabledState;
 
     public Dialog_ResearchInfoCard(ResearchProjectDef researchProject)
     {
@@ -18,6 +19,19 @@ public class Dialog_ResearchInfoCard : Window
     }
 
     public override Vector2 InitialSize => new(955f, 765f);
+
+    public override void PreOpen()
+    {
+        _previousTooltipDisabledState = TooltipHandler_Modified.GloballyDisabled;
+        TooltipHandler_Modified.GloballyDisabled = true;
+        base.PreOpen();
+    }
+
+    public override void PostClose()
+    {
+        base.PostClose();
+        TooltipHandler_Modified.GloballyDisabled = _previousTooltipDisabledState;
+    }
 
     public override void DoWindowContents(Rect inRect)
     {

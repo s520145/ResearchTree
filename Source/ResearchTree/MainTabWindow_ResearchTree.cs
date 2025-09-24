@@ -160,6 +160,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public void Notify_TreeInitialized()
     {
+        Assets.RefreshResearch = true;
         setRects();
         ApplyTreeInitializedState();
     }
@@ -252,17 +253,23 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private void setRects()
     {
-        var startPosition = new Vector2(StandardMargin / Prefs.UIScale,
-            Constants.TopBarHeight + Constants.Margin + (StandardMargin / Prefs.UIScale));
-        var size = new Vector2((Screen.width - (StandardMargin * 2f)) / Prefs.UIScale,
-            UI.screenHeight - MainButtonDef.ButtonHeight - startPosition.y);
+        var uiScale = Prefs.UIScale;
+        var marginScaled = StandardMargin / uiScale;
+        var startPosition = new Vector2(marginScaled,
+            Constants.TopBarHeight + Constants.Margin + marginScaled);
+
+        var bottomPaddingView = marginScaled;
+        var size = new Vector2((Screen.width - (StandardMargin * 2f)) / uiScale,
+            Mathf.Max(0f, UI.screenHeight - MainButtonDef.ButtonHeight - bottomPaddingView - startPosition.y));
 
         _baseViewRect = new Rect(startPosition, size);
-        _baseViewRectInner = _baseViewRect.ContractedBy(Constants.Margin / Prefs.UIScale);
+        _baseViewRectInner = _baseViewRect.ContractedBy(Constants.Margin / uiScale);
         windowRect.x = 0f;
         windowRect.y = 0f;
         windowRect.width = UI.screenWidth;
-        windowRect.height = UI.screenHeight - MainButtonDef.ButtonHeight;
+        var bottomPaddingWindow = Mathf.Max(0f, StandardMargin * uiScale);
+        windowRect.height = Mathf.Max(0f,
+            UI.screenHeight - MainButtonDef.ButtonHeight - bottomPaddingWindow);
     }
     private void ClampScroll()
     {
@@ -479,8 +486,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     {
         UI.ApplyUIScale();
         GUI.BeginClip(windowRect);
-        GUI.BeginClip(new Rect(0f, UI.screenHeight - Constants.TopBarHeight,
-            UI.screenWidth, UI.screenHeight - MainButtonDef.ButtonHeight - Constants.TopBarHeight));
+        var contentHeight = Mathf.Max(0f, windowRect.height - Constants.TopBarHeight);
+        GUI.BeginClip(new Rect(0f, Constants.TopBarHeight, windowRect.width, contentHeight));
     }
     private void drawTopBar(Rect canvas)
     {
