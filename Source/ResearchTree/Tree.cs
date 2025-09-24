@@ -59,35 +59,6 @@ public static class Tree
         new List<Edge<Node, Node>>(64)
     };
 
-    private readonly struct TabBandInfo
-    {
-        public TabBandInfo(ResearchTabDef tab, int minRow, int maxRow, Color background)
-        {
-            Tab = tab;
-            MinRow = minRow;
-            MaxRow = maxRow;
-            Background = background;
-        }
-
-        public ResearchTabDef Tab { get; }
-
-        public int MinRow { get; }
-
-        public int MaxRow { get; }
-
-        public Color Background { get; }
-    }
-
-    private static readonly Color[] TabBandPalette =
-    {
-        new(0.09f, 0.10f, 0.12f, 0.32f),
-        new(0.11f, 0.09f, 0.12f, 0.32f),
-        new(0.08f, 0.11f, 0.12f, 0.32f),
-        new(0.10f, 0.12f, 0.08f, 0.32f)
-    };
-
-    private static readonly List<TabBandInfo> ResearchTabBands = [];
-
     private const float CullPadding = 120f;
     private const string InitializePerformancePrefix = "Tree.Initialize::";
 
@@ -184,78 +155,6 @@ public static class Tree
         return leftDone || rightDone;
     }
 
-    private static ResearchTabDef ResolveNodeTab(Node node)
-    {
-        switch (node)
-        {
-            case ResearchNode researchNode:
-                return researchNode.Tab ?? GetProjectTab(researchNode.Research);
-            case DummyNode dummy:
-                var childTab = dummy.Child?.Tab;
-                var parentTab = dummy.Parent?.Tab;
-                if (childTab != null && parentTab != null && childTab != parentTab)
-                {
-                    return childTab;
-                }
-
-                return childTab ?? parentTab;
-            default:
-                return null;
-        }
-    }
-
-    private static (int maxBaryPasses, int maxGreedyPasses, int minBaryPasses, int minGreedyPasses, int baryFails,
-        int greedyFails) GetCrossingIterationBudget(int researchCount)
-    {
-        if (researchCount >= 2000)
-        {
-            return (18, 18, 1, 1, 1, 1);
-        }
-
-        if (researchCount >= 1200)
-        {
-            return (26, 24, 1, 1, 1, 1);
-        }
-
-        if (researchCount >= 800)
-        {
-            return (34, 30, 1, 0, 2, 2);
-        }
-
-        if (researchCount >= 400)
-        {
-            return (42, 38, 0, 0, 2, 2);
-        }
-
-        return (50, 50, 0, 0, 2, 2);
-    }
-
-    private static (int maxPairIterations, int minPairIterations, double pairRelativeThreshold, int pairAbsoluteThreshold,
-        double targetCumulativeRelative) GetEdgeLengthIterationBudget(int researchCount)
-    {
-        if (researchCount >= 2000)
-        {
-            return (5, 2, 0.08, 1000, 0.45);
-        }
-
-        if (researchCount >= 1200)
-        {
-            return (6, 2, 0.07, 900, 0.5);
-        }
-
-        if (researchCount >= 800)
-        {
-            return (8, 2, 0.06, 800, 0.55);
-        }
-
-        if (researchCount >= 400)
-        {
-            return (10, 2, 0.05, 700, 0.6);
-        }
-
-        return (12, 2, 0.04, 600, 0.65);
-    }
-
     public static List<Node> Nodes
     {
         get
@@ -309,7 +208,6 @@ public static class Tree
         _edges = null;
         _relevantTechLevels = null;
         _techLevelBounds = null;
-        ResearchTabBands.Clear();
         _initializing = false;
         Initialized = false;
         OrderDirty = false;
@@ -537,8 +435,6 @@ public static class Tree
             for (int x = 0; x < LayerBuckets.Length; x++)
                 LayerSlots[x] = (LayerBuckets[x] == null) ? Array.Empty<Node>() : LayerBuckets[x].ToArray();
         }
-
-        ArrangeResearchTabsIntoBands();
     }
 
     // 将某一层的顺序一次性替换为 newOrder，保持所有缓存一致
@@ -561,140 +457,6 @@ public static class Tree
         // 3) 规范化 Y = 1..Count
         for (int i = 0; i < newOrder.Length; i++)
             newOrder[i].Y = i + 1;
-    }
-
-    private sealed class NodeTabSnapshot
-    {
-        public NodeTabSnapshot(Node node, int oldY, ResearchTabDef tab)
-        {
-            Node = node;
-            OldY = oldY;
-            Tab = tab;
-        }
-
-        public Node Node { get; }
-
-        public int OldY { get; }
-
-        public ResearchTabDef Tab { get; }
-    }
-
-    private static void ArrangeResearchTabsIntoBands()
-    {
-        ResearchTabBands.Clear();
-
-        var nodes = Nodes;
-        if (nodes.NullOrEmpty())
-        {
-            return;
-        }
-
-        var snapshots = new List<NodeTabSnapshot>(nodes.Count);
-        foreach (var node in nodes)
-        {
-            snapshots.Add(new NodeTabSnapshot(node, node.Y, ResolveNodeTab(node)));
-        }
-
-        var groupedTabs = snapshots
-            .Where(s => s.Tab != null)
-            .GroupBy(s => s.Tab)
-            .OrderBy(g => g.Min(s => s.OldY))
-            .ToList();
-
-        if (groupedTabs.Count == 0)
-        {
-            ResortLayerCachesPreservingY();
-            return;
-        }
-
-        int paletteIndex = 0;
-        var nextRow = 1;
-
-        foreach (var group in groupedTabs)
-        {
-            var rowGroups = group
-                .GroupBy(s => s.OldY)
-                .OrderBy(g => g.Key)
-                .ToList();
-
-            if (rowGroups.Count == 0)
-            {
-                continue;
-            }
-
-            int startRow = nextRow;
-
-            foreach (var rowGroup in rowGroups)
-            {
-                var newRow = nextRow++;
-                foreach (var snapshot in rowGroup)
-                {
-                    snapshot.Node.Y = newRow;
-                    snapshot.Node.Yf = newRow;
-                }
-            }
-
-            int endRow = nextRow - 1;
-            var color = TabBandPalette[paletteIndex % TabBandPalette.Length];
-            paletteIndex++;
-
-            ResearchTabBands.Add(new TabBandInfo(group.Key, startRow, endRow, color));
-        }
-
-        var unassigned = snapshots
-            .Where(s => s.Tab == null)
-            .GroupBy(s => s.OldY)
-            .OrderBy(g => g.Key)
-            .ToList();
-
-        if (unassigned.Count > 0)
-        {
-            int startRow = nextRow;
-
-            foreach (var row in unassigned)
-            {
-                var newRow = nextRow++;
-                foreach (var snapshot in row)
-                {
-                    snapshot.Node.Y = newRow;
-                    snapshot.Node.Yf = newRow;
-                }
-            }
-
-            int endRow = nextRow - 1;
-            var color = TabBandPalette[paletteIndex % TabBandPalette.Length];
-            ResearchTabBands.Add(new TabBandInfo(null, startRow, endRow, color));
-        }
-
-        Size = new IntVec2(Size.x, Math.Max(0, nextRow - 1));
-
-        ResortLayerCachesPreservingY();
-    }
-
-    private static void ResortLayerCachesPreservingY()
-    {
-        if (LayerBuckets != null)
-        {
-            for (int x = 0; x < LayerBuckets.Length; x++)
-            {
-                var bucket = LayerBuckets[x];
-                if (bucket == null)
-                {
-                    continue;
-                }
-
-                bucket.Sort((a, b) => a.Y.CompareTo(b.Y));
-            }
-        }
-
-        if (LayerSlots != null && LayerBuckets != null)
-        {
-            for (int x = 0; x < LayerSlots.Length && x < LayerBuckets.Length; x++)
-            {
-                var bucket = LayerBuckets[x];
-                LayerSlots[x] = bucket == null ? Array.Empty<Node>() : bucket.ToArray();
-            }
-        }
     }
 
     // 计算层 l 上每个节点的重心key（@in=true: 用 InEdges.In.Y；否则用 OutEdges.Out.Y）
@@ -761,13 +523,11 @@ public static class Tree
     private static void minimizeEdgeLength()
     {
         // ====== 可调参数======
-        var researchCount = Nodes?.Count(n => n is ResearchNode) ?? 0;
-        var edgeBudget = GetEdgeLengthIterationBudget(researchCount);
-        var maxPairIters = edgeBudget.maxPairIterations;   // 最多做多少“对”（= 2*此值 次 Local）
-        var minPairIters = edgeBudget.minPairIterations;    // 至少做多少“对”，避免过早停
-        var pairRelEps = edgeBudget.pairRelativeThreshold; // 每对相对收益阈值（4%）；更快停可设 0.06~0.08
-        var pairAbsEps = edgeBudget.pairAbsoluteThreshold;  // 每对绝对收益阈值（单位：Y 差总和）
-        var targetCumRel = edgeBudget.targetCumulativeRelative; // 累计相对收益达到 65% 即停；更快停可设 0.5~0.6
+        const int MAX_PAIR_ITERS = 12;   // 最多做多少“对”（= 2*此值 次 Local）
+        const int MIN_PAIR_ITERS = 2;    // 至少做多少“对”，避免过早停
+        const double PAIR_REL_EPS = 0.04; // 每对相对收益阈值（4%）；更快停可设 0.06~0.08
+        const int PAIR_ABS_EPS = 600;  // 每对绝对收益阈值（单位：Y 差总和）
+        const double TARGET_CUM_REL = 0.65; // 累计相对收益达到 65% 即停；更快停可设 0.5~0.6
 
         // “收益稳定”（平台期）检测：最近 N 对的相对收益波动很小则停
         const int PLATEAU_SPAN = 3;    // 检测窗口（对数）
@@ -779,7 +539,7 @@ public static class Tree
         double cumRel = 0.0;               // 累计相对收益（相对于每对开始前的 denom 累加）
         var lastPairRels = new Queue<double>(PLATEAU_SPAN);
 
-        for (int pair = 0; pair < maxPairIters; pair++)
+        for (int pair = 0; pair < MAX_PAIR_ITERS; pair++)
         {
             // 以当前状态计算“对”的分母：in + out 的总边长（避免某一侧权重过低）
             long denomIn = TotalEdgeLength_Int(@in: true);
@@ -806,9 +566,9 @@ public static class Tree
             cumRel += pairRel;
 
             // ---- 是否满足早停条件 ----
-            bool stopByPairRel = pair >= minPairIters && pairRel < pairRelEps;
-            bool stopByPairAbs = pair >= minPairIters && pairGain < pairAbsEps;
-            bool stopByTarget = cumRel >= targetCumRel;
+            bool stopByPairRel = pair >= MIN_PAIR_ITERS && pairRel < PAIR_REL_EPS;
+            bool stopByPairAbs = pair >= MIN_PAIR_ITERS && pairGain < PAIR_ABS_EPS;
+            bool stopByTarget = cumRel >= TARGET_CUM_REL;
 
             // 平台期检测：最近 N 对的相对收益波动是否很小
             bool stopByPlateau = false;
@@ -823,7 +583,7 @@ public static class Tree
                     foreach (var r in lastPairRels) { if (r < min) min = r; if (r > max) max = r; }
                     // 以窗口内均值为基准的相对波动
                     double mean = 0.0; foreach (var r in lastPairRels) mean += r; mean /= PLATEAU_SPAN;
-                    if (mean > 0 && (max - min) / mean < PLATEAU_DELTA && pair >= minPairIters)
+                    if (mean > 0 && (max - min) / mean < PLATEAU_DELTA && pair >= MIN_PAIR_ITERS)
                         stopByPlateau = true;
                 }
             }
@@ -1330,7 +1090,6 @@ public static class Tree
         Parallel.ForEach(researchList, (def, _, index) =>
         {
             var researchNode = new ResearchNode(def, (int)index);
-            researchNode.AssignTab(GetProjectTab(def));
             lock (_nodes)
             {
                 _nodes.Add(researchNode);
@@ -1413,8 +1172,6 @@ public static class Tree
         {
             drawTimer = Stopwatch.StartNew();
         }
-
-        drawResearchTabBands(visibleRect);
 
         // Draw tech levels（不受“隐藏已完成”影响）
         foreach (var relevantTechLevel in RelevantTechLevels)
@@ -1769,98 +1526,6 @@ public static class Tree
     }
 
 
-    private static void drawResearchTabDivider(float x, float width, float y)
-    {
-        var prevColor = GUI.color;
-        GUI.color = Assets.TechLevelColor;
-        GUI.DrawTexture(new Rect(x, y, width, 2f), BaseContent.WhiteTex);
-        GUI.color = prevColor;
-    }
-
-    private static void drawResearchTabBands(Rect visibleRect)
-    {
-        if (ResearchTabBands.Count == 0)
-        {
-            return;
-        }
-
-        if (Event.current.type != EventType.Repaint)
-        {
-            return;
-        }
-
-        var rowSpan = Constants.NodeSize.y + Constants.NodeMargins.y;
-        var clipX = visibleRect.xMin;
-        var clipWidth = visibleRect.width;
-        var prevColor = GUI.color;
-        var prevAnchor = Text.Anchor;
-
-        for (var i = 0; i < ResearchTabBands.Count; i++)
-        {
-            var band = ResearchTabBands[i];
-            if (band.MinRow <= 0 || band.MaxRow < band.MinRow)
-            {
-                continue;
-            }
-
-            var top = (band.MinRow - 1) * rowSpan;
-            var bandHeight = Math.Max(rowSpan, (band.MaxRow - band.MinRow + 1) * rowSpan);
-            var bandRect = new Rect(clipX, top, clipWidth, bandHeight);
-
-            if (!bandRect.Overlaps(visibleRect))
-            {
-                continue;
-            }
-
-            var visibleTop = Mathf.Max(bandRect.yMin, visibleRect.yMin);
-            var visibleBottom = Mathf.Min(bandRect.yMax, visibleRect.yMax);
-            if (visibleBottom <= visibleTop)
-            {
-                continue;
-            }
-
-            var fillRect = new Rect(clipX, visibleTop, clipWidth, visibleBottom - visibleTop);
-            GUI.color = band.Background;
-            GUI.DrawTexture(fillRect, BaseContent.WhiteTex);
-            GUI.color = prevColor;
-
-            if (i > 0)
-            {
-                var lineY = top;
-                if (lineY >= visibleRect.yMin && lineY <= visibleRect.yMax)
-                {
-                    drawResearchTabDivider(clipX, clipWidth, lineY);
-                }
-            }
-
-            if (band.Tab != null)
-            {
-                var labelY = Mathf.Clamp(top + 4f, visibleRect.yMin, visibleRect.yMax);
-                if (labelY < visibleRect.yMax)
-                {
-                    var labelRect = new Rect(clipX + 8f, labelY, clipWidth - 16f, 24f);
-                    GUI.color = Assets.TechLevelColor;
-                    Text.Anchor = TextAnchor.UpperLeft;
-                    Widgets.Label(labelRect, band.Tab.defName);
-                    GUI.color = prevColor;
-                }
-            }
-        }
-
-        if (ResearchTabBands.Count > 0)
-        {
-            var last = ResearchTabBands[ResearchTabBands.Count - 1];
-            var bottomY = last.MaxRow * rowSpan;
-            if (bottomY >= visibleRect.yMin && bottomY <= visibleRect.yMax)
-            {
-                drawResearchTabDivider(clipX, clipWidth, bottomY);
-            }
-        }
-
-        GUI.color = prevColor;
-        Text.Anchor = prevAnchor;
-    }
-
     private static void drawTechLevel(TechLevel techlevel, Rect visibleRect)
     {
         if (!TechLevelBounds.ContainsKey(techlevel))
@@ -1935,14 +1600,12 @@ public static class Tree
     private static void minimizeCrossings()
     {
         // ====== 可调参数======
-        var researchCount = Nodes?.Count(n => n is ResearchNode) ?? 0;
-        var crossingBudget = GetCrossingIterationBudget(researchCount);
-        var maxPassesBary = crossingBudget.maxBaryPasses;   // 与原版一致：最多尝试 50 次
-        var maxPassesGreedy = crossingBudget.maxGreedyPasses;
-        var minPassesBary = crossingBudget.minBaryPasses;   // 如需更保守可设 2~3；0 表示与原版一致
-        var minPassesGreedy = crossingBudget.minGreedyPasses;
-        var failsQuotaBary = crossingBudget.baryFails;   // “出现过一次成功后，允许的失败次数”
-        var failsQuotaGreedy = crossingBudget.greedyFails;   // “允许的失败次数”
+        const int MAX_PASSES_BARY = 50;  // 与原版一致：最多尝试 50 次
+        const int MAX_PASSES_GREEDY = 50;
+        const int MIN_PASSES_BARY = 0;   // 如需更保守可设 2~3；0 表示与原版一致
+        const int MIN_PASSES_GREEDY = 0;
+        const int FAILS_QUOTA_BARY = 2;   // “出现过一次成功后，允许的失败次数”
+        const int FAILS_QUOTA_GREEDY = 2;   // “允许的失败次数”
 
         // ====== 预布局：保持原逻辑 ======
         Parallel.For(1, Size.x + 1, i =>
@@ -1959,11 +1622,11 @@ public static class Tree
         // ====== Barymetric phase（语义等价于原：先要出现过 true，然后累计 2 次 false 即停）======
         var barySw = new System.Diagnostics.Stopwatch();
         int pass = 0;
-        int baryFailsLeft = failsQuotaBary;
+        int baryFailsLeft = FAILS_QUOTA_BARY;
         bool seenBarySuccess = false;
         long baryMs = 0;
 
-        while (pass < maxPassesBary)
+        while (pass < MAX_PASSES_BARY)
         {
             barySw.Restart();
             bool improved = barymetricSweep(pass++);
@@ -1976,14 +1639,14 @@ public static class Tree
             }
             else
             {
-                if (seenBarySuccess && pass > minPassesBary) baryFailsLeft--;
+                if (seenBarySuccess && pass > MIN_PASSES_BARY) baryFailsLeft--;
             }
 
-            Logging.Message($"[Profile] CrossingSweep bary pass={pass - 1} took {barySw.ElapsedMilliseconds} ms, improved={improved}, failsLeft={(seenBarySuccess ? baryFailsLeft : failsQuotaBary)}");
+            Logging.Message($"[Profile] CrossingSweep bary pass={pass - 1} took {barySw.ElapsedMilliseconds} ms, improved={improved}, failsLeft={(seenBarySuccess ? baryFailsLeft : FAILS_QUOTA_BARY)}");
 
-            if (seenBarySuccess && pass >= minPassesBary && baryFailsLeft <= 0)
+            if (seenBarySuccess && pass >= MIN_PASSES_BARY && baryFailsLeft <= 0)
             {
-                Logging.Message($"[Profile] CrossingSweep early-stop bary at pass={pass - 1} (after first success, failsQuota={failsQuotaBary})");
+                Logging.Message($"[Profile] CrossingSweep early-stop bary at pass={pass - 1} (after first success, FAILS_QUOTA reached)");
                 break;
             }
         }
@@ -1991,17 +1654,17 @@ public static class Tree
         // ====== Greedy phase（语义等价于原：累计 2 次 false 即停）======
         var greedySw = new System.Diagnostics.Stopwatch();
         pass = 0;
-        int greedyFailsLeft = failsQuotaGreedy;
+        int greedyFailsLeft = FAILS_QUOTA_GREEDY;
         long greedyMs = 0;
 
-        while (pass < maxPassesGreedy && greedyFailsLeft > 0)
+        while (pass < MAX_PASSES_GREEDY && greedyFailsLeft > 0)
         {
             greedySw.Restart();
             bool improved = greedySweep(pass++);
             greedySw.Stop();
             greedyMs += greedySw.ElapsedMilliseconds;
 
-            if (!improved && pass > minPassesGreedy) greedyFailsLeft--;
+            if (!improved && pass > MIN_PASSES_GREEDY) greedyFailsLeft--;
 
             Logging.Message($"[Profile] CrossingSweep greedy pass={pass - 1} took {greedySw.ElapsedMilliseconds} ms, improved={improved}, failsLeft={greedyFailsLeft}");
         }

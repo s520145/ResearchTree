@@ -24,8 +24,6 @@ public class ResearchNode : Node
 
     public readonly ResearchProjectDef Research;
 
-    public ResearchTabDef Tab { get; private set; }
-
     private bool availableCache;
 
     private int currentCacheOrder;
@@ -111,11 +109,6 @@ public class ResearchNode : Node
         _pos = new Vector2(0f, research.researchViewY + 1f);
         cacheOrder = order;
         currentCacheOrder = Assets.TotalAmountOfResearch;
-    }
-
-    public void AssignTab(ResearchTabDef tab)
-    {
-        Tab = tab;
     }
 
     public List<ResearchNode> Parents
