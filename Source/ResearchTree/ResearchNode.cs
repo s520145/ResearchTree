@@ -537,7 +537,7 @@ public class ResearchNode : Node
                     Widgets.DefIcon(rect, unlockDefsAndDescs[i].First);
                     if (Queue._draggedNode == null)
                     {
-                        TooltipHandler_Modified.TipRegion(rect, unlockDefsAndDescs[i].Second);
+                        TooltipHandler_Modified.TipRegionIfEnabled(rect, unlockDefsAndDescs[i].Second);
                     }
                 }
             }
@@ -774,7 +774,7 @@ public class ResearchNode : Node
             researchTooltipString.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
         }
 
-        TooltipHandler_Modified.TipRegion(Rect, researchTooltipString.ToString());
+        TooltipHandler_Modified.TipRegionIfEnabled(Rect, researchTooltipString.ToString());
     }
 
     private StringBuilder getResearchTooltipString()
