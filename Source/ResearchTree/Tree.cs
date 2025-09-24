@@ -60,6 +60,7 @@ public static class Tree
     };
 
     private const float CullPadding = 120f;
+    private const string InitializePerformancePrefix = "Tree.Initialize::";
 
     private static Dictionary<TechLevel, IntRange> TechLevelBounds
     {
@@ -224,11 +225,11 @@ public static class Tree
 
         if (FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeLoadInBackground)
         {
-            LongEventHandler.QueueLongEvent(Initialize, "ResearchPal.BuildingResearchTreeAsync", false,
-                null);
+            QueueProfiledLongEvent(Initialize, $"{InitializePerformancePrefix}QueuedInitialize",
+                "ResearchPal.BuildingResearchTreeAsync");
         }
     }
-    private static void ProfiledStep(string name, Action step)
+    private static void ProfiledStep(string label, Action step)
     {
         var sw = Stopwatch.StartNew();
         try
@@ -238,8 +239,14 @@ public static class Tree
         finally
         {
             sw.Stop();
-            Logging.Performance($"Tree.Initialize::{name}", sw.ElapsedMilliseconds, 250);
+            Logging.Performance(label, sw.ElapsedMilliseconds, 250);
         }
+    }
+
+    private static void QueueProfiledLongEvent(Action step, string label, string textKey, bool doAsynchronously = false,
+        Action extraAction = null)
+    {
+        LongEventHandler.QueueLongEvent(() => ProfiledStep(label, step), textKey, doAsynchronously, extraAction);
     }
 
     public static void Initialize()
@@ -256,15 +263,15 @@ public static class Tree
         {
             try
             {
-                ProfiledStep("CheckPrerequisites", CheckPrerequisites);
-                ProfiledStep("CreateEdges", createEdges);
-                ProfiledStep("HorizontalPositions", horizontalPositions);
-                ProfiledStep("NormalizeEdges", normalizeEdges);
-                ProfiledStep("BuildBuckets", BuildBuckets);
-                ProfiledStep("Collapse", collapse);
-                ProfiledStep("MinimizeCrossings", minimizeCrossings);
-                ProfiledStep("MinimizeEdgeLength", minimizeEdgeLength);
-                ProfiledStep("RemoveEmptyRows", removeEmptyRows);
+                ProfiledStep($"{InitializePerformancePrefix}CheckPrerequisites", CheckPrerequisites);
+                ProfiledStep($"{InitializePerformancePrefix}CreateEdges", createEdges);
+                ProfiledStep($"{InitializePerformancePrefix}HorizontalPositions", horizontalPositions);
+                ProfiledStep($"{InitializePerformancePrefix}NormalizeEdges", normalizeEdges);
+                ProfiledStep($"{InitializePerformancePrefix}BuildBuckets", BuildBuckets);
+                ProfiledStep($"{InitializePerformancePrefix}Collapse", collapse);
+                ProfiledStep($"{InitializePerformancePrefix}MinimizeCrossings", minimizeCrossings);
+                ProfiledStep($"{InitializePerformancePrefix}MinimizeEdgeLength", minimizeEdgeLength);
+                ProfiledStep($"{InitializePerformancePrefix}RemoveEmptyRows", removeEmptyRows);
 
                 Logging.Message("Done");
                 Initialized = true;
@@ -279,35 +286,40 @@ public static class Tree
             return;
         }
 
-        LongEventHandler.QueueLongEvent(CheckPrerequisites, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
-        LongEventHandler.QueueLongEvent(createEdges, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
-        LongEventHandler.QueueLongEvent(horizontalPositions, "Fluffy.ResearchTree.PreparingTree.Setup", false,
-            null);
-        LongEventHandler.QueueLongEvent(normalizeEdges, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
+        QueueProfiledLongEvent(CheckPrerequisites, $"{InitializePerformancePrefix}CheckPrerequisites",
+            "Fluffy.ResearchTree.PreparingTree.Setup");
+        QueueProfiledLongEvent(createEdges, $"{InitializePerformancePrefix}CreateEdges",
+            "Fluffy.ResearchTree.PreparingTree.Setup");
+        QueueProfiledLongEvent(horizontalPositions, $"{InitializePerformancePrefix}HorizontalPositions",
+            "Fluffy.ResearchTree.PreparingTree.Setup");
+        QueueProfiledLongEvent(normalizeEdges, $"{InitializePerformancePrefix}NormalizeEdges",
+            "Fluffy.ResearchTree.PreparingTree.Setup");
         // 新增：构建桶与边缓存
-        LongEventHandler.QueueLongEvent(BuildBuckets, "Fluffy.ResearchTree.PreparingTree.Setup", false, null);
-        LongEventHandler.QueueLongEvent(collapse, "Fluffy.ResearchTree.PreparingTree.CrossingReduction", false,
-            null);
-        LongEventHandler.QueueLongEvent(minimizeCrossings, "Fluffy.ResearchTree.PreparingTree.CrossingReduction",
-            false, null);
-        LongEventHandler.QueueLongEvent(minimizeEdgeLength, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false,
-            null);
-        LongEventHandler.QueueLongEvent(removeEmptyRows, "Fluffy.ResearchTree.PreparingTree.LayoutNew", false, null);
-        LongEventHandler.QueueLongEvent(delegate
+        QueueProfiledLongEvent(BuildBuckets, $"{InitializePerformancePrefix}BuildBuckets",
+            "Fluffy.ResearchTree.PreparingTree.Setup");
+        QueueProfiledLongEvent(collapse, $"{InitializePerformancePrefix}Collapse",
+            "Fluffy.ResearchTree.PreparingTree.CrossingReduction");
+        QueueProfiledLongEvent(minimizeCrossings, $"{InitializePerformancePrefix}MinimizeCrossings",
+            "Fluffy.ResearchTree.PreparingTree.CrossingReduction");
+        QueueProfiledLongEvent(minimizeEdgeLength, $"{InitializePerformancePrefix}MinimizeEdgeLength",
+            "Fluffy.ResearchTree.PreparingTree.LayoutNew");
+        QueueProfiledLongEvent(removeEmptyRows, $"{InitializePerformancePrefix}RemoveEmptyRows",
+            "Fluffy.ResearchTree.PreparingTree.LayoutNew");
+        QueueProfiledLongEvent(() =>
             {
                 Initialized = true;
                 _initializing = false;
-            }, "Fluffy.ResearchTree.PreparingTree.LayoutNew",
-            false, null);
-        LongEventHandler.QueueLongEvent(Queue.Notify_TreeReinitialized,
-            "Fluffy.ResearchTree.RestoreQueue", false, null);
-        LongEventHandler.QueueLongEvent(MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized,
-            "Fluffy.ResearchTree.RestoreQueue", false, null);
+                Logging.Message("Done");
+            }, $"{InitializePerformancePrefix}Finalize", "Fluffy.ResearchTree.PreparingTree.LayoutNew");
+        QueueProfiledLongEvent(Queue.Notify_TreeReinitialized,
+            $"{InitializePerformancePrefix}NotifyQueueReinitialized", "Fluffy.ResearchTree.RestoreQueue");
+        QueueProfiledLongEvent(MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized,
+            $"{InitializePerformancePrefix}NotifyTreeInitialized", "Fluffy.ResearchTree.RestoreQueue");
         if (_reopenResearchTabAfterInit)
         {
             // open tab
-            LongEventHandler.QueueLongEvent(() => { Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research); },
-                "Fluffy.ResearchTree.RestoreQueue", false, null);
+            QueueProfiledLongEvent(() => { Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research); },
+                $"{InitializePerformancePrefix}ToggleResearchTab", "Fluffy.ResearchTree.RestoreQueue");
         }
         _reopenResearchTabAfterInit = true;
     }
@@ -1107,16 +1119,16 @@ public static class Tree
         }
         else
         {
-            LongEventHandler.QueueLongEvent(
+            QueueProfiledLongEvent(
                 Queue.Notify_TreeReinitialized,
-                "Fluffy.ResearchTree.RestoreQueue",
-                false, null
+                $"{InitializePerformancePrefix}NotifyQueueReinitialized",
+                "Fluffy.ResearchTree.RestoreQueue"
             );
             // 后台模式：Reset() 只排了 Initialize，这里再排一个“初始化完成后的通知”，保证窗口收到
-            LongEventHandler.QueueLongEvent(
+            QueueProfiledLongEvent(
                 MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized,
-                "Fluffy.ResearchTree.RestoreQueue",
-                false, null
+                $"{InitializePerformancePrefix}NotifyTreeInitialized",
+                "Fluffy.ResearchTree.RestoreQueue"
             );
         }
 
