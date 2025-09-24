@@ -331,12 +331,41 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         GUI.color = Color.white;
         Text.Anchor = TextAnchor.UpperLeft;
 
+        AbsorbUnclaimedInput();
+
         if (firstDrawTimer != null)
         {
             firstDrawTimer.Stop();
             Logging.Performance("MainTabWindow_ResearchTree.DoWindowContents.FirstDraw",
                 firstDrawTimer.ElapsedMilliseconds, FirstDrawWarnThresholdMs);
             _logFirstDrawNextFrame = false;
+        }
+    }
+
+    private void AbsorbUnclaimedInput()
+    {
+        var e = Event.current;
+        if (!e.isMouse)
+        {
+            return;
+        }
+
+        if (e.type == EventType.Used)
+        {
+            return;
+        }
+
+        if (!Mouse.IsOver(windowRect))
+        {
+            return;
+        }
+
+        switch (e.type)
+        {
+            case EventType.MouseDown:
+            case EventType.MouseUp:
+                e.Use();
+                break;
         }
     }
 
