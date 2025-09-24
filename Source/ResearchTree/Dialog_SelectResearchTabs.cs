@@ -23,6 +23,7 @@ namespace FluffyResearchTree
         private readonly List<ResearchTabDef> _allTabs;
         private readonly HashSet<string> _workingIncluded;
         private readonly Dictionary<string, string> _truncateCache = new();
+        private bool _previousTooltipDisabledState;
 
         public override Vector2 InitialSize => new(700f, 520f);
 
@@ -41,6 +42,19 @@ namespace FluffyResearchTree
 
             _workingIncluded = new HashSet<string>(settings.IncludedTabs ?? new HashSet<string>(),
                                                    StringComparer.OrdinalIgnoreCase);
+        }
+
+        public override void PreOpen()
+        {
+            _previousTooltipDisabledState = TooltipHandler_Modified.GloballyDisabled;
+            TooltipHandler_Modified.GloballyDisabled = true;
+            base.PreOpen();
+        }
+
+        public override void PostClose()
+        {
+            base.PostClose();
+            TooltipHandler_Modified.GloballyDisabled = _previousTooltipDisabledState;
         }
 
         public override void DoWindowContents(Rect inRect)
