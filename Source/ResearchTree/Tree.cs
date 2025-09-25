@@ -207,7 +207,10 @@ public static class Tree
             }
             else if (horizontalSpan <= Constants.Epsilon)
             {
-                DrawVertical(start.x, start.y, end.y, color);
+                if (!TryDrawDetouredVertical(from, to, start, end, color))
+                {
+                    DrawVertical(start.x, start.y, end.y, color);
+                }
             }
             else
             {
@@ -331,6 +334,160 @@ public static class Tree
             via.Reverse();
             var start = current ?? edge.In;
             return new CollapsedEdge(start, edge.Out, via);
+        }
+
+        private static bool TryDrawDetouredVertical(Node from, Node to, Vector2 start, Vector2 end, Color color)
+        {
+            if (from == null || to == null)
+            {
+                return false;
+            }
+
+            if (!SegmentBlocked(start.x, start.y, end.x, end.y, from, to))
+            {
+                return false;
+            }
+
+            var minY = Math.Min(start.y, end.y);
+            var maxY = Math.Max(start.y, end.y);
+
+            var leftCorridor = ColumnLeft(from.X) - (Constants.NodeMargins.x / 2f);
+            var rightCorridor = ColumnRight(from.X) + (Constants.NodeMargins.x / 2f);
+
+            var leftValid = CorridorIsClear(leftCorridor, start, end, from, to);
+            var rightValid = CorridorIsClear(rightCorridor, start, end, from, to);
+
+            if (!leftValid && !rightValid)
+            {
+                return false;
+            }
+
+            float corridorX;
+            if (leftValid && rightValid)
+            {
+                var leftDensity = CountVisibleNodes(from.X - 1, minY, maxY, from, to);
+                var rightDensity = CountVisibleNodes(from.X + 1, minY, maxY, from, to);
+                corridorX = leftDensity <= rightDensity ? leftCorridor : rightCorridor;
+            }
+            else
+            {
+                corridorX = leftValid ? leftCorridor : rightCorridor;
+            }
+
+            DrawHorizontal(start.y, start.x, corridorX, color);
+            DrawVertical(corridorX, start.y, end.y, color);
+            DrawHorizontal(end.y, corridorX, end.x, color);
+
+            return true;
+        }
+
+        private static bool CorridorIsClear(float corridorX, Vector2 start, Vector2 end, Node from, Node to)
+        {
+            if (float.IsNaN(corridorX))
+            {
+                return false;
+            }
+
+            if (SegmentBlocked(start.x, start.y, corridorX, start.y, from, to))
+            {
+                return false;
+            }
+
+            if (SegmentBlocked(end.x, end.y, corridorX, end.y, from, to))
+            {
+                return false;
+            }
+
+            if (SegmentBlocked(corridorX, start.y, corridorX, end.y, from, to))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool SegmentBlocked(float x1, float y1, float x2, float y2, Node from, Node to)
+        {
+            var width = Math.Abs(x2 - x1);
+            var height = Math.Abs(y2 - y1);
+
+            if (width <= Constants.Epsilon && height <= Constants.Epsilon)
+            {
+                return false;
+            }
+
+            Rect segmentRect;
+            if (width <= Constants.Epsilon)
+            {
+                segmentRect = new Rect(x1 - 2f, Math.Min(y1, y2), 4f, height);
+            }
+            else if (height <= Constants.Epsilon)
+            {
+                segmentRect = new Rect(Math.Min(x1, x2), y1 - 2f, width, 4f);
+            }
+            else
+            {
+                segmentRect = new Rect(Math.Min(x1, x2), Math.Min(y1, y2), width, height);
+            }
+
+            foreach (var node in Nodes)
+            {
+                if (node == null || node == from || node == to)
+                {
+                    continue;
+                }
+
+                if (!node.IsVisible)
+                {
+                    continue;
+                }
+
+                if (node.Rect.Overlaps(segmentRect))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static int CountVisibleNodes(int column, float minY, float maxY, Node from, Node to)
+        {
+            if (column <= 0)
+            {
+                return 0;
+            }
+
+            var nodesInColumn = layer(column);
+            if (nodesInColumn == null)
+            {
+                return 0;
+            }
+
+            var count = 0;
+            for (var i = 0; i < nodesInColumn.Count; i++)
+            {
+                var node = nodesInColumn[i];
+                if (node == null || node == from || node == to)
+                {
+                    continue;
+                }
+
+                if (!node.IsVisible)
+                {
+                    continue;
+                }
+
+                var rect = node.Rect;
+                if (rect.yMax <= minY || rect.yMin >= maxY)
+                {
+                    continue;
+                }
+
+                count++;
+            }
+
+            return count;
         }
     }
 
