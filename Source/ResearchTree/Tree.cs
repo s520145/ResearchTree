@@ -137,7 +137,7 @@ public static class Tree
                 var direction = Math.Sign(end.x - start.x);
                 if (Math.Abs(direction) < Constants.Epsilon)
                 {
-                    direction = 1f;
+                    direction = 1;
                 }
 
                 if (stub > Constants.Epsilon)
