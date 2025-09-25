@@ -1,13 +1,13 @@
 ﻿// Tree.cs
 // Copyright Karel Kroeze, 2020-2020
 
-using HarmonyLib;
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using HarmonyLib;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -42,16 +42,16 @@ public static class Tree
     private static bool _loggedInitialDraw;
 
     // --- caches for hot paths ---
-    private static List<Node>[] LayerBuckets;                 // [0..L]
-    private static List<Edge<Node, Node>>[] InEdgesPerLayer;  // [0..L]
-    private static List<Edge<Node, Node>>[] OutEdgesPerLayer; // [0..L]
+    private static List<Node>[] _layerBuckets;                 // [0..L]
+    private static List<Edge<Node, Node>>[] _inEdgesPerLayer;  // [0..L]
+    private static List<Edge<Node, Node>>[] _outEdgesPerLayer; // [0..L]
 
-    // 每层的 Y 槽位数组：LayerSlots[x][y-1] => Node
-    private static Node[][] LayerSlots;
+    // Layer y-slot lookup: _layerSlots[x][y - 1] => Node
+    private static Node[][] _layerSlots;
 
     private static readonly List<Node> VisibleNodesBuffer = new(256);
 
-    private static readonly List<Edge<Node, Node>>[] EdgeDrawBuckets =
+    private static readonly List<Edge<Node, Node>>[] _edgeDrawBuckets =
     {
         new List<Edge<Node, Node>>(64),
         new List<Edge<Node, Node>>(64),
@@ -61,6 +61,7 @@ public static class Tree
 
     private const float CullPadding = 120f;
     private const string InitializePerformancePrefix = "Tree.Initialize::";
+    private const int DummyTraversalGuard = 256;
 
     private static Dictionary<TechLevel, IntRange> TechLevelBounds
     {
@@ -88,69 +89,89 @@ public static class Tree
         }
     }
 
-    // 尝试从 ResearchProjectDef 上取出 ResearchTabDef
     private static ResearchTabDef GetProjectTab(ResearchProjectDef def)
     {
-        if (def == null) return null;
-        var t = def.GetType();
+        if (def == null)
+        {
+            return null;
+        }
 
-        // 优先找属性
-        var prop = t.GetProperty("tab") ?? t.GetProperty("researchTab") ?? t.GetProperty("researchTabDef");
-        if (prop != null && typeof(ResearchTabDef).IsAssignableFrom(prop.PropertyType))
-            return prop.GetValue(def) as ResearchTabDef;
+        var type = def.GetType();
 
-        // 再找字段
-        var fld = t.GetField("tab") ?? t.GetField("researchTab") ?? t.GetField("researchTabDef");
-        if (fld != null && typeof(ResearchTabDef).IsAssignableFrom(fld.FieldType))
-            return fld.GetValue(def) as ResearchTabDef;
+        var property = type.GetProperty("tab")
+                       ?? type.GetProperty("researchTab")
+                       ?? type.GetProperty("researchTabDef");
+        if (property != null && typeof(ResearchTabDef).IsAssignableFrom(property.PropertyType))
+        {
+            return property.GetValue(def) as ResearchTabDef;
+        }
 
-        // 兜底（大多数情况下是 Main）
-        try { return ResearchTabDefOf.Main; } catch { return null; }
+        var field = type.GetField("tab")
+                    ?? type.GetField("researchTab")
+                    ?? type.GetField("researchTabDef");
+        if (field != null && typeof(ResearchTabDef).IsAssignableFrom(field.FieldType))
+        {
+            return field.GetValue(def) as ResearchTabDef;
+        }
+
+        try
+        {
+            return ResearchTabDefOf.Main;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
-    // 运行期：是否隐藏已完成（读设置，实时生效）
-    private static bool SkipCompletedSetting =>
-        FluffyResearchTreeMod.instance?.Settings?.SkipCompleted ?? false;
+    // Whether completed projects should be hidden when rendering the tree.
+    private static bool SkipCompletedSetting => FluffyResearchTreeMod.instance?.Settings?.SkipCompleted ?? false;
 
-    // 根据“隐藏已完成”判断某个节点是否应被跳过（仅在绘制阶段使用，不影响布局）
+    // Check whether a node should be hidden while the "skip completed" option is active.
     private static bool NodeHiddenBySkipCompleted(Node node)
     {
-        if (!SkipCompletedSetting) return false;
-        if (node is ResearchNode rn && rn.Research != null)
+        if (!SkipCompletedSetting)
         {
-            // vanilla: ResearchProjectDef 有 IsFinished 属性；若个别分支无此属性，可退化用 ResearchManager 判定
-            return rn.Research.IsFinished;
+            return false;
         }
-        return false;
+
+        return node is ResearchNode researchNode && researchNode.Research != null && researchNode.Research.IsFinished;
     }
 
-    // 找到从某个端点出发，沿着 dummy 节点一路走到最近的真实研究节点。
-    // backward=true 走 In 方向；false 走 Out 方向。
+    // Walk along dummy nodes until the next research node is encountered.
     private static ResearchNode FindRealResearchEndpoint(Node n, bool backward)
     {
-        var cur = n;
-        int guard = 256; // 防御循环
-        while (cur != null && !(cur is ResearchNode) && guard-- > 0)
+        var current = n;
+        var guard = DummyTraversalGuard;
+
+        while (current is not ResearchNode && guard-- > 0)
         {
-            if (backward)
-                cur = (cur.InEdges != null && cur.InEdges.Count > 0) ? cur.InEdges[0].In : null;
-            else
-                cur = (cur.OutEdges != null && cur.OutEdges.Count > 0) ? cur.OutEdges[0].Out : null;
+            var edges = backward ? current?.InEdges : current?.OutEdges;
+            if (edges.NullOrEmpty())
+            {
+                return null;
+            }
+
+            current = backward ? edges[0].In : edges[0].Out;
         }
-        return cur as ResearchNode;
+
+        return current as ResearchNode;
     }
 
-    // 只要“隐藏已完成”开启，且这条小边所在链的两端任一真实研究节点已完成，就隐藏整条链
+    // Hide edge chains that connect two completed research nodes when the skip setting is active.
     private static bool EdgeHiddenBySkipCompleted<TIn, TOut>(Edge<TIn, TOut> e)
         where TIn : Node where TOut : Node
     {
-        if (!(FluffyResearchTreeMod.instance?.Settings?.SkipCompleted ?? false)) return false;
+        if (!SkipCompletedSetting)
+        {
+            return false;
+        }
 
         var left = FindRealResearchEndpoint(e.In, backward: true);
         var right = FindRealResearchEndpoint(e.Out, backward: false);
 
-        bool leftDone = left != null && left.Research != null && left.Research.IsFinished;
-        bool rightDone = right != null && right.Research != null && right.Research.IsFinished;
+        var leftDone = left?.Research?.IsFinished ?? false;
+        var rightDone = right?.Research?.IsFinished ?? false;
 
         return leftDone || rightDone;
     }
@@ -295,7 +316,7 @@ public static class Tree
             "Fluffy.ResearchTree.PreparingTree.Setup");
         QueueProfiledLongEvent(normalizeEdges, $"{InitializePerformancePrefix}NormalizeEdges",
             "Fluffy.ResearchTree.PreparingTree.Setup");
-        // 新增：构建桶与边缓存
+        // Build buckets and edge caches before running layout optimizations.
         QueueProfiledLongEvent(BuildBuckets, $"{InitializePerformancePrefix}BuildBuckets",
             "Fluffy.ResearchTree.PreparingTree.Setup");
         QueueProfiledLongEvent(collapse, $"{InitializePerformancePrefix}Collapse",
@@ -325,64 +346,83 @@ public static class Tree
         _reopenResearchTabAfterInit = true;
     }
 
-    // 构建分层桶与分层边缓存。只依赖 Node.X / Node.InEdges / Node.OutEdges（Y 会在后续不断变化不要紧）
+    // Build per-layer caches for nodes and edges using the current horizontal layout.
     private static void BuildBuckets()
     {
-        // 以 Nodes 当前的最大层号为准（更稳妥，不依赖 Size.x 何时被设置）
-        int L = 0;
-        if (!Nodes.NullOrEmpty()) L = Nodes.Max(n => n.X);
-
-        LayerBuckets = new List<Node>[L + 1];
-        InEdgesPerLayer = new List<Edge<Node, Node>>[L + 1];
-        OutEdgesPerLayer = new List<Edge<Node, Node>>[L + 1];
-
-        for (int x = 0; x <= L; x++)
+        // Use the maximum current layer index (safer than relying on Size.x).
+        int maxLayer = 0;
+        if (!Nodes.NullOrEmpty())
         {
-            LayerBuckets[x] = new List<Node>(64);
-            InEdgesPerLayer[x] = new List<Edge<Node, Node>>(64);
-            OutEdgesPerLayer[x] = new List<Edge<Node, Node>>(64);
+            maxLayer = Nodes.Max(n => n.X);
         }
 
-        // 填充层桶
+        _layerBuckets = new List<Node>[maxLayer + 1];
+        _inEdgesPerLayer = new List<Edge<Node, Node>>[maxLayer + 1];
+        _outEdgesPerLayer = new List<Edge<Node, Node>>[maxLayer + 1];
+
+        for (int x = 0; x <= maxLayer; x++)
+        {
+            _layerBuckets[x] = new List<Node>(64);
+            _inEdgesPerLayer[x] = new List<Edge<Node, Node>>(64);
+            _outEdgesPerLayer[x] = new List<Edge<Node, Node>>(64);
+        }
+
+        // Populate layer buckets.
         foreach (var n in Nodes)
         {
-            if (n.X >= 0 && n.X <= L) LayerBuckets[n.X].Add(n);
-        }
-
-        // 预收集每层的 in/out 边（集合成员固定，Y 后续可变）
-        for (int x = 0; x <= L; x++)
-        {
-            var bucket = LayerBuckets[x];
-            if (bucket.Count == 0) continue;
-
-            foreach (var node in bucket)
+            if (n.X >= 0 && n.X <= maxLayer)
             {
-                if (!node.InEdges.NullOrEmpty()) InEdgesPerLayer[x].AddRange(node.InEdges);
-                if (!node.OutEdges.NullOrEmpty()) OutEdgesPerLayer[x].AddRange(node.OutEdges);
+                _layerBuckets[n.X].Add(n);
             }
         }
 
-        // 规范每层的 Y 顺序并建立槽位表
-        LayerSlots = new Node[LayerBuckets.Length][];
-        for (int x = 0; x < LayerBuckets.Length; x++)
+        // Cache inbound and outbound edges per layer (Y positions can change later).
+        for (int x = 0; x <= maxLayer; x++)
         {
-            var bucket = LayerBuckets[x];
+            var bucket = _layerBuckets[x];
+            if (bucket.Count == 0)
+            {
+                continue;
+            }
+
+            foreach (var node in bucket)
+            {
+                if (!node.InEdges.NullOrEmpty())
+                {
+                    _inEdgesPerLayer[x].AddRange(node.InEdges);
+                }
+
+                if (!node.OutEdges.NullOrEmpty())
+                {
+                    _outEdgesPerLayer[x].AddRange(node.OutEdges);
+                }
+            }
+        }
+
+        // Normalize the Y ordering within each layer and build the slot lookup table.
+        _layerSlots = new Node[_layerBuckets.Length][];
+        for (int x = 0; x < _layerBuckets.Length; x++)
+        {
+            var bucket = _layerBuckets[x];
             if (bucket == null || bucket.Count == 0)
             {
-                LayerSlots[x] = Array.Empty<Node>();
+                _layerSlots[x] = Array.Empty<Node>();
                 continue;
             }
 
             bucket.Sort((a, b) => a.Y.CompareTo(b.Y));
-            for (int i = 0; i < bucket.Count; i++) bucket[i].Y = i + 1;
+            for (int i = 0; i < bucket.Count; i++)
+            {
+                bucket[i].Y = i + 1;
+            }
 
-            LayerSlots[x] = bucket.ToArray(); // 与 LayerBuckets 保持同序
+            _layerSlots[x] = bucket.ToArray();
         }
     }
 
     private static void removeEmptyRows()
     {
-        // 1) 统计最大行号（若 Size.z 不可靠，用 Nodes.Max 兜底）
+        // Determine the highest populated row, falling back to the nodes if Size.z is stale.
         int maxY = Size.z > 0
             ? Size.z
             : (Nodes.Count == 0 ? 0 : Nodes.Max(n => n.Y));
@@ -393,7 +433,7 @@ public static class Tree
             return;
         }
 
-        // 2) 标记占用行
+        // Track which rows are actually used.
         var used = new bool[maxY + 1];
         foreach (var n in Nodes)
         {
@@ -401,7 +441,7 @@ public static class Tree
             if ((uint)y <= (uint)maxY) used[y] = true;
         }
 
-        // 3) 构建 oldY -> newY 压缩映射
+        // Build an oldY -> newY compression map.
         var map = new int[maxY + 1];
         int next = 0;
         for (int y = 1; y <= maxY; y++)
@@ -409,62 +449,61 @@ public static class Tree
             if (used[y]) { next++; map[y] = next; }
         }
 
-        // 4) 一次性重写所有节点 Y
+        // Re-assign node Y positions using the compression map.
         foreach (var n in Nodes)
         {
             int y = n.Y;
             if ((uint)y <= (uint)maxY && used[y]) n.Y = map[y];
         }
 
-        // 5) 更新 Size.z
+        // Update Size.z to the new row count.
         Size = new IntVec2(Size.x, next);
 
-        // 6) 若已建立分层缓存，则按新 Y 重新排序并同步
-        if (LayerBuckets != null)
+        // Synchronize caches with the new Y ordering.
+        if (_layerBuckets != null)
         {
-            for (int x = 0; x < LayerBuckets.Length; x++)
+            for (int x = 0; x < _layerBuckets.Length; x++)
             {
-                var bucket = LayerBuckets[x];
+                var bucket = _layerBuckets[x];
                 if (bucket == null || bucket.Count == 0) continue;
                 bucket.Sort((a, b) => a.Y.CompareTo(b.Y));
                 for (int i = 0; i < bucket.Count; i++) bucket[i].Y = i + 1;
             }
         }
-        if (LayerSlots != null && LayerBuckets != null)
+        if (_layerSlots != null && _layerBuckets != null)
         {
-            LayerSlots = new Node[LayerBuckets.Length][];
-            for (int x = 0; x < LayerBuckets.Length; x++)
-                LayerSlots[x] = (LayerBuckets[x] == null) ? Array.Empty<Node>() : LayerBuckets[x].ToArray();
+            _layerSlots = new Node[_layerBuckets.Length][];
+            for (int x = 0; x < _layerBuckets.Length; x++)
+                _layerSlots[x] = (_layerBuckets[x] == null) ? Array.Empty<Node>() : _layerBuckets[x].ToArray();
         }
     }
 
-    // 将某一层的顺序一次性替换为 newOrder，保持所有缓存一致
+    // Replace the ordering of a layer with a new sequence and keep caches in sync.
     private static void ApplyLayerOrder(int l, Node[] newOrder)
     {
-        // 1) 更新 LayerSlots
-        if (LayerSlots == null || (uint)l >= (uint)LayerSlots.Length)
+        // Update the slot cache first.
+        if (_layerSlots == null || (uint)l >= (uint)_layerSlots.Length)
             return;
 
-        LayerSlots[l] = newOrder;
+        _layerSlots[l] = newOrder;
 
-        // 2) 更新 LayerBuckets
-        if (LayerBuckets != null && (uint)l < (uint)LayerBuckets.Length)
+        // Mirror the change to the bucket cache.
+        if (_layerBuckets != null && (uint)l < (uint)_layerBuckets.Length)
         {
-            var bucket = LayerBuckets[l];
+            var bucket = _layerBuckets[l];
             bucket.Clear();
             bucket.AddRange(newOrder);
         }
 
-        // 3) 规范化 Y = 1..Count
+        // Normalize Y so nodes remain 1..Count within the layer.
         for (int i = 0; i < newOrder.Length; i++)
             newOrder[i].Y = i + 1;
     }
 
-    // 计算层 l 上每个节点的重心key（@in=true: 用 InEdges.In.Y；否则用 OutEdges.Out.Y）
-    // 返回和 LayerSlots[l] 等长的 key 数组
+    // Compute barycenter keys for layer l using inbound or outbound edges.
     private static float[] ComputeBarycenterKeys(int l, bool @in)
     {
-        var slots = LayerSlots;
+        var slots = _layerSlots;
         var arr = (slots != null && (uint)l < (uint)slots.Length) ? slots[l] : null;
         if (arr == null || arr.Length == 0) return Array.Empty<float>();
 
@@ -478,7 +517,7 @@ public static class Tree
                 var eList = n.InEdges;
                 if (eList == null || eList.Count == 0)
                 {
-                    keys[i] = n.Y; // 无邻居，保持原地
+                    keys[i] = n.Y; // No neighbours, keep the original position.
                     continue;
                 }
 
@@ -510,11 +549,11 @@ public static class Tree
 
     private static long TotalEdgeLength_Int(bool @in)
     {
-        if (LayerSlots == null || LayerSlots.Length == 0) return 0;
+        if (_layerSlots == null || _layerSlots.Length == 0) return 0;
         long sum = 0;
-        for (int l = 0; l < LayerSlots.Length; l++)
+        for (int l = 0; l < _layerSlots.Length; l++)
         {
-            // EdgeLength(l,@in) 返回 float（由 |int-int| 累加而来），这里用四舍五入转 long
+            // EdgeLength returns a float accumulated from integer differences; round to long for totals.
             sum += (long)Math.Round(EdgeLength(l, @in));
         }
         return sum;
@@ -523,31 +562,31 @@ public static class Tree
 
     private static void minimizeEdgeLength()
     {
-        // ====== 可调参数======
-        const int MAX_PAIR_ITERS = 12;   // 最多做多少“对”（= 2*此值 次 Local）
-        const int MIN_PAIR_ITERS = 2;    // 至少做多少“对”，避免过早停
-        const double PAIR_REL_EPS = 0.04; // 每对相对收益阈值（4%）；更快停可设 0.06~0.08
-        const int PAIR_ABS_EPS = 600;  // 每对绝对收益阈值（单位：Y 差总和）
-        const double TARGET_CUM_REL = 0.65; // 累计相对收益达到 65% 即停；更快停可设 0.5~0.6
+        // Tunable parameters.
+        const int MAX_PAIR_ITERS = 12;   // Maximum number of iteration pairs (two local sweeps each).
+        const int MIN_PAIR_ITERS = 2;    // Minimum number of pairs before early stopping is considered.
+        const double PAIR_REL_EPS = 0.04; // Threshold for per-pair relative improvement.
+        const int PAIR_ABS_EPS = 600;  // Threshold for per-pair absolute improvement in total Y distance.
+        const double TARGET_CUM_REL = 0.65; // Stop once cumulative relative gain reaches this value.
 
-        // “收益稳定”（平台期）检测：最近 N 对的相对收益波动很小则停
-        const int PLATEAU_SPAN = 3;    // 检测窗口（对数）
-        const double PLATEAU_DELTA = 0.05; // 波动阈值（5% 相对波动）
+        // Plateau detection: stop when relative gain stabilizes across the last N pairs.
+        const int PLATEAU_SPAN = 3;    // Number of recent pairs to sample.
+        const double PLATEAU_DELTA = 0.05; // Maximum relative fluctuation allowed within the window.
 
-        // ====== 运行时统计 ======
+        // Runtime metrics.
         var sw = new Stopwatch();
         long localMs = 0;
-        double cumRel = 0.0;               // 累计相对收益（相对于每对开始前的 denom 累加）
+        double cumRel = 0.0;               // Cumulative relative improvement.
         var lastPairRels = new Queue<double>(PLATEAU_SPAN);
 
         for (int pair = 0; pair < MAX_PAIR_ITERS; pair++)
         {
-            // 以当前状态计算“对”的分母：in + out 的总边长（避免某一侧权重过低）
+            // Compute the denominator: the sum of inbound and outbound edge lengths.
             long denomIn = TotalEdgeLength_Int(@in: true);
             long denomOut = TotalEdgeLength_Int(@in: false);
-            long denom = Math.Max(1, denomIn + denomOut); // 防御
+            long denom = Math.Max(1, denomIn + denomOut); // Guard against division by zero.
 
-            // 执行一“对”：先 in，再 out（与你现有 iter 约定保持一致：偶数 in，奇数 out）
+            // Execute a pair of sweeps: even iterations use inbound edges, odd iterations outbound.
             int gainIn, gainOut;
 
             sw.Restart();
@@ -557,21 +596,21 @@ public static class Tree
 
             localMs += sw.ElapsedMilliseconds;
 
-            int pairGain = gainIn + gainOut;           // 这“一对”的真实收益
-            double pairRel = (double)pairGain / denom;   // 这“一对”的相对收益
+            int pairGain = gainIn + gainOut;           // Absolute gain from this pair.
+            double pairRel = (double)pairGain / denom;   // Relative gain from this pair.
 
             Logging.Message($"[Profile] EdgeLengthSweep_Local pair={pair} took {sw.ElapsedMilliseconds} ms, " +
                             $"gainIn={gainIn}, gainOut={gainOut}, pairGain={pairGain}, pairRel={pairRel:P2}");
 
-            // 累计相对收益
+            // Track cumulative improvement.
             cumRel += pairRel;
 
-            // ---- 是否满足早停条件 ----
+            // Evaluate early stopping conditions.
             bool stopByPairRel = pair >= MIN_PAIR_ITERS && pairRel < PAIR_REL_EPS;
             bool stopByPairAbs = pair >= MIN_PAIR_ITERS && pairGain < PAIR_ABS_EPS;
             bool stopByTarget = cumRel >= TARGET_CUM_REL;
 
-            // 平台期检测：最近 N 对的相对收益波动是否很小
+            // Check whether the recent gains have plateaued.
             bool stopByPlateau = false;
             if (PLATEAU_SPAN > 1)
             {
@@ -582,7 +621,7 @@ public static class Tree
                 {
                     double min = double.MaxValue, max = double.MinValue;
                     foreach (var r in lastPairRels) { if (r < min) min = r; if (r > max) max = r; }
-                    // 以窗口内均值为基准的相对波动
+                    // Relative fluctuation compared to the window mean.
                     double mean = 0.0; foreach (var r in lastPairRels) mean += r; mean /= PLATEAU_SPAN;
                     if (mean > 0 && (max - min) / mean < PLATEAU_DELTA && pair >= MIN_PAIR_ITERS)
                         stopByPlateau = true;
@@ -610,19 +649,19 @@ public static class Tree
 
     private static void EdgeLengthSweep_Global()
     {
-        if (LayerSlots == null || LayerSlots.Length == 0) return;
+        if (_layerSlots == null || _layerSlots.Length == 0) return;
 
-        //左右各 2 轮（可调小/大）
+        // Run a few left-to-right and right-to-left passes.
         const int ROUNDS = 2;
 
         for (int round = 0; round < ROUNDS; round++)
         {
-            // 左->右：用 InEdges（上一层对当前层）
-            for (int l = 0; l < LayerSlots.Length; l++)
+            // Left to right: use inbound edges from the previous layer.
+            for (int l = 0; l < _layerSlots.Length; l++)
                 EdgeLengthSweep_Global_Layer(l, @in: true);
 
-            // 右->左：用 OutEdges（当前层对下一层）
-            for (int l = LayerSlots.Length - 1; l >= 0; l--)
+            // Right to left: use outbound edges toward the next layer.
+            for (int l = _layerSlots.Length - 1; l >= 0; l--)
                 EdgeLengthSweep_Global_Layer(l, @in: false);
         }
     }
@@ -633,46 +672,45 @@ public static class Tree
         bool useIn = (iter & 1) == 0;
 
         totalGain = 0;
-        if (LayerSlots == null || LayerSlots.Length == 0)
+        if (_layerSlots == null || _layerSlots.Length == 0)
             return false;
 
         bool improvedAny = false;
-        for (int l = 0; l < LayerSlots.Length; l++)
+        for (int l = 0; l < _layerSlots.Length; l++)
         {
-            var arr = LayerSlots[l];
+            var arr = _layerSlots[l];
             if (arr == null || arr.Length < 2) continue;
 
             int layerGain;
             if (EdgeLengthSweep_Local_Layer(l, useIn, out layerGain))
             {
                 improvedAny = true;
-                totalGain += layerGain;   // 真实收益累加
+                totalGain += layerGain;   // Accumulate actual gain for this layer.
             }
         }
         return improvedAny;
     }
 
 
-    // 用重心排序为层 l 重排；@in=true 表示使用 (l-1)->l 的邻居计算key，反之用 l->(l+1)
+    // Reorder layer l using barycentric sorting. Inbound edges use the previous layer; outbound use the next.
     private static void EdgeLengthSweep_Global_Layer(int l, bool @in)
     {
-        var slots = LayerSlots;
+        var slots = _layerSlots;
         if (slots == null || (uint)l >= (uint)slots.Length) return;
         var arr = slots[l];
         if (arr == null || arr.Length < 2) return;
 
-        // 1) 计算 key
+        // 1) Calculate barycentric keys.
         var keys = ComputeBarycenterKeys(l, @in);
 
-        // 2) 拷贝当前顺序作为基线与候选
+        // 2) Clone the current ordering as baseline and candidate arrays.
         var baseOrder = (Node[])arr.Clone();
         var candOrder = (Node[])arr.Clone();
 
-        // 3) 稳定排序（key 小的在前；key 相等按原顺序保证稳定）
-        //    为了稳定，我们比较 key，再比较原索引
+        // 3) Stable sort by key, falling back to the original index for ties.
         Array.Sort(candOrder, (a, b) =>
         {
-            // 取原索引（在 baseOrder 中的位置）
+            // Determine original indices within baseOrder.
             int ia = Array.IndexOf(baseOrder, a);
             int ib = Array.IndexOf(baseOrder, b);
 
@@ -684,21 +722,19 @@ public static class Tree
             return ia.CompareTo(ib);
         });
 
-        // 4)不让交叉数变差（可以关掉这段以更激进地收短边）
+        // 4) Only keep the new order if it does not increase crossings.
         int beforeCross = Crossings(l);
         ApplyLayerOrder(l, candOrder);
         int afterCross = Crossings(l);
         if (afterCross > beforeCross)
         {
-            // 回滚
+            // Roll back to the baseline order.
             ApplyLayerOrder(l, baseOrder);
         }
     }
 
-    // 仅针对相邻交换(A,Y=a)与(B,Y=b)计算边长变化：
-    // @in=true  使用 A.InEdges/B.InEdges 与其来源节点 Y；
-    // @in=false 使用 A.OutEdges/B.OutEdges 与其目标节点 Y。
-    // 返回 after - before（负数代表更好）
+    // Calculate edge-length delta for swapping adjacent nodes A (Y=a) and B (Y=b).
+    // @in=true uses inbound edges, otherwise outbound edges. Returns after - before (negative is better).
     private static int DeltaEdgeLengthForAdjacentSwap(Node A, Node B, bool @in)
     {
         int aY = A.Y;
@@ -715,7 +751,7 @@ public static class Tree
                 {
                     int y = eA[k].In.Y;
                     before += Math.Abs(y - aY);
-                    after += Math.Abs(y - bY);   // A 换到 bY
+                    after += Math.Abs(y - bY);   // A moves to B's Y.
                 }
             }
 
@@ -726,7 +762,7 @@ public static class Tree
                 {
                     int y = eB[k].In.Y;
                     before += Math.Abs(y - bY);
-                    after += Math.Abs(y - aY);   // B 换到 aY
+                    after += Math.Abs(y - aY);   // B moves to A's Y.
                 }
             }
         }
@@ -762,13 +798,13 @@ public static class Tree
     {
         layerGain = 0;
 
-        var slots = LayerSlots;
+        var slots = _layerSlots;
         if (slots == null || (uint)l >= (uint)slots.Length) return false;
         var arr = slots[l];
         if (arr == null || arr.Length < 2) return false;
 
         bool improvedLayer = false;
-        const int PASSES = 1; // 如需更强可设为 2
+        const int PASSES = 1; // Increase for more aggressive swapping.
 
         for (int pass = 0; pass < PASSES; pass++)
         {
@@ -778,13 +814,13 @@ public static class Tree
                 var B = arr[i + 1];
 
                 int delta = DeltaEdgeLengthForAdjacentSwap(A, B, @in); // after - before
-                if (delta < 0) // 交换后更短
+                if (delta < 0) // Negative delta means the swap shortens edges.
                 {
-                    trySwap(A, B);              // 同步 LayerSlots/LayerBuckets 和 A.Y/B.Y
+                    trySwap(A, B);              // Keep caches and node positions synchronized.
                     improvedLayer = true;
-                    layerGain += -delta;     // 真实收益累加（before - after）
+                    layerGain += -delta;     // Accumulate the actual improvement (before - after).
 
-                    if (i > 0) i--;             // 冒泡推进
+                    if (i > 0) i--;             // Step back so the new pair is reconsidered.
                 }
             }
         }
@@ -994,7 +1030,7 @@ public static class Tree
 
     private static ResearchTabDef TryGetProjectTab(ResearchProjectDef def)
     {
-        // 兼容不同字段名：tab / researchTab
+        // Support mods that expose either "tab" or "researchTab" fields.
         var f = AccessTools.Field(typeof(ResearchProjectDef), "tab")
                 ?? AccessTools.Field(typeof(ResearchProjectDef), "researchTab");
         return f?.GetValue(def) as ResearchTabDef;
@@ -1004,7 +1040,7 @@ public static class Tree
     {
         NoTabsSelected = false;
 
-        // Filter Anomaly DLC research（你原有前两段保持）
+        // Filter out Anomaly DLC research projects.
         var allDefsListForReading =
             DefDatabase<ResearchProjectDef>.AllDefsListForReading.Where(def => def.knowledgeCategory == null).ToArray();
         var hidden = allDefsListForReading.Where(p => p.prerequisites?.Contains(p) ?? false);
@@ -1012,11 +1048,11 @@ public static class Tree
         var baseResearchList = allDefsListForReading.Except(hidden).Except(second).ToList();
         var researchList = baseResearchList;
 
-        // ===== 按来源（ResearchTabDef）过滤 =====
+        // Filter by ResearchTabDef origin.
         var st = FluffyResearchTreeMod.instance?.Settings;
         if (st != null)
         {
-            st.EnsureTabCache(); // 用于处理中途增/减 mod 的 tab 集合  :contentReference[oaicite:2]{index=2}
+            st.EnsureTabCache(); // Keep the tab cache up-to-date when mods change mid-run.
 
             var hasSelection = st.IncludedTabs != null && st.IncludedTabs.Count > 0;
             var hasKnownTabs = st.AllTabsCache != null && st.AllTabsCache.Count > 0;
@@ -1036,7 +1072,7 @@ public static class Tree
                 foreach (var def in baseResearchList)
                 {
                     var tab = TryGetProjectTab(def);
-                    // 若取不到 Tab，保守地不做项目级过滤（避免误杀）
+                    // If no tab can be resolved, skip filtering to avoid removing the project.
                     if (tab == null || st.TabIncluded(tab))
                     {
                         includedDefs.Add(def);
@@ -1084,7 +1120,7 @@ public static class Tree
             }
         }
 
-        // —— 并行创建节点 —— //
+        // Create nodes in parallel.
         _nodes = [];
         Assets.TotalAmountOfResearch = researchList.Count;
 
@@ -1099,24 +1135,22 @@ public static class Tree
         });
     }
 
-    // Tree.cs 里（Tree 类内）新增：
+    // Request a tree rebuild from inside Tree.cs.
     public static void RequestRebuild(bool resetZoom = true, bool reopenResearchTab = false)
     {
-        // 1) 关闭刷新标志（避免重复重建），并重置所有缓存&尺寸
+        // Reset refresh flags and cached state.
         Assets.RefreshResearch = false;
 
         _reopenResearchTabAfterInit = reopenResearchTab;
 
-        // Reset() 已负责：Size/_nodes/_edges/缓存清空、窗口脏标记，
-        // 且在“后台模式”会自动 QueueLongEvent(Initialize, ...)，非后台不会。
+        // Reset clears caches, sizes, and marks the windows dirty. In background mode it also queues Initialize.
         Reset(alsoZoom: resetZoom);
 
-        // 2) 非后台模式：立即初始化；后台模式：Reset 已经排队了 Initialize
+        // Foreground mode rebuilds immediately; background mode already queued Initialize via Reset.
         var st = FluffyResearchTreeMod.instance?.Settings;
         if (st == null || st.LoadType != Constants.LoadTypeLoadInBackground)
         {
-            Initialize(); // 立刻按现有管线重建
-                          // 非后台分支里，Initialize 自己会 Queue Notify_TreeInitialized（你现有实现已包含）
+            Initialize();
         }
         else
         {
@@ -1125,7 +1159,7 @@ public static class Tree
                 "Fluffy.ResearchTree.RestoreQueue",
                 false, null
             );
-            // 后台模式：Reset() 只排了 Initialize，这里再排一个“初始化完成后的通知”，保证窗口收到
+            // In background mode we need to enqueue the notification separately.
             LongEventHandler.QueueLongEvent(
                 MainTabWindow_ResearchTree.Instance.Notify_TreeInitialized,
                 "Fluffy.ResearchTree.RestoreQueue",
@@ -1133,10 +1167,10 @@ public static class Tree
             );
         }
 
-        // 3) 可选：重开研究面板（比如你是在对话框里点“重新生成”后希望直接看到新树）
+        // Optionally reopen the research tab after rebuilding.
         if (reopenResearchTab)
         {
-            // 如果当前没打开，打开研究页签；已经打开不会打断
+            // Toggle the tab if it is not currently visible.
             Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research);
         }
     }
@@ -1174,7 +1208,7 @@ public static class Tree
             drawTimer = Stopwatch.StartNew();
         }
 
-        // Draw tech levels（不受“隐藏已完成”影响）
+        // Draw tech levels (this is unaffected by the skip-completed filter).
         foreach (var relevantTechLevel in RelevantTechLevels)
         {
             drawTechLevel(relevantTechLevel, visibleRect);
@@ -1194,7 +1228,7 @@ public static class Tree
         if (canUseCulling)
         {
             collectVisibleEdges(minLayer, maxLayer);
-            foreach (var bucket in EdgeDrawBuckets)
+            foreach (var bucket in _edgeDrawBuckets)
             {
                 for (var i = 0; i < bucket.Count; i++)
                 {
@@ -1260,9 +1294,9 @@ public static class Tree
         var maxLayerCount = Size.x;
         if (maxLayerCount <= 0)
         {
-            if (LayerSlots != null && LayerSlots.Length > 0)
+            if (_layerSlots != null && _layerSlots.Length > 0)
             {
-                maxLayerCount = LayerSlots.Length - 1;
+                maxLayerCount = _layerSlots.Length - 1;
             }
             else if (!Nodes.NullOrEmpty())
             {
@@ -1294,11 +1328,11 @@ public static class Tree
             return maxRow;
         }
 
-        if (LayerSlots != null && LayerSlots.Length > 0)
+        if (_layerSlots != null && _layerSlots.Length > 0)
         {
-            for (var i = LayerSlots.Length - 1; i >= 0; i--)
+            for (var i = _layerSlots.Length - 1; i >= 0; i--)
             {
-                var column = LayerSlots[i];
+                var column = _layerSlots[i];
                 if (column == null || column.Length == 0)
                 {
                     continue;
@@ -1340,9 +1374,9 @@ public static class Tree
 
     private static void collectVisibleEdges(int minLayer, int maxLayer)
     {
-        for (var i = 0; i < EdgeDrawBuckets.Length; i++)
+        for (var i = 0; i < _edgeDrawBuckets.Length; i++)
         {
-            EdgeDrawBuckets[i].Clear();
+            _edgeDrawBuckets[i].Clear();
         }
 
         var edges = Edges;
@@ -1365,7 +1399,7 @@ public static class Tree
                 continue;
             }
 
-            EdgeDrawBuckets[edge.DrawOrder].Add(edge);
+            _edgeDrawBuckets[edge.DrawOrder].Add(edge);
         }
     }
 
@@ -1373,7 +1407,7 @@ public static class Tree
     {
         VisibleNodesBuffer.Clear();
 
-        if (LayerSlots == null || LayerSlots.Length == 0)
+        if (_layerSlots == null || _layerSlots.Length == 0)
         {
             var nodes = Nodes;
             foreach (var node in nodes)
@@ -1394,12 +1428,12 @@ public static class Tree
             return;
         }
 
-        var minIndex = Mathf.Clamp(minLayer, 0, LayerSlots.Length - 1);
-        var maxIndex = Mathf.Clamp(maxLayer, minIndex, LayerSlots.Length - 1);
+        var minIndex = Mathf.Clamp(minLayer, 0, _layerSlots.Length - 1);
+        var maxIndex = Mathf.Clamp(maxLayer, minIndex, _layerSlots.Length - 1);
 
         for (var layer = minIndex; layer <= maxIndex; layer++)
         {
-            var column = LayerSlots[layer];
+            var column = _layerSlots[layer];
             if (column == null || column.Length == 0)
             {
                 continue;
@@ -1460,32 +1494,32 @@ public static class Tree
     public static bool IsEdgeVisible<T1, T2>(Edge<T1, T2> edge, Rect visibleRect)
         where T1 : Node where T2 : Node
     {
-        // 适当外扩，减少边在视口边缘“忽隐忽现”
+        // Expand the viewport slightly to avoid flickering edges near the boundary.
         const float MARGIN = 100f;
         var rect = new Rect(
             visibleRect.xMin - MARGIN, visibleRect.yMin - MARGIN,
             visibleRect.width + 2 * MARGIN, visibleRect.height + 2 * MARGIN);
 
-        // 端点矩形（节点 Rect）有重叠——直接可见
+        // If either endpoint rectangle overlaps the expanded view, the edge is visible.
         if (edge.In.Rect.Overlaps(rect) || edge.Out.Rect.Overlaps(rect)) return true;
 
-        // 线段是否与矩形相交
+        // Otherwise test whether the line segment intersects the rectangle.
         var a = edge.In.Rect.center;
         var b = edge.Out.Rect.center;
         return LineIntersectsRect(a, b, rect);
 
         static bool LineIntersectsRect(Vector2 p1, Vector2 p2, Rect r)
         {
-            // 快速排除：整个线段在矩形外同一侧
+            // Quickly reject if the entire segment lies outside on the same side.
             if (p1.x < r.xMin && p2.x < r.xMin) return false;
             if (p1.x > r.xMax && p2.x > r.xMax) return false;
             if (p1.y < r.yMin && p2.y < r.yMin) return false;
             if (p1.y > r.yMax && p2.y > r.yMax) return false;
 
-            // 若任一端点在矩形内，也算相交
+            // If either endpoint is inside the rectangle, the segment intersects it.
             if (r.Contains(p1) || r.Contains(p2)) return true;
 
-            // 与矩形四条边是否相交
+            // Check for intersection with each rectangle edge.
             return SegmentsIntersect(p1, p2, new Vector2(r.xMin, r.yMin), new Vector2(r.xMax, r.yMin)) ||
                    SegmentsIntersect(p1, p2, new Vector2(r.xMax, r.yMin), new Vector2(r.xMax, r.yMax)) ||
                    SegmentsIntersect(p1, p2, new Vector2(r.xMax, r.yMax), new Vector2(r.xMin, r.yMax)) ||
@@ -1512,7 +1546,7 @@ public static class Tree
                 ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0)))
                 return true;
 
-            // 共线重叠（极少数情况），做包围盒判定
+            // Handle rare colinear overlap cases with bounding-box checks.
             bool OnColinear(Vector2 p, Vector2 q, Vector2 r) =>
                 Mathf.Min(p.x, q.x) <= r.x && r.x <= Mathf.Max(p.x, q.x) &&
                 Mathf.Min(p.y, q.y) <= r.y && r.y <= Mathf.Max(p.y, q.y);
@@ -1587,7 +1621,7 @@ public static class Tree
 
     private static Node nodeAt(int X, int Y)
     {
-        var slots = LayerSlots;
+        var slots = _layerSlots;
         if (slots != null && (uint)X < (uint)slots.Length)
         {
             var arr = slots[X];
@@ -1600,15 +1634,15 @@ public static class Tree
 
     private static void minimizeCrossings()
     {
-        // ====== 可调参数======
-        const int MAX_PASSES_BARY = 50;  // 与原版一致：最多尝试 50 次
+        // Tunable parameters.
+        const int MAX_PASSES_BARY = 50;  // Matches the original upper limit.
         const int MAX_PASSES_GREEDY = 50;
-        const int MIN_PASSES_BARY = 0;   // 如需更保守可设 2~3；0 表示与原版一致
+        const int MIN_PASSES_BARY = 0;   // Raise for a more conservative barycentric phase.
         const int MIN_PASSES_GREEDY = 0;
-        const int FAILS_QUOTA_BARY = 2;   // “出现过一次成功后，允许的失败次数”
-        const int FAILS_QUOTA_GREEDY = 2;   // “允许的失败次数”
+        const int FAILS_QUOTA_BARY = 2;   // Allowed failures after the first barycentric success.
+        const int FAILS_QUOTA_GREEDY = 2;   // Allowed failures for the greedy phase.
 
-        // ====== 预布局：保持原逻辑 ======
+        // Pre-layout: preserve the original ordering logic.
         Parallel.For(1, Size.x + 1, i =>
         {
             var list = (from n in layer(i)
@@ -1620,7 +1654,7 @@ public static class Tree
         var totalSw = new System.Diagnostics.Stopwatch();
         totalSw.Start();
 
-        // ====== Barymetric phase（语义等价于原：先要出现过 true，然后累计 2 次 false 即停）======
+        // Barycentric phase: require a success before counting failures toward the quota.
         var barySw = new System.Diagnostics.Stopwatch();
         int pass = 0;
         int baryFailsLeft = FAILS_QUOTA_BARY;
@@ -1636,7 +1670,7 @@ public static class Tree
 
             if (improved)
             {
-                if (!seenBarySuccess) seenBarySuccess = true; // 第一次成功后才开始计算失败额度
+                if (!seenBarySuccess) seenBarySuccess = true; // Start counting failures after the first success.
             }
             else
             {
@@ -1652,7 +1686,7 @@ public static class Tree
             }
         }
 
-        // ====== Greedy phase（语义等价于原：累计 2 次 false 即停）======
+        // Greedy phase: stop once the allowed number of failed passes is reached.
         var greedySw = new System.Diagnostics.Stopwatch();
         pass = 0;
         int greedyFailsLeft = FAILS_QUOTA_GREEDY;
@@ -1699,11 +1733,11 @@ public static class Tree
 
     private static void GreedySweep_Layer(int l)
     {
-        // 快速退出
+        // Quick exit if no crossings exist.
         int best = Crossings(l);
         if (best == 0) return;
 
-        var slots = LayerSlots;
+        var slots = _layerSlots;
         if (slots == null || (uint)l >= (uint)slots.Length) return;
         var arr = slots[l];
         if (arr == null || arr.Length < 2) return;
@@ -1712,7 +1746,7 @@ public static class Tree
         while (improved)
         {
             improved = false;
-            // 仅对相邻对 (i, i+1) 进行尝试
+            // Only test adjacent pairs (i, i + 1).
             for (int i = 0; i < arr.Length - 1; i++)
             {
                 var A = arr[i];
@@ -1724,11 +1758,11 @@ public static class Tree
                 {
                     best = cur;
                     improved = true;
-                    // 注意：arr 已与 LayerSlots[l] 同引用，swap 后 arr[i]/arr[i+1] 也已更新
+                    // arr references _layerSlots[l], so swapping updates the shared data.
                 }
                 else
                 {
-                    // 恢复
+                    // Revert the swap when it doesn't help.
                     trySwap(B, A);
                 }
             }
@@ -1748,23 +1782,23 @@ public static class Tree
         int ia = A.Y - 1;
         int ib = B.Y - 1;
 
-        // 交换槽位数组
-        if (LayerSlots != null && (uint)l < (uint)LayerSlots.Length)
+        // Swap entries in the slot cache.
+        if (_layerSlots != null && (uint)l < (uint)_layerSlots.Length)
         {
-            var arr = LayerSlots[l];
+            var arr = _layerSlots[l];
             if (arr != null && (uint)ia < (uint)arr.Length && (uint)ib < (uint)arr.Length)
                 (arr[ia], arr[ib]) = (arr[ib], arr[ia]);
         }
 
-        // 交换 LayerBuckets 中对应位置，保持 layer(l, true) 返回列表的顺序一致
-        if (LayerBuckets != null && (uint)l < (uint)LayerBuckets.Length)
+        // Mirror the swap in the bucket cache to keep ordering consistent.
+        if (_layerBuckets != null && (uint)l < (uint)_layerBuckets.Length)
         {
-            var bucket = LayerBuckets[l];
+            var bucket = _layerBuckets[l];
             if (bucket != null && (uint)ia < (uint)bucket.Count && (uint)ib < (uint)bucket.Count)
                 (bucket[ia], bucket[ib]) = (bucket[ib], bucket[ia]);
         }
 
-        // 交换两个节点的 Y 值
+        // Swap the Y coordinates on the nodes themselves.
         (A.Y, B.Y) = (B.Y, A.Y);
         return true;
     }
@@ -1870,7 +1904,7 @@ public static class Tree
         return Crossings(layer, true) + Crossings(layer, false);
     }
 
-    // ---- Tree 类中新加：Fenwick 和通用逆序数统计 ----
+    // Fenwick tree and inversion-counting helpers for crossing detection.
     private sealed class Fenwick
     {
         private readonly int[] bit;
@@ -1890,7 +1924,7 @@ public static class Tree
     private static int CountInversions(int[] arr)
     {
         if (arr.Length < 2) return 0;
-        // 坐标压缩
+        // Coordinate compression.
         var uniq = arr.Distinct().ToList();
         uniq.Sort();
         var index = new Dictionary<int, int>(uniq.Count);
@@ -1910,17 +1944,17 @@ public static class Tree
 
     private static int Crossings(int layer, bool @in)
     {
-        var slots = LayerSlots;
+        var slots = _layerSlots;
         if (slots == null || (uint)layer >= (uint)slots.Length) return 0;
         var arr = slots[layer];
         if (arr == null || arr.Length < 2) return 0;
 
-        // 收集“目标层”的 Y 序列（按源层 Y 升序）
-        // 预估容量：每节点 2 条边作为初值，避免频繁扩容
+        // Collect Y positions of neighbouring nodes in the target layer.
+        // Start with a generous capacity to avoid repeated growth.
         var targetY = new List<int>(arr.Length * 2);
         if (@in)
         {
-            // 统计 (layer-1) -> layer
+            // Gather edges from the previous layer.
             for (int yi = 0; yi < arr.Length; yi++)
             {
                 var n = arr[yi];
@@ -1931,7 +1965,7 @@ public static class Tree
         }
         else
         {
-            // 统计 layer -> (layer+1)
+            // Gather edges toward the next layer.
             for (int yi = 0; yi < arr.Length; yi++)
             {
                 var n = arr[yi];
@@ -1942,12 +1976,12 @@ public static class Tree
         }
 
         if (targetY.Count < 2) return 0;
-        return CountInversions(targetY.ToArray()); // 使用现有的 Fenwick 逆序数
+        return CountInversions(targetY.ToArray()); // Reuse the Fenwick-based inversion counter.
     }
 
     private static float EdgeLength(int layer, bool @in)
     {
-        var slots = LayerSlots;
+        var slots = _layerSlots;
         if (slots == null || (uint)layer >= (uint)slots.Length) return 0f;
         var arr = slots[layer];
         if (arr == null || arr.Length == 0) return 0f;
@@ -1980,10 +2014,10 @@ public static class Tree
 
     private static List<Node> layer(int depth, bool ordered = false)
     {
-        if (LayerBuckets != null && depth >= 0 && depth < LayerBuckets.Length)
-            return LayerBuckets[depth];
+        if (_layerBuckets != null && depth >= 0 && depth < _layerBuckets.Length)
+            return _layerBuckets[depth];
 
-        // 兜底：原实现
+        // Fallback to the original behaviour when caches are unavailable.
         if (!ordered || !OrderDirty)
             return Nodes.Where(n => n.X == depth).ToList();
 
