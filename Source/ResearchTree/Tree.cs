@@ -97,18 +97,37 @@ public static class Tree
 
         private Color EdgeColor => End?.EdgeColor ?? Color.white;
 
-        private static Vector2 AnchorLeft(Node node)
+        private static Vector2 AnchorLeft(Node node, Node other)
         {
             if (node is DummyNode)
             {
                 var center = node.Rect.center;
                 return new Vector2(center.x, center.y);
+            }
+
+            if (other != null)
+            {
+                var rect = node.Rect;
+                if (other.X < node.X - Constants.Epsilon)
+                {
+                    return new Vector2(rect.xMin, rect.center.y);
+                }
+
+                if (other.Yf > node.Yf + Constants.Epsilon)
+                {
+                    return new Vector2(rect.center.x, rect.yMax);
+                }
+
+                if (other.Yf < node.Yf - Constants.Epsilon)
+                {
+                    return new Vector2(rect.center.x, rect.yMin);
+                }
             }
 
             return node.Left;
         }
 
-        private static Vector2 AnchorRight(Node node)
+        private static Vector2 AnchorRight(Node node, Node other)
         {
             if (node is DummyNode)
             {
@@ -116,54 +135,99 @@ public static class Tree
                 return new Vector2(center.x, center.y);
             }
 
+            if (other != null)
+            {
+                var rect = node.Rect;
+                if (other.X > node.X + Constants.Epsilon)
+                {
+                    return new Vector2(rect.xMax, rect.center.y);
+                }
+
+                if (other.Yf > node.Yf + Constants.Epsilon)
+                {
+                    return new Vector2(rect.center.x, rect.yMax);
+                }
+
+                if (other.Yf < node.Yf - Constants.Epsilon)
+                {
+                    return new Vector2(rect.center.x, rect.yMin);
+                }
+            }
+
             return node.Right;
         }
 
-        private static void DrawSegment(Vector2 start, Vector2 end, Color color, bool drawHub)
+        private static float ColumnLeft(int column)
         {
-            if (Mathf.Abs(start.y - end.y) < Constants.Epsilon)
+            return (column - 1) * (Constants.NodeSize.x + Constants.NodeMargins.x);
+        }
+
+        private static float ColumnRight(int column)
+        {
+            return ColumnLeft(column) + Constants.NodeSize.x;
+        }
+
+        private static void DrawHorizontal(float y, float x1, float x2, Color color)
+        {
+            var width = Math.Abs(x2 - x1);
+            if (width <= Constants.Epsilon)
             {
-                var xMin = Math.Min(start.x, end.x);
-                var width = Math.Abs(end.x - start.x);
-                if (width > Constants.Epsilon)
-                {
-                    FastGUI.DrawTextureFast(new Rect(xMin, start.y - 2f, width, 4f), Assets.Lines.EW, color);
-                }
+                return;
+            }
+
+            FastGUI.DrawTextureFast(
+                new Rect(Math.Min(x1, x2), y - 2f, width, 4f),
+                Assets.Lines.EW,
+                color);
+        }
+
+        private static void DrawVertical(float x, float y1, float y2, Color color)
+        {
+            var height = Math.Abs(y2 - y1);
+            if (height <= Constants.Epsilon)
+            {
+                return;
+            }
+
+            var yMin = Math.Min(y1, y2);
+            FastGUI.DrawTextureFast(new Rect(x - 2f, yMin, 4f, height), Assets.Lines.NS, color);
+        }
+
+        private static void DrawSegment(Node from, Node to, Color color, bool drawHub)
+        {
+            var start = AnchorRight(from, to);
+            var end = AnchorLeft(to, from);
+
+            var horizontalSpan = Math.Abs(end.x - start.x);
+            var verticalSpan = Math.Abs(end.y - start.y);
+
+            if (verticalSpan <= Constants.Epsilon)
+            {
+                DrawHorizontal(start.y, start.x, end.x, color);
+            }
+            else if (horizontalSpan <= Constants.Epsilon)
+            {
+                DrawVertical(start.x, start.y, end.y, color);
             }
             else
             {
-                var horizontalSpan = Math.Abs(end.x - start.x);
-                var stub = Math.Min(Constants.NodeMargins.x / 4f, horizontalSpan / 2f);
-                var direction = Math.Sign(end.x - start.x);
-                if (Math.Abs(direction) < Constants.Epsilon)
+                float corridorX;
+                if (to.X > from.X)
                 {
-                    direction = 1;
+                    corridorX = ColumnRight(from.X) + (Constants.NodeMargins.x / 2f);
+                }
+                else if (to.X < from.X)
+                {
+                    corridorX = ColumnLeft(from.X) - (Constants.NodeMargins.x / 2f);
+                }
+                else
+                {
+                    corridorX = (start.x + end.x) / 2f;
                 }
 
-                if (stub > Constants.Epsilon)
-                {
-                    var stubEnd = start.x + (stub * direction);
-                    FastGUI.DrawTextureFast(
-                        new Rect(Math.Min(start.x, stubEnd), start.y - 2f, Math.Abs(stubEnd - start.x), 4f),
-                        Assets.Lines.EW,
-                        color);
-                    start = new Vector2(stubEnd, start.y);
-                }
-
-                var yMin = Math.Min(start.y, end.y);
-                var yMax = Math.Max(start.y, end.y);
-                if (yMax > yMin)
-                {
-                    FastGUI.DrawTextureFast(new Rect(start.x - 2f, yMin, 4f, yMax - yMin), Assets.Lines.NS, color);
-                }
-
-                var exitStart = new Vector2(start.x, end.y);
-                var exitWidth = Math.Abs(end.x - exitStart.x);
-                if (exitWidth > Constants.Epsilon)
-                {
-                    FastGUI.DrawTextureFast(
-                        new Rect(Math.Min(exitStart.x, end.x), end.y - 2f, exitWidth, 4f), Assets.Lines.EW, color);
-                }
+                DrawHorizontal(start.y, start.x, corridorX, color);
+                DrawVertical(corridorX, start.y, end.y, color);
+                DrawHorizontal(end.y, corridorX, end.x, color);
             }
 
             if (drawHub)
@@ -249,10 +313,8 @@ public static class Tree
             {
                 var from = nodes[i];
                 var to = nodes[i + 1];
-                var start = AnchorRight(from);
-                var end = AnchorLeft(to);
                 var drawHub = i == nodes.Count - 2;
-                DrawSegment(start, end, EdgeColor, drawHub);
+                DrawSegment(from, to, EdgeColor, drawHub);
             }
         }
 
