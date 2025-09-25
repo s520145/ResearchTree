@@ -51,13 +51,226 @@ public static class Tree
 
     private static readonly List<Node> VisibleNodesBuffer = new(256);
 
-    private static readonly List<Edge<Node, Node>>[] _edgeDrawBuckets =
+    private static readonly List<CollapsedEdge>[] _edgeDrawBuckets =
     {
-        new List<Edge<Node, Node>>(64),
-        new List<Edge<Node, Node>>(64),
-        new List<Edge<Node, Node>>(64),
-        new List<Edge<Node, Node>>(64)
+        new List<CollapsedEdge>(64),
+        new List<CollapsedEdge>(64),
+        new List<CollapsedEdge>(64),
+        new List<CollapsedEdge>(64)
     };
+
+    private static List<CollapsedEdge> _collapsedEdges;
+
+    private sealed class CollapsedEdge
+    {
+        private readonly List<DummyNode> _via;
+
+        public CollapsedEdge(Node start, Node end, List<DummyNode> via)
+        {
+            Start = start;
+            End = end;
+            _via = via ?? [];
+
+            MinLayer = Start?.X ?? 0;
+            MaxLayer = Start?.X ?? 0;
+
+            if (_via.Count > 0)
+            {
+                MinLayer = Math.Min(MinLayer, _via.Min(n => n.X));
+                MaxLayer = Math.Max(MaxLayer, _via.Max(n => n.X));
+            }
+
+            if (End != null)
+            {
+                MinLayer = Math.Min(MinLayer, End.X);
+                MaxLayer = Math.Max(MaxLayer, End.X);
+            }
+        }
+
+        public Node Start { get; }
+
+        public Node End { get; }
+
+        public int MinLayer { get; }
+
+        public int MaxLayer { get; }
+
+        private Color EdgeColor => End?.EdgeColor ?? Color.white;
+
+        private static Vector2 AnchorLeft(Node node)
+        {
+            if (node is DummyNode)
+            {
+                var center = node.Rect.center;
+                return new Vector2(center.x, center.y);
+            }
+
+            return node.Left;
+        }
+
+        private static Vector2 AnchorRight(Node node)
+        {
+            if (node is DummyNode)
+            {
+                var center = node.Rect.center;
+                return new Vector2(center.x, center.y);
+            }
+
+            return node.Right;
+        }
+
+        private static void DrawSegment(Vector2 start, Vector2 end, Color color, bool drawHub)
+        {
+            if (Mathf.Abs(start.y - end.y) < Constants.Epsilon)
+            {
+                var xMin = Math.Min(start.x, end.x);
+                var width = Math.Abs(end.x - start.x);
+                if (width > Constants.Epsilon)
+                {
+                    FastGUI.DrawTextureFast(new Rect(xMin, start.y - 2f, width, 4f), Assets.Lines.EW, color);
+                }
+            }
+            else
+            {
+                var horizontalSpan = Math.Abs(end.x - start.x);
+                var stub = Math.Min(Constants.NodeMargins.x / 4f, horizontalSpan / 2f);
+                var direction = Math.Sign(end.x - start.x);
+                if (Math.Abs(direction) < Constants.Epsilon)
+                {
+                    direction = 1f;
+                }
+
+                if (stub > Constants.Epsilon)
+                {
+                    var stubEnd = start.x + (stub * direction);
+                    FastGUI.DrawTextureFast(
+                        new Rect(Math.Min(start.x, stubEnd), start.y - 2f, Math.Abs(stubEnd - start.x), 4f),
+                        Assets.Lines.EW,
+                        color);
+                    start = new Vector2(stubEnd, start.y);
+                }
+
+                var yMin = Math.Min(start.y, end.y);
+                var yMax = Math.Max(start.y, end.y);
+                if (yMax > yMin)
+                {
+                    FastGUI.DrawTextureFast(new Rect(start.x - 2f, yMin, 4f, yMax - yMin), Assets.Lines.NS, color);
+                }
+
+                var exitStart = new Vector2(start.x, end.y);
+                var exitWidth = Math.Abs(end.x - exitStart.x);
+                if (exitWidth > Constants.Epsilon)
+                {
+                    FastGUI.DrawTextureFast(
+                        new Rect(Math.Min(exitStart.x, end.x), end.y - 2f, exitWidth, 4f), Assets.Lines.EW, color);
+                }
+            }
+
+            if (drawHub)
+            {
+                FastGUI.DrawTextureFast(
+                    new Rect(end.x - Constants.HubSize, end.y - 8f, Constants.HubSize, Constants.HubSize),
+                    Assets.Lines.End,
+                    color);
+            }
+        }
+
+        internal bool HiddenBySkipCompleted()
+        {
+            if (!SkipCompletedSetting)
+            {
+                return false;
+            }
+
+            var left = FindRealResearchEndpoint(Start, backward: true);
+            var right = FindRealResearchEndpoint(End, backward: false);
+
+            var leftDone = left?.Research?.IsFinished ?? false;
+            var rightDone = right?.Research?.IsFinished ?? false;
+
+            return leftDone || rightDone;
+        }
+
+        public int DrawOrder
+        {
+            get
+            {
+                if (End?.Highlighted == true)
+                {
+                    return 3;
+                }
+
+                if (End?.Completed == true)
+                {
+                    return 2;
+                }
+
+                return End?.Available == true ? 1 : 0;
+            }
+        }
+
+        public bool ShouldDraw(Rect visibleRect)
+        {
+            if (Start == null || End == null)
+            {
+                return false;
+            }
+
+            if (!Start.IsVisible || !End.IsVisible)
+            {
+                return false;
+            }
+
+            if (HiddenBySkipCompleted())
+            {
+                return false;
+            }
+
+            return IsEdgeVisible(visibleRect, Start.Rect, End.Rect);
+        }
+
+        public bool IntersectsLayers(int minLayer, int maxLayer)
+        {
+            return MaxLayer >= minLayer && MinLayer <= maxLayer;
+        }
+
+        public void Draw(Rect visibleRect)
+        {
+            if (!ShouldDraw(visibleRect) || Event.current.type != EventType.Repaint)
+            {
+                return;
+            }
+
+            var nodes = new List<Node>(_via.Count + 2) { Start };
+            nodes.AddRange(_via);
+            nodes.Add(End);
+
+            for (var i = 0; i < nodes.Count - 1; i++)
+            {
+                var from = nodes[i];
+                var to = nodes[i + 1];
+                var start = AnchorRight(from);
+                var end = AnchorLeft(to);
+                var drawHub = i == nodes.Count - 2;
+                DrawSegment(start, end, EdgeColor, drawHub);
+            }
+        }
+
+        public static CollapsedEdge FromTerminalEdge(Edge<Node, Node> edge)
+        {
+            var via = new List<DummyNode>();
+            var current = edge.In;
+            while (current is DummyNode dummy && dummy.InEdges.Count == 1)
+            {
+                via.Add(dummy);
+                current = dummy.InEdges[0].In;
+            }
+
+            via.Reverse();
+            var start = current ?? edge.In;
+            return new CollapsedEdge(start, edge.Out, via);
+        }
+    }
 
     private const float CullPadding = 120f;
     private const string InitializePerformancePrefix = "Tree.Initialize::";
@@ -233,6 +446,7 @@ public static class Tree
         Initialized = false;
         OrderDirty = false;
         FirstLoadDone = false;
+        _collapsedEdges = null;
         MainTabWindow_ResearchTree.InvalidateTreeRectCache();
         if (MainTabWindow_ResearchTree.Instance != null)
         {
@@ -289,6 +503,7 @@ public static class Tree
                 ProfiledStep($"{InitializePerformancePrefix}CreateEdges", createEdges);
                 ProfiledStep($"{InitializePerformancePrefix}HorizontalPositions", horizontalPositions);
                 ProfiledStep($"{InitializePerformancePrefix}NormalizeEdges", normalizeEdges);
+                ProfiledStep($"{InitializePerformancePrefix}BuildCollapsedEdges", BuildCollapsedEdges);
                 ProfiledStep($"{InitializePerformancePrefix}BuildBuckets", BuildBuckets);
                 ProfiledStep($"{InitializePerformancePrefix}Collapse", collapse);
                 ProfiledStep($"{InitializePerformancePrefix}MinimizeCrossings", minimizeCrossings);
@@ -315,6 +530,8 @@ public static class Tree
         QueueProfiledLongEvent(horizontalPositions, $"{InitializePerformancePrefix}HorizontalPositions",
             "Fluffy.ResearchTree.PreparingTree.Setup");
         QueueProfiledLongEvent(normalizeEdges, $"{InitializePerformancePrefix}NormalizeEdges",
+            "Fluffy.ResearchTree.PreparingTree.Setup");
+        QueueProfiledLongEvent(BuildCollapsedEdges, $"{InitializePerformancePrefix}BuildCollapsedEdges",
             "Fluffy.ResearchTree.PreparingTree.Setup");
         // Build buckets and edge caches before running layout optimizations.
         QueueProfiledLongEvent(BuildBuckets, $"{InitializePerformancePrefix}BuildBuckets",
@@ -903,6 +1120,45 @@ public static class Tree
         }
     }
 
+    private static void BuildCollapsedEdges()
+    {
+        _collapsedEdges ??= new List<CollapsedEdge>(Edges?.Count ?? 0);
+        _collapsedEdges.Clear();
+
+        if (Edges.NullOrEmpty())
+        {
+            return;
+        }
+
+        if (_collapsedEdges.Capacity < Edges.Count)
+        {
+            _collapsedEdges.Capacity = Edges.Count;
+        }
+
+        foreach (var node in Nodes)
+        {
+            if (node is not ResearchNode researchNode)
+            {
+                continue;
+            }
+
+            if (researchNode.InEdges.NullOrEmpty())
+            {
+                continue;
+            }
+
+            foreach (var edge in researchNode.InEdges)
+            {
+                if (edge == null || edge.Out != researchNode)
+                {
+                    continue;
+                }
+
+                _collapsedEdges.Add(CollapsedEdge.FromTerminalEdge(edge));
+            }
+        }
+    }
+
     private static void createEdges()
     {
         if (_edges.NullOrEmpty())
@@ -1254,14 +1510,12 @@ public static class Tree
             return;
         }
 
-        foreach (var edge in Edges)
+        if (_collapsedEdges != null)
         {
-            if (EdgeHiddenBySkipCompleted(edge))
+            foreach (var edge in _collapsedEdges)
             {
-                continue;
+                edge?.Draw(visibleRect);
             }
-
-            edge.Draw(visibleRect);
         }
 
         foreach (var node in Nodes)
@@ -1379,22 +1633,33 @@ public static class Tree
             _edgeDrawBuckets[i].Clear();
         }
 
-        var edges = Edges;
-        if (edges == null)
+        var collapsed = _collapsedEdges;
+        if (collapsed == null)
         {
-            return;
+            if (!Edges.NullOrEmpty())
+            {
+                BuildCollapsedEdges();
+                collapsed = _collapsedEdges;
+            }
+            else
+            {
+                return;
+            }
         }
 
-        foreach (var edge in edges)
+        foreach (var edge in collapsed)
         {
-            if (EdgeHiddenBySkipCompleted(edge))
+            if (edge == null)
             {
                 continue;
             }
 
-            var edgeMinLayer = Mathf.Min(edge.In.X, edge.Out.X);
-            var edgeMaxLayer = Mathf.Max(edge.In.X, edge.Out.X);
-            if (edgeMaxLayer < minLayer || edgeMinLayer > maxLayer)
+            if (!edge.IntersectsLayers(minLayer, maxLayer))
+            {
+                continue;
+            }
+
+            if (edge.HiddenBySkipCompleted())
             {
                 continue;
             }
@@ -1494,32 +1759,34 @@ public static class Tree
     public static bool IsEdgeVisible<T1, T2>(Edge<T1, T2> edge, Rect visibleRect)
         where T1 : Node where T2 : Node
     {
-        // Expand the viewport slightly to avoid flickering edges near the boundary.
+        return IsEdgeVisible(visibleRect, edge.In.Rect, edge.Out.Rect);
+    }
+
+    public static bool IsEdgeVisible(Rect visibleRect, Rect inRect, Rect outRect)
+    {
         const float MARGIN = 100f;
         var rect = new Rect(
             visibleRect.xMin - MARGIN, visibleRect.yMin - MARGIN,
             visibleRect.width + 2 * MARGIN, visibleRect.height + 2 * MARGIN);
 
-        // If either endpoint rectangle overlaps the expanded view, the edge is visible.
-        if (edge.In.Rect.Overlaps(rect) || edge.Out.Rect.Overlaps(rect)) return true;
+        if (inRect.Overlaps(rect) || outRect.Overlaps(rect))
+        {
+            return true;
+        }
 
-        // Otherwise test whether the line segment intersects the rectangle.
-        var a = edge.In.Rect.center;
-        var b = edge.Out.Rect.center;
+        var a = inRect.center;
+        var b = outRect.center;
         return LineIntersectsRect(a, b, rect);
 
         static bool LineIntersectsRect(Vector2 p1, Vector2 p2, Rect r)
         {
-            // Quickly reject if the entire segment lies outside on the same side.
             if (p1.x < r.xMin && p2.x < r.xMin) return false;
             if (p1.x > r.xMax && p2.x > r.xMax) return false;
             if (p1.y < r.yMin && p2.y < r.yMin) return false;
             if (p1.y > r.yMax && p2.y > r.yMax) return false;
 
-            // If either endpoint is inside the rectangle, the segment intersects it.
             if (r.Contains(p1) || r.Contains(p2)) return true;
 
-            // Check for intersection with each rectangle edge.
             return SegmentsIntersect(p1, p2, new Vector2(r.xMin, r.yMin), new Vector2(r.xMax, r.yMin)) ||
                    SegmentsIntersect(p1, p2, new Vector2(r.xMax, r.yMin), new Vector2(r.xMax, r.yMax)) ||
                    SegmentsIntersect(p1, p2, new Vector2(r.xMax, r.yMax), new Vector2(r.xMin, r.yMax)) ||
@@ -1546,7 +1813,6 @@ public static class Tree
                 ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0)))
                 return true;
 
-            // Handle rare colinear overlap cases with bounding-box checks.
             bool OnColinear(Vector2 p, Vector2 q, Vector2 r) =>
                 Mathf.Min(p.x, q.x) <= r.x && r.x <= Mathf.Max(p.x, q.x) &&
                 Mathf.Min(p.y, q.y) <= r.y && r.y <= Mathf.Max(p.y, q.y);
