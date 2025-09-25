@@ -116,6 +116,25 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         }
     }
 
+    private Rect InteractionRect
+    {
+        get
+        {
+            var rect = ViewRect;
+            var zoom = ZoomLevel;
+
+            if (!Mathf.Approximately(zoom, 1f) && zoom > 0f)
+            {
+                rect.xMin /= zoom;
+                rect.yMin /= zoom;
+                rect.width /= zoom;
+                rect.height /= zoom;
+            }
+
+            return rect;
+        }
+    }
+
     private static Rect TreeRect
     {
         get
@@ -521,7 +540,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         // 先确认鼠标在窗口内（不是只看 ViewRect）
         bool inWindow = Mouse.IsOver(this.windowRect);
-        bool inView = inWindow && ViewRect.Contains(e.mousePosition);
+        bool inView = inWindow && InteractionRect.Contains(e.mousePosition);
 
         if (e.type == EventType.MouseDown && inWindow)
         {
