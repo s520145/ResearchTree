@@ -322,9 +322,14 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             firstDrawTimer = Stopwatch.StartNew();
         }
 
+        var skipTreeDraw = ShouldSkipTreeDrawThisEvent();
+
         _scrollPosition = GUI.BeginScrollView(ViewRect, _scrollPosition, TreeRect, true, true);
-        Tree.Draw(VisibleRect);
-        Queue.DrawLabels(VisibleRect);
+        if (!skipTreeDraw)
+        {
+            Tree.Draw(VisibleRect);
+            Queue.DrawLabels(VisibleRect);
+        }
         GUI.EndScrollView(false);
         ResetZoomLevel();
         GUI.color = Color.white;
@@ -338,6 +343,28 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             Logging.Performance("MainTabWindow_ResearchTree.DoWindowContents.FirstDraw",
                 firstDrawTimer.ElapsedMilliseconds, FirstDrawWarnThresholdMs);
             _logFirstDrawNextFrame = false;
+        }
+    }
+
+    private bool ShouldSkipTreeDrawThisEvent()
+    {
+        var evt = Event.current;
+        if (evt == null)
+        {
+            return false;
+        }
+
+        switch (evt.type)
+        {
+            case EventType.Layout:
+                return true;
+            case EventType.MouseDrag:
+                return _panning;
+            case EventType.ScrollWheel:
+                // 滚轮事件会紧跟一个 Repaint，再绘制即可
+                return true;
+            default:
+                return false;
         }
     }
 
