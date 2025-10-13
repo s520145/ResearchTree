@@ -44,7 +44,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     private bool _panning;                 // 是否已进入平移
     private Vector2 _dragStart;            // 按下时坐标
     private const float PanThreshold = 4f; // 启动平移的像素阈值（避免轻点触发）
-    private int _capturedMouseButton = -1; // 记录始于窗口内部的鼠标按钮
+    private readonly HashSet<int> _capturedMouseButtons = new(); // 记录始于窗口内部的鼠标按钮
     private const float TopBarControlGap = 6f;
     private const float TopBarLabelPadding = 24f;
     private const float TopBarMinSearchWidth = 220f;
@@ -210,7 +210,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             Assets.RefreshResearch = true;
             _dragging = false;
             closeOnClickedOutside = false;
-            _capturedMouseButton = -1;
+            _capturedMouseButtons.Clear();
 
             _cachedUnlockedDefsGroupedByPrerequisites = null;
             _cachedVisibleResearchProjects = null;
@@ -401,7 +401,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         }
 
         var pointerOverWindow = Mouse.IsOver(windowRect);
-        var capturing = _capturedMouseButton != -1;
+        var capturing = _capturedMouseButtons.Count > 0;
 
         if (!pointerOverWindow && !capturing)
         {
@@ -416,7 +416,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                 e.Use();
                 break;
             case EventType.MouseDrag:
-                if (!capturing || (e.button != _capturedMouseButton && _capturedMouseButton != -1))
+                if (!capturing || !_capturedMouseButtons.Contains(e.button))
                 {
                     return;
                 }
@@ -424,11 +424,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                 e.Use();
                 break;
             case EventType.MouseUp:
-                if (capturing && e.button == _capturedMouseButton)
-                {
-                    _capturedMouseButton = -1;
-                }
-
+                _capturedMouseButtons.Remove(e.button);
                 e.Use();
                 break;
         }
@@ -544,10 +540,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         if (e.type == EventType.MouseDown && inWindow)
         {
-            if (_capturedMouseButton == -1)
-            {
-                _capturedMouseButton = e.button;
-            }
+            _capturedMouseButtons.Add(e.button);
 
             _dragging = inView && e.button == 0; // 只有左键才触发平移
             _panning = false;
@@ -556,15 +549,18 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        if (e.type == EventType.MouseUp && e.button == _capturedMouseButton)
+        if (e.type == EventType.MouseUp && _capturedMouseButtons.Remove(e.button))
         {
-            _dragging = _panning = false;
-            _dragStart = _mousePosition = Vector2.zero;
-            _capturedMouseButton = -1;
+            if (e.button == 0)
+            {
+                _dragging = _panning = false;
+                _dragStart = _mousePosition = Vector2.zero;
+            }
+
             return;
         }
 
-        if (_dragging && e.type == EventType.MouseDrag && e.button == _capturedMouseButton)
+        if (_dragging && e.type == EventType.MouseDrag && _capturedMouseButtons.Contains(e.button))
         {
             if (!_panning)
             {
