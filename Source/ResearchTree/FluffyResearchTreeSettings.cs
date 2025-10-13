@@ -1,7 +1,9 @@
-﻿using RimWorld;
+﻿using HarmonyLib;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using Verse;
 
@@ -38,6 +40,16 @@ internal class FluffyResearchTreeSettings : ModSettings
 
     // UI 缓存：所有可选 Tab（运行时收集）
     [Unsaved(false)] public List<ResearchTabDef> AllTabsCache;
+
+    private static readonly PropertyInfo ResearchTabProperty =
+        AccessTools.Property(typeof(ResearchProjectDef), "tab")
+        ?? AccessTools.Property(typeof(ResearchProjectDef), "researchTab")
+        ?? AccessTools.Property(typeof(ResearchProjectDef), "researchTabDef");
+
+    private static readonly FieldInfo ResearchTabField =
+        AccessTools.Field(typeof(ResearchProjectDef), "tab")
+        ?? AccessTools.Field(typeof(ResearchProjectDef), "researchTab")
+        ?? AccessTools.Field(typeof(ResearchProjectDef), "researchTabDef");
 
     /// <summary>
     ///     Saving and loading the values
@@ -106,6 +118,15 @@ internal class FluffyResearchTreeSettings : ModSettings
             .OrderBy(t => t.defName)
             .ToList();
 
+        var tabsWithResearch = new HashSet<ResearchTabDef>(
+            DefDatabase<ResearchProjectDef>.AllDefsListForReading
+                .Select(TryResolveProjectTab)
+                .Where(tab => tab != null));
+
+        AllTabsCache = AllTabsCache
+            .Where(tab => tab != null && tabsWithResearch.Contains(tab))
+            .ToList();
+
         IncludedTabs ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         var validTabNames = new HashSet<string>(
@@ -150,6 +171,30 @@ internal class FluffyResearchTreeSettings : ModSettings
         {
             Logging.Message($"[ResearchTree]:{tab.defName} / {tab.LabelCap}");
         }
+    }
+
+    private static ResearchTabDef TryResolveProjectTab(ResearchProjectDef def)
+    {
+        if (def == null)
+        {
+            return null;
+        }
+
+        if (ResearchTabProperty != null)
+        {
+            var value = ResearchTabProperty.GetValue(def) as ResearchTabDef;
+            if (value != null)
+            {
+                return value;
+            }
+        }
+
+        if (ResearchTabField != null)
+        {
+            return ResearchTabField.GetValue(def) as ResearchTabDef;
+        }
+
+        return null;
     }
 
     public bool TabIncluded(ResearchTabDef def)
