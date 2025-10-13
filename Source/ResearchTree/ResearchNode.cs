@@ -260,13 +260,12 @@ public class ResearchNode : Node
                     continue;
                 }
 
-                if (researchPrerequisite.ResearchNode().Available)
+                var prerequisiteNode = researchPrerequisite.ResearchNode();
+                if (prerequisiteNode == null || !prerequisiteNode.Available)
                 {
-                    continue;
+                    availableCache = false;
+                    return availableCache;
                 }
-
-                availableCache = false;
-                return availableCache;
             }
         }
 
@@ -279,13 +278,12 @@ public class ResearchNode : Node
                     continue;
                 }
 
-                if (researchPrerequisite.ResearchNode().Available)
+                var prerequisiteNode = researchPrerequisite.ResearchNode();
+                if (prerequisiteNode == null || !prerequisiteNode.Available)
                 {
-                    continue;
+                    availableCache = false;
+                    return availableCache;
                 }
-
-                availableCache = false;
-                return availableCache;
             }
         }
 
