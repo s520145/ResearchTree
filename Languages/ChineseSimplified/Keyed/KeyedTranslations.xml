@@ -80,6 +80,8 @@
   <Fluffy.ResearchTree.selectInvert>反选</Fluffy.ResearchTree.selectInvert>
   <Fluffy.ResearchTree.cancel>取消</Fluffy.ResearchTree.cancel>
   <Fluffy.ResearchTree.rebuild>重新生成</Fluffy.ResearchTree.rebuild>
+  <Fluffy.ResearchTree.SkipCompletedRegenerateTitle>需要重新生成</Fluffy.ResearchTree.SkipCompletedRegenerateTitle>
+  <Fluffy.ResearchTree.SkipCompletedRegeneratePrompt>已完成的研究在生成时被跳过。要再次显示这些项目需要重新生成研究树。是否现在重新生成？</Fluffy.ResearchTree.SkipCompletedRegeneratePrompt>
   <Fluffy.ResearchTree.refresh>已应用研究标签筛选并请求刷新研究树</Fluffy.ResearchTree.refresh>
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
 </LanguageData>
