@@ -251,6 +251,23 @@ public class Queue : WorldComponent
         return _instance._queue.Contains(node) && !node.Research.IsAnomalyResearch();
     }
 
+    public static IEnumerable<ResearchProjectDef> GetQueuedProjects()
+    {
+        var projects = new List<ResearchProjectDef>();
+
+        if (_instance != null)
+        {
+            projects.AddRange(_instance._queue.Select(n => n.Research));
+        }
+
+        if (_queueBackup != null && _queueBackup.Count > 0)
+        {
+            projects.AddRange(_queueBackup);
+        }
+
+        return projects.Distinct();
+    }
+
     public static void TryStartNext(ResearchProjectDef finished)
     {
         if (!IsQueued(finished.ResearchNode()))

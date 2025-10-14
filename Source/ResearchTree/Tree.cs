@@ -1554,6 +1554,16 @@ public static class Tree
                     }
                 }
 
+                foreach (var queuedProject in Queue.GetQueuedProjects())
+                {
+                    if (!validDefs.Contains(queuedProject))
+                    {
+                        continue;
+                    }
+
+                    includedDefs.Add(queuedProject);
+                }
+
                 if (includedDefs.Count > 0)
                 {
                     var queue = new Queue<ResearchProjectDef>(includedDefs);
