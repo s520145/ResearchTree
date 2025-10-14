@@ -178,6 +178,13 @@ public static class ResearchProjectDef_Extensions
         var researchNode = Tree.ResearchToNode(research) as ResearchNode;
         if (researchNode == null)
         {
+            var skipCompletedActive = Tree.CompletedResearchSkipped
+                                      || FluffyResearchTreeMod.instance?.Settings?.SkipCompleted == true;
+            if (skipCompletedActive && research.IsFinished)
+            {
+                return null;
+            }
+
             // It would be better to use warning instead of error. This is just a reminder.
             // eg: RimFridge_PowerFactorSetting def is hidden, but it is also finished.
             // So the patch of "ResearchManager.FinishProject" method will be executed to jump here.
