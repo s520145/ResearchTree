@@ -80,7 +80,5 @@ Please use the load on first time opening if you experience this.</Fluffy.Resear
   <Fluffy.ResearchTree.selectInvert>Invert selection</Fluffy.ResearchTree.selectInvert>
   <Fluffy.ResearchTree.cancel>Cancel</Fluffy.ResearchTree.cancel>
   <Fluffy.ResearchTree.rebuild>Rebuild</Fluffy.ResearchTree.rebuild>
-  <Fluffy.ResearchTree.SkipCompletedRegenerateTitle>Rebuild required</Fluffy.ResearchTree.SkipCompletedRegenerateTitle>
-  <Fluffy.ResearchTree.SkipCompletedRegeneratePrompt>Completed research was skipped when the tree was rebuilt. Rebuilding the tree is required to show completed projects again. Rebuild now?</Fluffy.ResearchTree.SkipCompletedRegeneratePrompt>
   <Fluffy.ResearchTree.refresh>Applied research tag filter and requested research tree refresh.</Fluffy.ResearchTree.refresh>
 </LanguageData>

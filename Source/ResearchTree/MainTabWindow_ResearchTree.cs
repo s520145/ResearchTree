@@ -681,39 +681,9 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         if (Widgets.ButtonInvisible(toggleRect, doMouseoverSound: true))
         {
-            var settings = FluffyResearchTreeMod.instance.Settings;
-            void requestRebuild()
-            {
-                Tree.RequestRebuild(resetZoom: false, reopenResearchTab: false);
-                Assets.RefreshResearch = true;
-            }
-
-            if (!settings.SkipCompleted)
-            {
-                settings.SkipCompleted = true;
-                requestRebuild();
-            }
-            else
-            {
-                void disableAndRebuild()
-                {
-                    settings.SkipCompleted = false;
-                    requestRebuild();
-                }
-
-                if (Tree.CompletedResearchSkipped)
-                {
-                    Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
-                        "Fluffy.ResearchTree.SkipCompletedRegeneratePrompt".Translate(),
-                        disableAndRebuild,
-                        destructive: false,
-                        "Fluffy.ResearchTree.SkipCompletedRegenerateTitle".Translate()));
-                }
-                else
-                {
-                    disableAndRebuild();
-                }
-            }
+            FluffyResearchTreeMod.instance.Settings.SkipCompleted = !FluffyResearchTreeMod.instance.Settings.SkipCompleted;
+            Tree.ResetNodeAvailabilityCache();
+            Assets.RefreshResearch = true;
         }
     }
 

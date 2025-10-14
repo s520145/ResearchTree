@@ -37,10 +37,6 @@ public static class Tree
 
     public static bool FirstLoadDone;
 
-    private static bool _completedResearchSkipped;
-
-    public static bool CompletedResearchSkipped => _completedResearchSkipped;
-
     private static readonly Dictionary<ResearchProjectDef, Node> ResearchToNodesCache = [];
 
     private static bool _loggedInitialDraw;
@@ -658,8 +654,6 @@ public static class Tree
         Queue.Notify_TreeWillReset();
 
         NoTabsSelected = false;
-
-        _completedResearchSkipped = false;
 
         Size = IntVec2.Zero;
         _nodes = null;
@@ -1610,17 +1604,6 @@ public static class Tree
                 NoTabsSelected = false;
             }
         }
-
-        var skipCompleted = SkipCompletedSetting;
-        var skippedCompletedProjects = false;
-        if (skipCompleted)
-        {
-            var filtered = researchList.Where(def => !def.IsFinished).ToList();
-            skippedCompletedProjects = filtered.Count != researchList.Count;
-            researchList = filtered;
-        }
-
-        _completedResearchSkipped = skipCompleted && skippedCompletedProjects;
 
         // Create nodes in parallel.
         _nodes = [];
