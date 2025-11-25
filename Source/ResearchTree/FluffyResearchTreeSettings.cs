@@ -17,6 +17,7 @@ internal class FluffyResearchTreeSettings : ModSettings
     public bool PauseOnOpen = true;
 
     public bool ShowCompletion;
+    public bool ReverseShift;
 
     public bool VerboseLogging;
 
@@ -30,6 +31,7 @@ internal class FluffyResearchTreeSettings : ModSettings
         Scribe_Values.Look(ref CtrlFunction, "CtrlFunction", true);
         Scribe_Values.Look(ref OverrideResearch, "OverrideResearch", true);
         Scribe_Values.Look(ref ShowCompletion, "ShowCompletion");
+        Scribe_Values.Look(ref ReverseShift, "ReverseShift");
         Scribe_Values.Look(ref NoIdeologyPopup, "NoIdeologyPopup");
         Scribe_Values.Look(ref HideNodesBlockedByTechLevel, "HideNodesBlockedByTechLevel");
         Scribe_Values.Look(ref VerboseLogging, "VerboseLogging");
@@ -43,6 +45,7 @@ internal class FluffyResearchTreeSettings : ModSettings
         CtrlFunction = true;
         OverrideResearch = true;
         ShowCompletion = false;
+        ReverseShift = false;
         NoIdeologyPopup = false;
         HideNodesBlockedByTechLevel = false;
         VerboseLogging = false;

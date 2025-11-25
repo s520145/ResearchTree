@@ -304,9 +304,9 @@ public class Node
             (_rect.height * .5f) - 3f);
 
         // research cost rect
-        _costLabelRect = new Rect(_rect.xMin + (_rect.width * 2f / 3f),
+        _costLabelRect = new Rect(_rect.xMin + (_rect.width * 3f / 5f),
             _rect.yMin + 3f,
-            (_rect.width * 1f / 3f) - 16f - 3f,
+            (_rect.width * 2f / 5f) - 16f - 3f,
             (_rect.height * .5f) - 3f);
 
         // research icon rect

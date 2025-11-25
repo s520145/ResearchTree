@@ -66,4 +66,8 @@ Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Prob
   <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>Die World Tech Level-Einstellungen erlauben diese Technologie nicht</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.LoadingWait>Baum nicht fertig generiert, klicken Sie, um den Vanille-Baum zu öffnen</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>Anomalieforschung</Fluffy.ResearchTree.Anomaly>
+  <Fluffy.ResearchTree.ReverseShift>Benutze SHIFT Links-Klick um die Warteschlange zu ersetzen</Fluffy.ResearchTree.ReverseShift>
+  <Fluffy.ResearchTree.ReverseShiftTT>Anstatt die gesamte Warteschlange zu ersetzen, wenn man mit der linken Maustaste auf ein Forschungsprojekt klickt, muss man mit SHIFT Links-Klick</Fluffy.ResearchTree.ReverseShiftTT>
+  <Fluffy.ResearchTree.SLClickReplaceQueue>Shift-Links-Klick zum Ersetzen der Warteschlange</Fluffy.ResearchTree.SLClickReplaceQueue>
+  <Fluffy.ResearchTree.LClickAddToQueue>Links-Klick zum Hinzufügen zur Warteschlange</Fluffy.ResearchTree.LClickAddToQueue>
 </LanguageData>

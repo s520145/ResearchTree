@@ -66,4 +66,8 @@
   <Fluffy.ResearchTree.LoadingWait>树未完成生成，点击可打开香草树</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>异常研究</Fluffy.ResearchTree.Anomaly>
   <!-- <Fluffy.ResearchTree.RClickForDetails>Right click for details</Fluffy.ResearchTree.RClickForDetails> -->
+  <Fluffy.ResearchTree.ReverseShift>使用 SHIFT 左键替换队列</Fluffy.ResearchTree.ReverseShift>
+  <Fluffy.ResearchTree.ReverseShiftTT>在研究项目上左键单击时，您需要使用 SHIFT 左键单击，而不是替换整个队列</Fluffy.ResearchTree.ReverseShiftTT>
+  <Fluffy.ResearchTree.SLClickReplaceQueue>Shift-Left-Click 替换队列</Fluffy.ResearchTree.SLClickReplaceQueue>
+  <Fluffy.ResearchTree.LClickAddToQueue>左键单击添加到队列</Fluffy.ResearchTree.LClickAddToQueue>
 </LanguageData>

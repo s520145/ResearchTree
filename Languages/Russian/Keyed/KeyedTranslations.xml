@@ -65,4 +65,8 @@
   <Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>Настройки мирового уровня техники не позволяют использовать эту технику</Fluffy.ResearchTree.WorldTechLevelDoesNotAllow>
   <Fluffy.ResearchTree.LoadingWait>Генерация дерева не завершена, нажмите, чтобы открыть ванильное дерево</Fluffy.ResearchTree.LoadingWait>
   <Fluffy.ResearchTree.Anomaly>Исследование аномалий</Fluffy.ResearchTree.Anomaly>
+  <Fluffy.ResearchTree.ReverseShift>Используйте левый клик SHIFT для замены очереди</Fluffy.ResearchTree.ReverseShift>
+  <Fluffy.ResearchTree.ReverseShiftTT>Вместо замены всей очереди при щелчке левой кнопкой мыши на исследовательском проекте, нужно использовать SHIFT Left-Click</Fluffy.ResearchTree.ReverseShiftTT>
+  <Fluffy.ResearchTree.SLClickReplaceQueue>Щелкните левой кнопкой мыши, чтобы заменить очередь</Fluffy.ResearchTree.SLClickReplaceQueue>
+  <Fluffy.ResearchTree.LClickAddToQueue>Щелкните левой кнопкой мыши, чтобы добавить в очередь</Fluffy.ResearchTree.LClickAddToQueue>
 </LanguageData>
