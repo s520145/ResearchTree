@@ -106,6 +106,7 @@ public static class Assets
 
     static Assets()
     {
+        var harmonyPatcher = new Harmony("Mlie.ResearchTree");
         if (ModLister.GetActiveModWithIdentifier("andery233xj.mod.BetterResearchTabs", true) != null)
         {
             BetterResearchTab = DefDatabase<MainButtonDef>.GetNamed("BetterResearchTab");
@@ -122,7 +123,7 @@ public static class Assets
         {
             SemiRandomTexture2D =
                 ContentFinder<Texture2D>.Get("UI/Buttons/MainButtons/CM_Semi_Random_Research_ResearchTree");
-            new Harmony("Mlie.ResearchTree").Patch(
+            harmonyPatcher.Patch(
                 AccessTools.Method("CM_Semi_Random_Research.MainTabWindow_NextResearch:DrawGoToTechTreeButton"),
                 new HarmonyMethod(SemiRandomResearch_DrawGoToTechTreeButton.Prefix));
             SemiRandomResearchLoaded = true;
@@ -137,10 +138,9 @@ public static class Assets
         {
             SemiRandomTexture2D =
                 ContentFinder<Texture2D>.Get("UI/Buttons/MainButtons/CM_Semi_Random_Research_ResearchTree");
-            new Harmony("Mlie.ResearchTree").Patch(
-                AccessTools.Method(typeof(Widgets), nameof(Widgets.ButtonText),
-                    [typeof(Rect), typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(TextAnchor)]),
-                new HarmonyMethod(SemiRandomResearchProgressionFork_ButtonText.Prefix));
+            harmonyPatcher.Patch(
+                AccessTools.Method("CM_Semi_Random_Research.MainTabWindow_NextResearch:DrawLeftColumn"), postfix:
+                new HarmonyMethod(SemiRandomResearch_DrawGoToTechTreeButton.ProgressionPostfix));
             SemiRandomResearchLoaded = true;
             SettingsInstance = AccessTools.Field("CM_Semi_Random_Research.SemiRandomResearchMod:settings")
                 .GetValue(null);

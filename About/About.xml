@@ -16,7 +16,6 @@
     </modDependencies>
     <loadAfter>
         <li>brrainz.harmony</li>
-        <li>m00nl1ght.WorldTechLevel</li>
     </loadAfter>
     <description>
 1.Fixed an issue where using it alongside the Organized Research Tab (Continued) would cause two research tabs to appear.
@@ -24,5 +23,5 @@
 3.Improved the responsiveness of dragging (including mouse and WASD) and zooming, making operations more immediate and smoother.
 4.Added a feature to hide completed projects.
     </description>
-    <modVersion IgnoreIfNoMatchingField="True">1.6.1</modVersion>
+    <modVersion IgnoreIfNoMatchingField="True">1.6.2</modVersion>
 </ModMetaData>

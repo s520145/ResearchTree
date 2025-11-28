@@ -20,11 +20,9 @@ public class ResearchNode : Node
 
     private static readonly Dictionary<ResearchProjectDef, List<ThingDef>> _missingFacilitiesCache = [];
 
-    private readonly int cacheOrder;
-
-    public readonly ResearchProjectDef Research;
-
     private bool availableCache;
+
+    private readonly int cacheOrder;
 
     private int currentCacheOrder;
 
@@ -39,6 +37,10 @@ public class ResearchNode : Node
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private static void RefreshBenchCacheIfNeeded()
+    public readonly ResearchProjectDef Research;
+
+
+    public ResearchNode(ResearchProjectDef research, int order)
     {
         int now = Find.TickManager?.TicksGame ?? 0;
         if (_benchesCacheTick != -1 && now - _benchesCacheTick < 60 &&
@@ -111,95 +113,143 @@ public class ResearchNode : Node
         currentCacheOrder = Assets.TotalAmountOfResearch;
     }
 
-    public List<ResearchNode> Parents
+    public static implicit operator ResearchNode(ResearchProjectDef def)
     {
-        get
-        {
-            var enumerable = InNodes.OfType<ResearchNode>();
-            enumerable = enumerable.Concat(from dn in InNodes.OfType<DummyNode>()
-                select dn.Parent);
-            return enumerable.ToList();
-        }
+        return def.ResearchNode();
     }
 
-    public override Color Color
+    private bool buildingPresent(ResearchProjectDef research)
     {
-        get
+        if (DebugSettings.godMode && Prefs.DevMode)
         {
-            if (Highlighted)
-            {
-                return GenUI.MouseoverColor;
-            }
-
-            if (Completed)
-            {
-                return Assets.ColorCompleted.TryGetValue(Research.techLevel);
-            }
-
-            return Available
-                ? Assets.ColorCompleted.TryGetValue(Research.techLevel)
-                : Assets.ColorUnavailable.TryGetValue(Research.techLevel);
+            return true;
         }
+
+        var hasCache = _buildingPresentCache.TryGetValue(research, out var value);
+
+        if (!Assets.RefreshResearch && hasCache || hasRefreshedBuildings && hasCache)
+        {
+            return value;
+        }
+
+        if (currentCacheOrder < Assets.TotalAmountOfResearch && hasCache)
+        {
+            currentCacheOrder++;
+            return value;
+        }
+
+        hasRefreshedBuildings = true;
+
+        value = research.requiredResearchBuilding == null || Find.Maps
+            .SelectMany(map => map.listerBuildings.allBuildingsColonist).OfType<Building_ResearchBench>()
+            .Any(b => research.CanBeResearchedAt(b, true));
+        if (value)
+        {
+            value = research.Ancestors().All(buildingPresent);
+        }
+
+        _buildingPresentCache[research] = value;
+        return value;
     }
 
-    public override Color EdgeColor
+    private void buildTips()
     {
-        get
+        if (Queue._draggedNode != null)
         {
-            if (Highlighted)
-            {
-                return GenUI.MouseoverColor;
-            }
-
-            if (Completed)
-            {
-                return Assets.ColorCompleted.TryGetValue(Research.techLevel);
-            }
-
-            return Available
-                ? Assets.ColorAvailable.TryGetValue(Research.techLevel)
-                : Assets.ColorUnavailable.TryGetValue(Research.techLevel);
+            return;
         }
-    }
 
-    public List<ResearchNode> Children
-    {
-        get
+        var researchTooltipString = getResearchTooltipString();
+        var missingFacilities = MissingFacilities();
+        if (missingFacilities?.Any() == true)
         {
-            var enumerable = OutNodes.OfType<ResearchNode>();
-            enumerable = enumerable.Concat(from dn in OutNodes.OfType<DummyNode>()
-                select dn.Child);
-            return enumerable.ToList();
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
+                missingFacilities.Select(td => td.LabelCap).ToArray())));
         }
-    }
 
-    public override string Label => Research.LabelCap;
-
-    public override bool Completed => Research.IsFinished;
-
-    public override bool Available
-    {
-        get
+        if (!Research.TechprintRequirementMet)
         {
-            if (Research.IsFinished || Research.IsAnomalyResearch())
-            {
-                return false;
-            }
-
-            return FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree
-                   || DebugSettings.godMode || getCacheValue();
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingTechprints".Translate(
+                Research.TechprintsApplied,
+                Research.techprintCount));
         }
-    }
 
-    public override bool IsVisible =>
-        !Assets.IsBlockedBySOS2(Research) && !Assets.IsHiddenByTechLevelRestrictions(Research);
+        if (!Research.InspectionRequirementsMet)
+        {
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("MissingGravEngineInspection".Translate());
+        }
 
-    public void ClearInstanceCaches()
-    {
-        hasRefreshedAvailability = false;
-        hasRefreshedBuildings = false;
-        hasRefreshedFacilities = false;
-        currentCacheOrder = cacheOrder;
+        if (!Research.AnalyzedThingsRequirementsMet)
+        {
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
+                Research.requiredAnalyzed.Select(def => def.LabelCap))));
+        }
+
+        if (!Research.PlayerMechanitorRequirementMet)
+        {
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
+        }
+
+        if (Assets.UsingVanillaVehiclesExpanded)
+        {
+            var valueArray = new object[] { Research, null };
+            var boolResult = (bool)Assets.IsDisabledMethod.Invoke(null, valueArray);
+
+            if (boolResult)
+            {
+                researchTooltipString.AppendLine();
+                var wreck = (ThingDef)valueArray[1];
+                if (wreck != null)
+                {
+                    researchTooltipString.AppendLine();
+                    researchTooltipString.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
+                }
+            }
+        }
+
+        if (Assets.IsBlockedByGrimworld(Research))
+        {
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.GrimworldDoesNotAllow".Translate());
+        }
+
+        if (Assets.IsBlockedByWorldTechLevel(Research))
+        {
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.WorldTechLevelDoesNotAllow".Translate());
+        }
+
+        if (Assets.IsBlockedByMedievalOverhaul(Research))
+        {
+            researchTooltipString.AppendLine();
+            if (Assets.TryGetBlockingSchematicFromMedievalOverhaul(Research, out var thingLabel))
+            {
+                researchTooltipString.AppendLine("DankPyon_RequiredSchematic".Translate() + $": {thingLabel}");
+            }
+            else
+            {
+                researchTooltipString.AppendLine("DankPyon_RequiredSchematic".Translate());
+            }
+        }
+
+        if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
+        {
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.SemiRandomResearchLoaded".Translate());
+        }
+
+        if (Assets.UsingRimedieval && !Assets.RimedievalAllowedResearchDefs.Contains(Research))
+        {
+            researchTooltipString.AppendLine();
+            researchTooltipString.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
+        }
+
+        TooltipHandler_Modified.TipRegion(Rect, researchTooltipString.ToString());
     }
 
     private bool getCacheValue()
@@ -291,55 +341,51 @@ public class ResearchNode : Node
         return availableCache;
     }
 
-    private bool buildingPresent(ResearchProjectDef research)
+    private StringBuilder getResearchTooltipString()
     {
-        if (DebugSettings.godMode && Prefs.DevMode) return true;
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine(Research.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n");
+        stringBuilder.AppendLine(Research.description);
 
-        if (_buildingPresentCache.TryGetValue(research, out var value))
+        if(!Assets.SemiRandomResearchLoaded)
         {
-            if (!Assets.RefreshResearch || hasRefreshedBuildings) return value;
-            if (currentCacheOrder < Assets.TotalAmountOfResearch)
+            stringBuilder.AppendLine();
+            // TODO: Add settings so that shortcut key tips can be hidden
+            if(Queue.IsQueued(this))
             {
-                currentCacheOrder++;
-                return value;
+                stringBuilder.AppendLine(
+                    "Fluffy.ResearchTree.LClickRemoveFromQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+                stringBuilder.AppendLine(
+                    "Fluffy.ResearchTree.CLClickMoveToFrontOfQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+            } else
+            {
+                if(FluffyResearchTreeMod.instance.Settings.ReverseShift)
+                {
+                    stringBuilder.AppendLine(
+                        "Fluffy.ResearchTree.LClickAddToQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+                    stringBuilder.AppendLine(
+                        "Fluffy.ResearchTree.SLClickReplaceQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+                } else
+                {
+                    stringBuilder.AppendLine(
+                        "Fluffy.ResearchTree.LClickReplaceQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+                    stringBuilder.AppendLine(
+                        "Fluffy.ResearchTree.SLClickAddToQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
+                }
+                stringBuilder.AppendLine(
+                    "Fluffy.ResearchTree.CLClickAddToFrontOfQueue".Translate().Colorize(ColoredText.SubtleGrayColor));
             }
         }
 
-        hasRefreshedBuildings = true;
-
-        // 刷新 60tick 研究台缓存
-        RefreshBenchCacheIfNeeded();
-
-        // 是否存在可进行该研究的“任一”研究台
-        bool anyBenchOk = (research.requiredResearchBuilding == null);
-        if (!anyBenchOk)
+        stringBuilder.AppendLine(
+            "Fluffy.ResearchTree.SRClickShowInfo".Translate().Colorize(ColoredText.SubtleGrayColor));
+        if (DebugSettings.godMode)
         {
-            for (int i = 0; i < _benchesCached.Count; i++)
-            {
-                if (research.CanBeResearchedAt(_benchesCached[i], true)) { anyBenchOk = true; break; }
-            }
+            stringBuilder.AppendLine("Fluffy.ResearchTree.RClickInstaFinishNew".Translate()
+                .Colorize(ColoredText.SubtleGrayColor));
         }
 
-        value = anyBenchOk;
-
-        // 若本项目可做，则其祖先也必须可做
-        if (value)
-        {
-            var ancestors = research.Ancestors();
-            for (int i = 0; i < ancestors.Count; i++)
-            {
-                if (!buildingPresent(ancestors[i])) { value = false; break; }
-            }
-        }
-
-        _buildingPresentCache[research] = value;
-        return value;
-    }
-
-
-    public static implicit operator ResearchNode(ResearchProjectDef def)
-    {
-        return def.ResearchNode();
+        return stringBuilder;
     }
 
     private List<ThingDef> missingFacilities(ResearchProjectDef research)
@@ -409,10 +455,22 @@ public class ResearchNode : Node
         return missing;
     }
 
+    private List<ThingDef> MissingFacilities()
+    {
+        return missingFacilities(Research);
+    }
 
     public bool BuildingPresent()
     {
         return buildingPresent(Research);
+    }
+
+    public void ClearInstanceCaches()
+    {
+        hasRefreshedAvailability = false;
+        hasRefreshedBuildings = false;
+        hasRefreshedFacilities = false;
+        currentCacheOrder = cacheOrder;
     }
 
     public override void Draw(Rect visibleRect, bool forceDetailedMode = false)
@@ -527,7 +585,7 @@ public class ResearchNode : Node
                         GUI.DrawTexture(rect, Assets.MoreIcon, ScaleMode.ScaleToFit);
                         var text = string.Join("\n",
                             (from p in unlockDefsAndDescs.GetRange(i, unlockDefsAndDescs.Count - i)
-                                select p.Second).ToArray());
+                             select p.Second).ToArray());
                         TooltipHandler.TipRegion(rect, text);
                         break;
                     }
@@ -594,7 +652,8 @@ public class ResearchNode : Node
         {
             if (!Queue.IsQueued(this))
             {
-                Queue.EnqueueRange(GetMissingRequired(), Event.current.shift);
+                var add = Event.current.shift != FluffyResearchTreeMod.instance.Settings.ReverseShift;
+                Queue.EnqueueRange(GetMissingRequired(), add);
             }
             else
             {
@@ -619,6 +678,21 @@ public class ResearchNode : Node
 
         // Shift + RClick + dev.godMod  finish this and start next
         Queue.Notify_InstantFinished(this);
+    }
+
+    public void DrawAt(Vector2 pos, Rect visibleRect, bool forceDetailedMode = false)
+    {
+        SetRects(pos);
+        Draw(visibleRect, forceDetailedMode);
+        SetRects();
+    }
+
+    public List<ResearchNode> GetMissingRequired()
+    {
+        return GetMissingRequiredRecursive()
+            .Concat(new List<ResearchNode>([this]))
+            .Distinct()
+            .ToList();
     }
 
     public List<ResearchNode> GetMissingRequiredRecursive()
@@ -662,162 +736,6 @@ public class ResearchNode : Node
         return result;
     }
 
-    public List<ResearchNode> GetMissingRequired()
-    {
-        var list = GetMissingRequiredRecursive();
-        if (!list.Contains(this)) list.Add(this);
-        return list;
-    }
-
-
-    private List<ThingDef> MissingFacilities()
-    {
-        return missingFacilities(Research);
-    }
-
-    private void buildTips()
-    {
-        if (Queue._draggedNode != null)
-        {
-            return;
-        }
-
-        var researchTooltipString = getResearchTooltipString();
-        var missingFacilities = MissingFacilities();
-        if (missingFacilities?.Any() == true)
-        {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
-                missingFacilities.Select(td => td.LabelCap).ToArray())));
-        }
-
-        if (!Research.TechprintRequirementMet)
-        {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingTechprints".Translate(
-                Research.TechprintsApplied,
-                Research.techprintCount));
-        }
-
-        if (!Research.InspectionRequirementsMet)
-        {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("MissingGravEngineInspection".Translate());
-        }
-
-        if (!Research.AnalyzedThingsRequirementsMet)
-        {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
-                Research.requiredAnalyzed.Select(def => def.LabelCap))));
-        }
-
-        if (!Research.PlayerMechanitorRequirementMet)
-        {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
-        }
-
-        if (Assets.UsingVanillaVehiclesExpanded)
-        {
-            var valueArray = new object[] { Research, null };
-            var boolResult = (bool)Assets.IsDisabledMethod.Invoke(null, valueArray);
-
-            if (boolResult)
-            {
-                researchTooltipString.AppendLine();
-                var wreck = (ThingDef)valueArray[1];
-                if (wreck != null)
-                {
-                    researchTooltipString.AppendLine();
-                    researchTooltipString.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
-                }
-            }
-        }
-
-        if (Assets.IsBlockedByGrimworld(Research))
-        {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.GrimworldDoesNotAllow".Translate());
-        }
-
-        if (Assets.IsBlockedByWorldTechLevel(Research))
-        {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.WorldTechLevelDoesNotAllow".Translate());
-        }
-
-        if (Assets.IsBlockedByMedievalOverhaul(Research))
-        {
-            researchTooltipString.AppendLine();
-            if (Assets.TryGetBlockingSchematicFromMedievalOverhaul(Research, out var thingLabel))
-            {
-                researchTooltipString.AppendLine("DankPyon_RequiredSchematic".Translate() + $": {thingLabel}");
-            }
-            else
-            {
-                researchTooltipString.AppendLine("DankPyon_RequiredSchematic".Translate());
-            }
-        }
-
-        if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
-        {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.SemiRandomResearchLoaded".Translate());
-        }
-
-        if (Assets.UsingRimedieval && !Assets.RimedievalAllowedResearchDefs.Contains(Research))
-        {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
-        }
-
-        TooltipHandler_Modified.TipRegionIfEnabled(Rect, researchTooltipString.ToString());
-    }
-
-    private StringBuilder getResearchTooltipString()
-    {
-        var stringBuilder = new StringBuilder();
-        stringBuilder.AppendLine(Research.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n");
-        stringBuilder.AppendLine(Research.description);
-
-        stringBuilder.AppendLine();
-        // TODO: Add settings so that shortcut key tips can be hidden
-        if (Queue.IsQueued(this))
-        {
-            stringBuilder.AppendLine("Fluffy.ResearchTree.LClickRemoveFromQueue".Translate()
-                .Colorize(ColoredText.SubtleGrayColor));
-            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickMoveToFrontOfQueue".Translate()
-                .Colorize(ColoredText.SubtleGrayColor));
-        }
-        else
-        {
-            stringBuilder.AppendLine("Fluffy.ResearchTree.LClickReplaceQueue".Translate()
-                .Colorize(ColoredText.SubtleGrayColor));
-            stringBuilder.AppendLine("Fluffy.ResearchTree.SLClickAddToQueue".Translate()
-                .Colorize(ColoredText.SubtleGrayColor));
-            stringBuilder.AppendLine("Fluffy.ResearchTree.CLClickAddToFrontOfQueue".Translate()
-                .Colorize(ColoredText.SubtleGrayColor));
-        }
-
-        stringBuilder.AppendLine(
-            "Fluffy.ResearchTree.SRClickShowInfo".Translate().Colorize(ColoredText.SubtleGrayColor));
-        if (DebugSettings.godMode)
-        {
-            stringBuilder.AppendLine("Fluffy.ResearchTree.RClickInstaFinishNew".Translate()
-                .Colorize(ColoredText.SubtleGrayColor));
-        }
-
-        return stringBuilder;
-    }
-
-    public void DrawAt(Vector2 pos, Rect visibleRect, bool forceDetailedMode = false)
-    {
-        SetRects(pos);
-        Draw(visibleRect, forceDetailedMode);
-        SetRects();
-    }
-
     // TODO: The above code for handling key events should be extracted into a public method,
     //       so that the consistency of shortcut keys can be maintained.
     //       However, left-clicking on a node will probably conflict with the original view.
@@ -845,4 +763,87 @@ public class ResearchNode : Node
             Queue.EnqueueRangeFirst(GetMissingRequired());
         }
     }
+
+    public List<ResearchNode> Parents
+    {
+        get
+        {
+            var enumerable = InNodes.OfType<ResearchNode>();
+            enumerable = enumerable.Concat(from dn in InNodes.OfType<DummyNode>()
+                                           select dn.Parent);
+            return enumerable.ToList();
+        }
+    }
+
+    public override Color Color
+    {
+        get
+        {
+            if (Highlighted)
+            {
+                return GenUI.MouseoverColor;
+            }
+
+            if (Completed)
+            {
+                return Assets.ColorCompleted.TryGetValue(Research.techLevel);
+            }
+
+            return Available
+                ? Assets.ColorCompleted.TryGetValue(Research.techLevel)
+                : Assets.ColorUnavailable.TryGetValue(Research.techLevel);
+        }
+    }
+
+    public override Color EdgeColor
+    {
+        get
+        {
+            if (Highlighted)
+            {
+                return GenUI.MouseoverColor;
+            }
+
+            if (Completed)
+            {
+                return Assets.ColorCompleted.TryGetValue(Research.techLevel);
+            }
+
+            return Available
+                ? Assets.ColorAvailable.TryGetValue(Research.techLevel)
+                : Assets.ColorUnavailable.TryGetValue(Research.techLevel);
+        }
+    }
+
+    public List<ResearchNode> Children
+    {
+        get
+        {
+            var enumerable = OutNodes.OfType<ResearchNode>();
+            enumerable = enumerable.Concat(from dn in OutNodes.OfType<DummyNode>()
+                                           select dn.Child);
+            return enumerable.ToList();
+        }
+    }
+
+    public override string Label => Research.LabelCap;
+
+    public override bool Completed => Research.IsFinished;
+
+    public override bool Available
+    {
+        get
+        {
+            if (Research.IsFinished || Research.IsAnomalyResearch())
+            {
+                return false;
+            }
+
+            return FluffyResearchTreeMod.instance.Settings.LoadType == Constants.LoadTypeDoNotGenerateResearchTree
+                   || DebugSettings.godMode || getCacheValue();
+        }
+    }
+
+    public override bool IsVisible =>
+        !Assets.IsBlockedBySOS2(Research) && !Assets.IsHiddenByTechLevelRestrictions(Research);
 }

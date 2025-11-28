@@ -7,6 +7,15 @@ namespace FluffyResearchTree;
 
 public static class SemiRandomResearch_DrawGoToTechTreeButton
 {
+    public static void ProgressionPostfix(Rect leftRect)
+    {
+        var relocatedRect = leftRect;
+        relocatedRect.width /= 7f;
+        relocatedRect.height = 48f;
+        relocatedRect.y = leftRect.yMax - relocatedRect.height;
+        Prefix(relocatedRect);
+    }
+
     public static bool Prefix(Rect mainRect)
     {
         const float num = 32f;

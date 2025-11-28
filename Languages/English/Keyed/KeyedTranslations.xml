@@ -2,14 +2,18 @@
 <LanguageData>
   <Fluffy.ResearchTree.HoldForClassic>Hold SHIFT to open the vanilla research window</Fluffy.ResearchTree.HoldForClassic>
   <Fluffy.ResearchTree.HoldForNew>Hold SHIFT to open the new research window</Fluffy.ResearchTree.HoldForNew>
+  <Fluffy.ResearchTree.ReverseShift>Use SHIFT Left-Click to replace queue</Fluffy.ResearchTree.ReverseShift>
+  <Fluffy.ResearchTree.ReverseShiftTT>Instead of replacing the whole queue when left-clicking on a research-project, you need to use SHIFT Left-Click</Fluffy.ResearchTree.ReverseShiftTT>
   <Fluffy.ResearchTree.AllowsBuildingX>Enables construction {0}</Fluffy.ResearchTree.AllowsBuildingX>
   <Fluffy.ResearchTree.AllowsCraftingX>Enables recipe {0}</Fluffy.ResearchTree.AllowsCraftingX>
   <Fluffy.ResearchTree.AllowsSowingXinY>Enables planting {0} in {1}</Fluffy.ResearchTree.AllowsSowingXinY>
   <Fluffy.ResearchTree.AllowsPlantingX>Enables growing {0}</Fluffy.ResearchTree.AllowsPlantingX>
   <Fluffy.ResearchTree.LClickReplaceQueue>Left-Click to replace queue</Fluffy.ResearchTree.LClickReplaceQueue>
+  <Fluffy.ResearchTree.SLClickReplaceQueue>Shift-Left-Click to replace queue</Fluffy.ResearchTree.SLClickReplaceQueue>
   <Fluffy.ResearchTree.LClickRemoveFromQueue>Shift-Click to remove from queue</Fluffy.ResearchTree.LClickRemoveFromQueue>
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-Left-Click to move to front of queue</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.SLClickAddToQueue>Shift-Left-Click to add to queue</Fluffy.ResearchTree.SLClickAddToQueue>
+  <Fluffy.ResearchTree.LClickAddToQueue>Left-Click to add to queue</Fluffy.ResearchTree.LClickAddToQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-Left-Click to add to front of queue</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.SRClickShowInfo>Right-Click to show info-window</Fluffy.ResearchTree.SRClickShowInfo>
   <Fluffy.ResearchTree.CannotMoveMore>{0} cannot be moved more to the front of the queue than it already is</Fluffy.ResearchTree.CannotMoveMore>
