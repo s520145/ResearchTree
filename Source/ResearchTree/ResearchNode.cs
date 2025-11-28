@@ -275,13 +275,18 @@ public class ResearchNode : Node
                     continue;
                 }
 
-                if (researchPrerequisite.ResearchNode().Available)
+                var prerequisiteNode = researchPrerequisite.ResearchNode();
+
+                if (prerequisiteNode == null || !prerequisiteNode.Available)
+                {
+                    availableCache = false;
+                    return availableCache;
+                }
+
+                if (prerequisiteNode.Available)
                 {
                     continue;
                 }
-
-                availableCache = false;
-                return availableCache;
             }
         }
 
@@ -294,13 +299,18 @@ public class ResearchNode : Node
                     continue;
                 }
 
-                if (researchPrerequisite.ResearchNode().Available)
+                var prerequisiteNode = researchPrerequisite.ResearchNode();
+
+                if (prerequisiteNode == null || !prerequisiteNode.Available)
+                {
+                    availableCache = false;
+                    return availableCache;
+                }
+
+                if (prerequisiteNode.Available)
                 {
                     continue;
                 }
-
-                availableCache = false;
-                return availableCache;
             }
         }
 
@@ -654,6 +664,7 @@ public class ResearchNode : Node
             (Research.prerequisites?.Where(rpd => !rpd.IsFinished) ?? [])
             .Concat(Research.hiddenPrerequisites?.Where(rpd => !rpd.IsFinished) ?? [])
             .Select(rpd => rpd.ResearchNode())
+            .Where(node => node != null)
             .ToList();
 
         var list = new List<ResearchNode>(enumerable);
