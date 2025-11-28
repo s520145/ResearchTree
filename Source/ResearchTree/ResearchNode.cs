@@ -30,43 +30,8 @@ public class ResearchNode : Node
     private bool hasRefreshedBuildings;
     private bool hasRefreshedFacilities;
 
-    // --- 研究台/设施短期缓存（60 ticks 刷新一次） ---
-    private static int _benchesCacheTick = -1;
-    private static List<Building_ResearchBench> _benchesCached;
-    private static HashSet<ThingDef> _benchDefsCached;
-
-    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    private static void RefreshBenchCacheIfNeeded()
     public readonly ResearchProjectDef Research;
 
-
-    public ResearchNode(ResearchProjectDef research, int order)
-    {
-        int now = Find.TickManager?.TicksGame ?? 0;
-        if (_benchesCacheTick != -1 && now - _benchesCacheTick < 60 &&
-            _benchesCached != null && _benchDefsCached != null)
-            return;
-
-        _benchesCacheTick = now;
-
-        // 收集所有殖民者研究台
-        var benches = new List<Building_ResearchBench>(64);
-        var maps = Find.Maps;
-        for (int mi = 0; mi < maps.Count; mi++)
-        {
-            var list = maps[mi].listerBuildings.allBuildingsColonist;
-            for (int bi = 0; bi < list.Count; bi++)
-                if (list[bi] is Building_ResearchBench rb)
-                    benches.Add(rb);
-        }
-        _benchesCached = benches;
-
-        // 研究台 def 去重
-        var defs = new HashSet<ThingDef>();
-        for (int i = 0; i < benches.Count; i++)
-            defs.Add(benches[i].def);
-        _benchDefsCached = defs;
-    }
 
     private static void RegisterHoverHighlight(ResearchNode node)
     {
@@ -249,7 +214,7 @@ public class ResearchNode : Node
             researchTooltipString.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
         }
 
-        TooltipHandler_Modified.TipRegion(Rect, researchTooltipString.ToString());
+        TooltipHandler_Modified.TipRegionIfEnabled(Rect, researchTooltipString.ToString());
     }
 
     private bool getCacheValue()
@@ -310,12 +275,13 @@ public class ResearchNode : Node
                     continue;
                 }
 
-                var prerequisiteNode = researchPrerequisite.ResearchNode();
-                if (prerequisiteNode == null || !prerequisiteNode.Available)
+                if (researchPrerequisite.ResearchNode().Available)
                 {
-                    availableCache = false;
-                    return availableCache;
+                    continue;
                 }
+
+                availableCache = false;
+                return availableCache;
             }
         }
 
@@ -328,12 +294,13 @@ public class ResearchNode : Node
                     continue;
                 }
 
-                var prerequisiteNode = researchPrerequisite.ResearchNode();
-                if (prerequisiteNode == null || !prerequisiteNode.Available)
+                if (researchPrerequisite.ResearchNode().Available)
                 {
-                    availableCache = false;
-                    return availableCache;
+                    continue;
                 }
+
+                availableCache = false;
+                return availableCache;
             }
         }
 
@@ -390,69 +357,55 @@ public class ResearchNode : Node
 
     private List<ThingDef> missingFacilities(ResearchProjectDef research)
     {
-        // 先读缓存
-        if (_missingFacilitiesCache.TryGetValue(research, out var cached))
+        var hasCache = _missingFacilitiesCache.TryGetValue(research, out var value);
+
+        if (!Assets.RefreshResearch && hasCache || hasRefreshedFacilities && hasCache)
         {
-            if (!Assets.RefreshResearch || hasRefreshedFacilities) return cached;
-            if (currentCacheOrder < Assets.TotalAmountOfResearch)
-            {
-                currentCacheOrder++;
-                return cached;
-            }
+            return value;
+        }
+
+        if (currentCacheOrder < Assets.TotalAmountOfResearch && hasCache)
+        {
+            currentCacheOrder++;
+            return value;
         }
 
         hasRefreshedFacilities = true;
 
-        // 刷新 60tick 研究台缓存
-        RefreshBenchCacheIfNeeded();
-
-        // 本项目 + 未完成祖先（且自身没可用研究台）
-        var chain = new List<ResearchProjectDef>(8);
-        var ancestors = research.Ancestors();
-        for (int i = 0; i < ancestors.Count; i++)
+        var list = research.Ancestors().Where(rpd => !rpd.IsFinished && !rpd.PlayerHasAnyAppropriateResearchBench)
+            .ToList();
+        list.Add(research);
+        var availableBenches = Find.Maps.SelectMany(map => map.listerBuildings.allBuildingsColonist)
+            .OfType<Building_ResearchBench>();
+        var distinctBenches = availableBenches.Select(b => b.def).Distinct();
+        value = [];
+        foreach (var item in list)
         {
-            var a = ancestors[i];
-            if (!a.IsFinished && !a.PlayerHasAnyAppropriateResearchBench)
-                chain.Add(a);
-        }
-        chain.Add(research);
-
-        var missing = new List<ThingDef>(4);
-
-        for (int i = 0; i < chain.Count; i++)
-        {
-            var item = chain[i];
-
-            // 必需研究台
-            var reqBench = item.requiredResearchBuilding;
-            if (reqBench != null && !_benchDefsCached.Contains(reqBench))
-                missing.Add(reqBench);
-
-            // 必需设施
-            var reqFacs = item.requiredResearchFacilities;
-            if (reqFacs == null || reqFacs.Count == 0) continue;
-
-            for (int f = 0; f < reqFacs.Count; f++)
+            if (item.requiredResearchBuilding != null)
             {
-                var fac = reqFacs[f];
-                bool anyHas = false;
-                for (int b = 0; b < _benchesCached.Count; b++)
+                if (!distinctBenches.Contains(item.requiredResearchBuilding))
                 {
-                    if (_benchesCached[b].HasFacility(fac)) { anyHas = true; break; }
+                    value.Add(item.requiredResearchBuilding);
                 }
-                if (!anyHas) missing.Add(fac);
+            }
+
+            if (item.requiredResearchFacilities.NullOrEmpty())
+            {
+                continue;
+            }
+
+            foreach (var facility in item.requiredResearchFacilities)
+            {
+                if (!availableBenches.Any(b => b.HasFacility(facility)))
+                {
+                    value.Add(facility);
+                }
             }
         }
 
-        // 去重
-        if (missing.Count > 1)
-        {
-            var hs = new HashSet<ThingDef>(missing);
-            missing = new List<ThingDef>(hs);
-        }
-
-        _missingFacilitiesCache[research] = missing;
-        return missing;
+        value = value.Distinct().ToList();
+        _missingFacilitiesCache[research] = value;
+        return value;
     }
 
     private List<ThingDef> MissingFacilities()
@@ -697,43 +650,19 @@ public class ResearchNode : Node
 
     public List<ResearchNode> GetMissingRequiredRecursive()
     {
-        // 显式栈 + 去重，一次遍历；与原语义等价（不含 this）
-        var result = new List<ResearchNode>(8);
-        var seen = new HashSet<ResearchNode>();
-        var stack = new List<ResearchNode>(8);
+        var enumerable =
+            (Research.prerequisites?.Where(rpd => !rpd.IsFinished) ?? [])
+            .Concat(Research.hiddenPrerequisites?.Where(rpd => !rpd.IsFinished) ?? [])
+            .Select(rpd => rpd.ResearchNode())
+            .ToList();
 
-        void PushPrereqs(ResearchProjectDef rpd)
+        var list = new List<ResearchNode>(enumerable);
+        foreach (var item in enumerable)
         {
-            var pre = rpd.prerequisites;
-            if (pre != null)
-                for (int i = 0; i < pre.Count; i++)
-                    if (!pre[i].IsFinished)
-                    {
-                        var n = pre[i].ResearchNode();
-                        if (seen.Add(n)) stack.Add(n);
-                    }
-
-            var hid = rpd.hiddenPrerequisites;
-            if (hid != null)
-                for (int i = 0; i < hid.Count; i++)
-                    if (!hid[i].IsFinished)
-                    {
-                        var n = hid[i].ResearchNode();
-                        if (seen.Add(n)) stack.Add(n);
-                    }
+            list.AddRange(item.GetMissingRequiredRecursive());
         }
 
-        PushPrereqs(Research);
-
-        while (stack.Count > 0)
-        {
-            var node = stack[stack.Count - 1];
-            stack.RemoveAt(stack.Count - 1);
-            result.Add(node);
-            PushPrereqs(node.Research);
-        }
-
-        return result;
+        return list.Distinct().ToList();
     }
 
     // TODO: The above code for handling key events should be extracted into a public method,
