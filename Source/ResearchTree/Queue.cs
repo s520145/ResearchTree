@@ -248,7 +248,7 @@ public class Queue : WorldComponent
 
     public static bool IsQueued(ResearchNode node)
     {
-        return _instance._queue.Contains(node) && !node.Research.IsAnomalyResearch();
+        return _instance != null && _instance._queue.Contains(node) && !node.Research.IsAnomalyResearch();
     }
 
     public static IEnumerable<ResearchProjectDef> GetQueuedProjects()
@@ -376,6 +376,11 @@ public class Queue : WorldComponent
 
     public static void DrawLabelForVanillaWindow(Rect rect, ResearchProjectDef projectToStart)
     {
+        if (_instance == null)
+        {
+            return;
+        }
+
         if (projectToStart.IsAnomalyResearch())
         {
             return;
