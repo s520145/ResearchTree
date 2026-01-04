@@ -402,8 +402,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         var pointerOverWindow = Mouse.IsOver(windowRect);
         var capturing = _capturedMouseButtons.Count > 0;
+        var consumingDragFromWindow = capturing && (e.type == EventType.MouseDrag || e.type == EventType.MouseUp);
+        var absorbing = pointerOverWindow || _panning || consumingDragFromWindow;
 
-        if (!pointerOverWindow && !capturing)
+        if (!absorbing)
         {
             return;
         }
@@ -413,10 +415,15 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             case EventType.MouseDown:
             case EventType.ScrollWheel:
             case EventType.ContextClick:
+                if (!pointerOverWindow)
+                {
+                    return;
+                }
+
                 e.Use();
                 break;
             case EventType.MouseDrag:
-                if (!capturing || !_capturedMouseButtons.Contains(e.button))
+                if (!_panning || !capturing || !_capturedMouseButtons.Contains(e.button))
                 {
                     return;
                 }
@@ -424,6 +431,12 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                 e.Use();
                 break;
             case EventType.MouseUp:
+                if (!_panning || !_capturedMouseButtons.Contains(e.button))
+                {
+                    _capturedMouseButtons.Remove(e.button);
+                    return;
+                }
+
                 _capturedMouseButtons.Remove(e.button);
                 e.Use();
                 break;
