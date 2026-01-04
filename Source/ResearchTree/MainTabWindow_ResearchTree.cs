@@ -549,7 +549,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         // 先确认鼠标在窗口内（不是只看 ViewRect）
         bool inWindow = Mouse.IsOver(this.windowRect);
-        bool inView = inWindow && InteractionRect.Contains(e.mousePosition);
+        // 仅在可见树区域内才认为是可用于平移的点击，避免将滚动条和外围按钮也当成平移起点
+        bool inView = inWindow && ViewRect_Inner.Contains(e.mousePosition);
 
         if (e.type == EventType.MouseDown && inWindow)
         {
