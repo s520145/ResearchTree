@@ -400,10 +400,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        var pointerOverWindow = Mouse.IsOver(ViewRect);
+        var pointerOverViewport = Mouse.IsOver(ViewRect_Inner);
         var capturing = _capturedMouseButtons.Count > 0;
         var consumingDragFromWindow = capturing && (e.type == EventType.MouseDrag || e.type == EventType.MouseUp);
-        var absorbing = pointerOverWindow || _panning || consumingDragFromWindow;
+        var absorbing = pointerOverViewport || _panning || consumingDragFromWindow;
 
         if (!absorbing)
         {
@@ -415,7 +415,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             case EventType.MouseDown:
             case EventType.ScrollWheel:
             case EventType.ContextClick:
-                if (!pointerOverWindow)
+                if (!pointerOverViewport)
                 {
                     return;
                 }
@@ -554,7 +554,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         if (e.type == EventType.MouseDown && inWindow)
         {
-            _capturedMouseButtons.Add(e.button);
+            if (inView)
+            {
+                _capturedMouseButtons.Add(e.button);
+            }
 
             _dragging = inView && e.button == 0; // 只有左键才触发平移
             _panning = false;
