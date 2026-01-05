@@ -400,7 +400,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        var pointerOverWindow = Mouse.IsOver(windowRect);
+        var pointerOverWindow = Mouse.IsOver(ViewRect);
         var capturing = _capturedMouseButtons.Count > 0;
         var consumingDragFromWindow = capturing && (e.type == EventType.MouseDrag || e.type == EventType.MouseUp);
         var absorbing = pointerOverWindow || _panning || consumingDragFromWindow;
@@ -547,8 +547,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         var e = Event.current;
 
-        // 先确认鼠标在窗口内（不是只看 ViewRect）
-        bool inWindow = Mouse.IsOver(this.windowRect);
+        // 只在可交互的树视窗内才记录点击，避免捕获到窗口外围的游戏 UI
+        bool inWindow = Mouse.IsOver(ViewRect);
         // 仅在可见树区域内才认为是可用于平移的点击，避免将滚动条和外围按钮也当成平移起点
         bool inView = inWindow && ViewRect_Inner.Contains(e.mousePosition);
 
