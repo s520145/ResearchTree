@@ -552,8 +552,17 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         // 仅在可见树区域内才认为是可用于平移的点击，避免将滚动条和外围按钮也当成平移起点
         bool inView = inWindow && ViewRect_Inner.Contains(e.mousePosition);
 
-        if (e.type == EventType.MouseDown && inWindow)
+        if (e.type == EventType.MouseDown)
         {
+            if (!inWindow)
+            {
+                // 点击了窗口外的 UI，确保不会继续保留任何平移/捕获状态
+                _capturedMouseButtons.Clear();
+                _dragging = _panning = false;
+                _dragStart = _mousePosition = Vector2.zero;
+                return;
+            }
+
             if (inView)
             {
                 _capturedMouseButtons.Add(e.button);
