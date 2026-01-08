@@ -721,7 +721,7 @@ public class Queue : WorldComponent
         }
 
         var orderedNodes = nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList();
-        var firstUnavailableIndex = orderedNodes.FindIndex(node => node?.Research == null || !node.Research.CanStartNow);
+        var firstUnavailableIndex = orderedNodes.FindIndex(IsQueueUnavailable);
         if (firstUnavailableIndex < 0)
         {
             return orderedNodes;
@@ -729,6 +729,43 @@ public class Queue : WorldComponent
 
         unavailableNodes = orderedNodes.Skip(firstUnavailableIndex).ToList();
         return orderedNodes.Take(firstUnavailableIndex).ToList();
+    }
+
+    private static bool IsQueueUnavailable(ResearchNode node)
+    {
+        var research = node?.Research;
+        if (research == null)
+        {
+            return true;
+        }
+
+        if (!research.PrerequisitesCompleted)
+        {
+            return false;
+        }
+
+        if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
+        {
+            return true;
+        }
+
+        if (Assets.UsingRimedieval && !Assets.RimedievalAllowedResearchDefs.Contains(research))
+        {
+            return true;
+        }
+
+        if (Assets.IsBlockedByGrimworld(research) || Assets.IsBlockedByWorldTechLevel(research) ||
+            Assets.IsBlockedByMedievalOverhaul(research))
+        {
+            return true;
+        }
+
+        if (!research.TechprintRequirementMet)
+        {
+            return true;
+        }
+
+        return !node.BuildingPresent();
     }
 
     private static void notifyUnavailableNodes(IEnumerable<ResearchNode> unavailableNodes)

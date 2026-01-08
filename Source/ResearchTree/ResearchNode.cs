@@ -271,6 +271,15 @@ public class ResearchNode : Node
             return availableCache;
         }
 
+        if (Research.PrerequisitesCompleted)
+        {
+            if (!Research.TechprintRequirementMet || missingFacilities(Research)?.Any() == true)
+            {
+                availableCache = false;
+                return availableCache;
+            }
+        }
+
         if (Research.prerequisites?.Any() != true && Research.hiddenPrerequisites?.Any() != true)
         {
             availableCache = true;
