@@ -19,6 +19,9 @@ public class ResearchNode : Node
     private static readonly Dictionary<ResearchProjectDef, bool> _buildingPresentCache = [];
 
     private static readonly Dictionary<ResearchProjectDef, List<ThingDef>> _missingFacilitiesCache = [];
+    private static readonly Dictionary<ResearchProjectDef, int> _lastRejectMessageTick = [];
+
+    private const int RejectMessageCooldownTicks = 60;
 
     private bool availableCache;
 
@@ -123,47 +126,37 @@ public class ResearchNode : Node
         return value;
     }
 
-    private void buildTips()
+    private string getMissingRequirementsText()
     {
-        if (Queue._draggedNode != null)
-        {
-            return;
-        }
-
-        var researchTooltipString = getResearchTooltipString();
+        var missingText = new StringBuilder();
         var missingFacilities = MissingFacilities();
         if (missingFacilities?.Any() == true)
         {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
+            missingText.AppendLine("Fluffy.ResearchTree.MissingFacilities".Translate(string.Join(", ",
                 missingFacilities.Select(td => td.LabelCap).ToArray())));
         }
 
         if (!Research.TechprintRequirementMet)
         {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingTechprints".Translate(
+            missingText.AppendLine("Fluffy.ResearchTree.MissingTechprints".Translate(
                 Research.TechprintsApplied,
                 Research.techprintCount));
         }
 
         if (!Research.InspectionRequirementsMet)
         {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("MissingGravEngineInspection".Translate());
+            missingText.AppendLine("MissingGravEngineInspection".Translate());
         }
 
         if (!Research.AnalyzedThingsRequirementsMet)
         {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
+            missingText.AppendLine("Fluffy.ResearchTree.MissingStudiedThings".Translate(string.Join(", ",
                 Research.requiredAnalyzed.Select(def => def.LabelCap))));
         }
 
         if (!Research.PlayerMechanitorRequirementMet)
         {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
+            missingText.AppendLine("Fluffy.ResearchTree.MissingMechanitorRequirement".Translate());
         }
 
         if (Assets.UsingVanillaVehiclesExpanded)
@@ -173,51 +166,87 @@ public class ResearchNode : Node
 
             if (boolResult)
             {
-                researchTooltipString.AppendLine();
                 var wreck = (ThingDef)valueArray[1];
                 if (wreck != null)
                 {
-                    researchTooltipString.AppendLine();
-                    researchTooltipString.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
+                    missingText.AppendLine("VVE_WreckNotRestored".Translate(wreck.LabelCap));
                 }
             }
         }
 
         if (Assets.IsBlockedByGrimworld(Research))
         {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.GrimworldDoesNotAllow".Translate());
+            missingText.AppendLine("Fluffy.ResearchTree.GrimworldDoesNotAllow".Translate());
         }
 
         if (Assets.IsBlockedByWorldTechLevel(Research))
         {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.WorldTechLevelDoesNotAllow".Translate());
+            missingText.AppendLine("Fluffy.ResearchTree.WorldTechLevelDoesNotAllow".Translate());
         }
 
         if (Assets.IsBlockedByMedievalOverhaul(Research))
         {
-            researchTooltipString.AppendLine();
             if (Assets.TryGetBlockingSchematicFromMedievalOverhaul(Research, out var thingLabel))
             {
-                researchTooltipString.AppendLine("DankPyon_RequiredSchematic".Translate() + $": {thingLabel}");
+                missingText.AppendLine("DankPyon_RequiredSchematic".Translate() + $": {thingLabel}");
             }
             else
             {
-                researchTooltipString.AppendLine("DankPyon_RequiredSchematic".Translate());
+                missingText.AppendLine("DankPyon_RequiredSchematic".Translate());
             }
         }
 
         if (Assets.SemiRandomResearchLoaded && Assets.SemiResearchEnabled)
         {
-            researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.SemiRandomResearchLoaded".Translate());
+            missingText.AppendLine("Fluffy.ResearchTree.SemiRandomResearchLoaded".Translate());
         }
 
         if (Assets.UsingRimedieval && !Assets.RimedievalAllowedResearchDefs.Contains(Research))
         {
+            missingText.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
+        }
+
+        return missingText.ToString().TrimEnd();
+    }
+
+    private void showUnavailableMessage()
+    {
+        if (Queue._draggedNode != null)
+        {
+            return;
+        }
+
+        var currentTick = Find.TickManager?.TicksGame ?? 0;
+        if (_lastRejectMessageTick.TryGetValue(Research, out var lastTick)
+            && currentTick - lastTick < RejectMessageCooldownTicks)
+        {
+            return;
+        }
+
+        _lastRejectMessageTick[Research] = currentTick;
+
+        var message = getMissingRequirementsText();
+        if (message.NullOrEmpty())
+        {
+            message = Research.LabelCap;
+        }
+
+        Messages.Message(message, MessageTypeDefOf.RejectInput);
+    }
+
+    private void buildTips()
+    {
+        if (Queue._draggedNode != null)
+        {
+            return;
+        }
+
+        var researchTooltipString = getResearchTooltipString();
+        var missingText = getMissingRequirementsText();
+        if (!missingText.NullOrEmpty())
+        {
             researchTooltipString.AppendLine();
-            researchTooltipString.AppendLine("Fluffy.ResearchTree.RimedievalDoesNotAllow".Translate());
+            researchTooltipString.AppendLine(missingText);
         }
 
         TooltipHandler_Modified.TipRegionIfEnabled(Rect, researchTooltipString.ToString());
@@ -618,6 +647,7 @@ public class ResearchNode : Node
 
         if (!Available)
         {
+            showUnavailableMessage();
             return;
         }
 
@@ -699,6 +729,7 @@ public class ResearchNode : Node
     {
         if (!Available)
         {
+            showUnavailableMessage();
             return;
         }
 
