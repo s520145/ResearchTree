@@ -152,7 +152,7 @@ public class Queue : WorldComponent
     {
         var researchOrder = filterUnavailableNodes(nodes, out var unavailable);
         notifyUnavailableNodes(unavailable);
-        if (researchOrder.NullOrEmpty())
+        if (!researchOrder.Any())
         {
             return;
         }
@@ -181,7 +181,7 @@ public class Queue : WorldComponent
     {
         var researchOrder = filterUnavailableNodes(nodes, out var unavailable);
         notifyUnavailableNodes(unavailable);
-        if (researchOrder.NullOrEmpty())
+        if (!researchOrder.Any())
         {
             return;
         }
@@ -250,7 +250,7 @@ public class Queue : WorldComponent
             enqueue(item, true);
         }
 
-        if (researchOrder.NullOrEmpty())
+        if (!researchOrder.Any())
         {
             return;
         }
@@ -733,7 +733,7 @@ public class Queue : WorldComponent
 
     private static void notifyUnavailableNodes(IEnumerable<ResearchNode> unavailableNodes)
     {
-        if (unavailableNodes.NullOrEmpty())
+        if (unavailableNodes == null || !unavailableNodes.Any())
         {
             return;
         }
