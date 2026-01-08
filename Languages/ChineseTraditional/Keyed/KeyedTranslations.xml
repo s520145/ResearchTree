@@ -30,6 +30,7 @@
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl+左鍵：移動到隊首</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl+左鍵：新增到隊首</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.CannotMoveMore>{0}不能被移動到佇列的最前面。</Fluffy.ResearchTree.CannotMoveMore>
+  <Fluffy.ResearchTree.QueueUnavailable>僅將可研究項目加入隊列。不可用：{0}</Fluffy.ResearchTree.QueueUnavailable>
   <Fluffy.ResearchTree.CurrentModVersion>已安裝模組版本：{0}</Fluffy.ResearchTree.CurrentModVersion>
   <Fluffy.ResearchTree.PauseOnOpen>開啟研究樹時暫停遊戲</Fluffy.ResearchTree.PauseOnOpen>
   <Fluffy.ResearchTree.LoadType>何時生成研究樹？</Fluffy.ResearchTree.LoadType>

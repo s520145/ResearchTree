@@ -150,7 +150,12 @@ public class Queue : WorldComponent
 
     public static void EnqueueRangeFirst(IEnumerable<ResearchNode> nodes)
     {
-        var researchOrder = nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList();
+        var researchOrder = filterUnavailableNodes(nodes, out var unavailable);
+        notifyUnavailableNodes(unavailable);
+        if (researchOrder.NullOrEmpty())
+        {
+            return;
+        }
 
         if (IsEnqueueRangeFirstSameOrder(researchOrder))
         {
@@ -174,7 +179,12 @@ public class Queue : WorldComponent
 
     public static void EnqueueFirst(IEnumerable<ResearchNode> nodes)
     {
-        var researchOrder = nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList();
+        var researchOrder = filterUnavailableNodes(nodes, out var unavailable);
+        notifyUnavailableNodes(unavailable);
+        if (researchOrder.NullOrEmpty())
+        {
+            return;
+        }
 
         if (IsEnqueueRangeFirstSameOrder(researchOrder))
         {
@@ -226,6 +236,8 @@ public class Queue : WorldComponent
 
     public static void EnqueueRange(IEnumerable<ResearchNode> nodes, bool add)
     {
+        var researchOrder = filterUnavailableNodes(nodes, out var unavailable);
+        notifyUnavailableNodes(unavailable);
         if (!add)
         {
             _instance._queue.Clear();
@@ -233,9 +245,14 @@ public class Queue : WorldComponent
         }
 
         var firstEnqueue = _instance._queue.Empty();
-        foreach (var item in nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent))
+        foreach (var item in researchOrder)
         {
             enqueue(item, true);
+        }
+
+        if (researchOrder.NullOrEmpty())
+        {
+            return;
         }
 
         if (firstEnqueue)
@@ -692,6 +709,37 @@ public class Queue : WorldComponent
 
             vector2.x += Constants.NodeSize.x + Constants.Margin;
         }
+    }
+
+    private static List<ResearchNode> filterUnavailableNodes(IEnumerable<ResearchNode> nodes,
+        out List<ResearchNode> unavailableNodes)
+    {
+        unavailableNodes = [];
+        if (nodes == null)
+        {
+            return [];
+        }
+
+        var orderedNodes = nodes.OrderBy(node => node.X).ThenBy(node => node.Research.CostApparent).ToList();
+        var firstUnavailableIndex = orderedNodes.FindIndex(node => node?.Research == null || !node.Research.CanStartNow);
+        if (firstUnavailableIndex < 0)
+        {
+            return orderedNodes;
+        }
+
+        unavailableNodes = orderedNodes.Skip(firstUnavailableIndex).ToList();
+        return orderedNodes.Take(firstUnavailableIndex).ToList();
+    }
+
+    private static void notifyUnavailableNodes(IEnumerable<ResearchNode> unavailableNodes)
+    {
+        if (unavailableNodes.NullOrEmpty())
+        {
+            return;
+        }
+
+        var labels = string.Join(", ", unavailableNodes.Select(node => node.Label));
+        Messages.Message("Fluffy.ResearchTree.QueueUnavailable".Translate(labels), null, MessageTypeDefOf.RejectInput);
     }
 
     private static void handleMouseDown()

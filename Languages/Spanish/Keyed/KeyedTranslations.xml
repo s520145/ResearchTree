@@ -12,6 +12,7 @@
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl+Clic izquierdo para añadir al principio de la cola</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.SRClickShowInfo>Clic derecho para mostrar la ventana de información</Fluffy.ResearchTree.SRClickShowInfo>
   <Fluffy.ResearchTree.CannotMoveMore>{0} no se puede mover más al principio de la cola</Fluffy.ResearchTree.CannotMoveMore>
+  <Fluffy.ResearchTree.QueueUnavailable>Solo se han puesto en cola investigaciones disponibles. No disponibles: {0}</Fluffy.ResearchTree.QueueUnavailable>
   <!--  <Fluffy.ResearchTree.RClickForDetails>Clic derecho para más detalles</Fluffy.ResearchTree.RClickForDetails>  -->
   <Fluffy.ResearchTree.RClickInstaFinish>(DEBUG) Clic derecho para completar instantáneamente</Fluffy.ResearchTree.RClickInstaFinish>
   <Fluffy.ResearchTree.RClickInstaFinishNew>(DEBUG) Shift+Clic derecho para completar instantáneamente</Fluffy.ResearchTree.RClickInstaFinishNew>

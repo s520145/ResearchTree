@@ -10,6 +10,7 @@
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-ЛКМ, чтобы добавить в начало очереди</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.SRClickShowInfo>ПКМ - информационное окно</Fluffy.ResearchTree.SRClickShowInfo>
   <Fluffy.ResearchTree.CannotMoveMore>"{0}" уже в начале очереди</Fluffy.ResearchTree.CannotMoveMore>
+  <Fluffy.ResearchTree.QueueUnavailable>В очередь добавлены только доступные исследования. Недоступны: {0}</Fluffy.ResearchTree.QueueUnavailable>
   <Fluffy.ResearchTree.RClickInstaFinish>(Дебаг) ПКМ для мгновенного изучения</Fluffy.ResearchTree.RClickInstaFinish>
   <Fluffy.ResearchTree.RClickInstaFinishNew>(Дебаг) Shift-ПКМ для мгновенного завершения</Fluffy.ResearchTree.RClickInstaFinishNew>
   <Fluffy.ResearchTree.Requires>Требует</Fluffy.ResearchTree.Requires>

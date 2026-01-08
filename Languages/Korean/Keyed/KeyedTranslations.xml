@@ -29,6 +29,7 @@
   <Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>Ctrl-왼쪽 클릭으로 대기열 맨 앞으로 이동</Fluffy.ResearchTree.CLClickMoveToFrontOfQueue>
   <Fluffy.ResearchTree.CLClickAddToFrontOfQueue>Ctrl-왼쪽 클릭으로 대기열 맨 앞에 추가</Fluffy.ResearchTree.CLClickAddToFrontOfQueue>
   <Fluffy.ResearchTree.CannotMoveMore>{0}은(는) 더 이상 대기열 앞쪽으로 이동할 수 없습니다.</Fluffy.ResearchTree.CannotMoveMore>
+  <Fluffy.ResearchTree.QueueUnavailable>가능한 연구만 대기열에 추가했습니다. 사용 불가: {0}</Fluffy.ResearchTree.QueueUnavailable>
   <Fluffy.ResearchTree.CurrentModVersion>설치된 모드 버전: {0}</Fluffy.ResearchTree.CurrentModVersion>
   <Fluffy.ResearchTree.PauseOnOpen>연구 트리를 열 때 게임 일시정지</Fluffy.ResearchTree.PauseOnOpen>
   <Fluffy.ResearchTree.LoadType>연구 트리를 언제 생성할까요?</Fluffy.ResearchTree.LoadType>
