@@ -334,7 +334,6 @@ public class ResearchNode : Node
         if(!Assets.SemiRandomResearchLoaded)
         {
             stringBuilder.AppendLine();
-            // TODO: Add settings so that shortcut key tips can be hidden
             if(Queue.IsQueued(this))
             {
                 stringBuilder.AppendLine(
@@ -692,10 +691,6 @@ public class ResearchNode : Node
         return list.Distinct().ToList();
     }
 
-    // TODO: The above code for handling key events should be extracted into a public method,
-    //       so that the consistency of shortcut keys can be maintained.
-    //       However, left-clicking on a node will probably conflict with the original view.
-    //       We will try it out, but that’s it for now.
     public void HandleVanillaNodeClickEvent()
     {
         if (!Available)

@@ -45,8 +45,8 @@
   <Fluffy.ResearchTree.GenerationInProgress>La génération de l'arbre de recherche est toujours en cours, veuillez patienter…</Fluffy.ResearchTree.GenerationInProgress>
   <Fluffy.ResearchTree.UIScaleWarning>Lorsque l'échelle de l'interface utilisateur est supérieure à 1x, il se peut que les étiquettes de recherche soient coupées si vous utilisez l'option de chargement en arrière-plan.
 Veuillez utiliser l'option de chargement à la première ouverture si vous rencontrez ce problème.</Fluffy.ResearchTree.UIScaleWarning>
-  <Fluffy.ResearchTree.CtrlFunctionScroll>Utilisez la touche Ctrl pour faire défiler verticalement l'arbre de recherche.</Fluffy.ResearchTree.CtrlFunctionScroll>
-  <Fluffy.ResearchTree.CtrlFunctionZoom>Utilisez la touche Ctrl pour agrandir l'arbre de recherche.</Fluffy.ResearchTree.CtrlFunctionZoom>
+  <Fluffy.ResearchTree.CtrlFunctionScroll>Utilisez Ctrl pour faire défiler verticalement l'arbre de recherche ; Alt le fait défiler horizontalement.</Fluffy.ResearchTree.CtrlFunctionScroll>
+  <Fluffy.ResearchTree.CtrlFunctionZoom>Utilisez Ctrl pour zoomer sur l'arbre de recherche ; Alt le fait défiler horizontalement.</Fluffy.ResearchTree.CtrlFunctionZoom>
   <Fluffy.ResearchTree.ResolutionChange>Arbre de recherche : Changement graphique détecté, l'arbre de recherche sera régénéré</Fluffy.ResearchTree.ResolutionChange>
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller ne permet pas cette technologie</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>L'environnement médiéval ne permet pas l'utilisation de cette technologie.</Fluffy.ResearchTree.RimedievalDoesNotAllow>
@@ -86,4 +86,18 @@ Veuillez utiliser l'option de chargement à la première ouverture si vous renco
   <Fluffy.ResearchTree.ReverseShiftTT>Au lieu de remplacer toute la file d'attente lorsque l'on fait un clic gauche sur un projet de recherche, il faut utiliser SHIFT Left-Click.</Fluffy.ResearchTree.ReverseShiftTT>
   <Fluffy.ResearchTree.SLClickReplaceQueue>Shift-Gauche-Clic pour remplacer la file d'attente</Fluffy.ResearchTree.SLClickReplaceQueue>
   <Fluffy.ResearchTree.LClickAddToQueue>Cliquer gauche pour ajouter à la file d'attente</Fluffy.ResearchTree.LClickAddToQueue>
+  <Fluffy.ResearchTree.ProfileDefault>Default</Fluffy.ResearchTree.ProfileDefault>
+  <Fluffy.ResearchTree.ProfileManage>Manage research tag profiles</Fluffy.ResearchTree.ProfileManage>
+  <Fluffy.ResearchTree.ProfileEditCurrent>Edit current profile</Fluffy.ResearchTree.ProfileEditCurrent>
+  <Fluffy.ResearchTree.ProfileRowLabel>Views</Fluffy.ResearchTree.ProfileRowLabel>
+  <Fluffy.ResearchTree.ProfileNew>New</Fluffy.ResearchTree.ProfileNew>
+  <Fluffy.ResearchTree.ProfileDelete>Delete</Fluffy.ResearchTree.ProfileDelete>
+  <Fluffy.ResearchTree.ProfileName>Name</Fluffy.ResearchTree.ProfileName>
+  <Fluffy.ResearchTree.ProfileManageShort>Manage</Fluffy.ResearchTree.ProfileManageShort>
+  <Fluffy.ResearchTree.ProfileNewQuick>Create a new profile from the current research tag selection.</Fluffy.ResearchTree.ProfileNewQuick>
+  <Fluffy.ResearchTree.ProfileLoading>Research tag profile is being prepared.</Fluffy.ResearchTree.ProfileLoading>
+  <Fluffy.ResearchTree.ProfileSwitch>Switch to {0}</Fluffy.ResearchTree.ProfileSwitch>
+  <Fluffy.ResearchTree.ProfileCreated>Created research tag profile: {0}</Fluffy.ResearchTree.ProfileCreated>
+  <Fluffy.ResearchTree.ProfileApplied>Applied research tag profile changes and requested a tree refresh.</Fluffy.ResearchTree.ProfileApplied>
+  <Fluffy.ResearchTree.ProfileNewDefaultName>New profile</Fluffy.ResearchTree.ProfileNewDefaultName>
 </LanguageData>

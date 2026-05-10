@@ -6,4 +6,5 @@
     <BuildType Name="Release" />
   </Configurations>
   <Project Path="ResearchTree/FluffyResearchTree.csproj" />
+  <Project Path="ResearchTree.Tests/ResearchTree.Tests.csproj" />
 </Solution>

@@ -46,8 +46,8 @@
   <Fluffy.ResearchTree.NoTabsSelected>当前未选择任何研究项目</Fluffy.ResearchTree.NoTabsSelected>
   <Fluffy.ResearchTree.UIScaleWarning>如果使用后台加载选项，当用户界面比例大于 1x 时，可能会出现研究标签被切断的情况。
 如果遇到这种情况，请使用首次打开时加载。</Fluffy.ResearchTree.UIScaleWarning>
-  <Fluffy.ResearchTree.CtrlFunctionScroll>使用 Ctrl 键垂直滚动研究树</Fluffy.ResearchTree.CtrlFunctionScroll>
-  <Fluffy.ResearchTree.CtrlFunctionZoom>使用 Ctrl 键缩放研究树</Fluffy.ResearchTree.CtrlFunctionZoom>
+  <Fluffy.ResearchTree.CtrlFunctionScroll>使用 Ctrl 键垂直滚动研究树；Alt 键横向滚动</Fluffy.ResearchTree.CtrlFunctionScroll>
+  <Fluffy.ResearchTree.CtrlFunctionZoom>使用 Ctrl 键缩放研究树；Alt 键横向滚动</Fluffy.ResearchTree.CtrlFunctionZoom>
   <Fluffy.ResearchTree.ResolutionChange>研究树：检测到图形变化，研究树将重新生成</Fluffy.ResearchTree.ResolutionChange>
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>故事讲述人不允许使用这种技术</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Rimedieval 设置不允许使用这种技术。</Fluffy.ResearchTree.RimedievalDoesNotAllow>
@@ -87,4 +87,18 @@
   <Fluffy.ResearchTree.ReverseShiftTT>在研究项目上左键单击时，您需要使用 SHIFT 左键单击，而不是替换整个队列</Fluffy.ResearchTree.ReverseShiftTT>
   <Fluffy.ResearchTree.SLClickReplaceQueue>Shift-Left-Click 替换队列</Fluffy.ResearchTree.SLClickReplaceQueue>
   <Fluffy.ResearchTree.LClickAddToQueue>左键单击添加到队列</Fluffy.ResearchTree.LClickAddToQueue>
+  <Fluffy.ResearchTree.ProfileDefault>&#40664;&#35748;</Fluffy.ResearchTree.ProfileDefault>
+  <Fluffy.ResearchTree.ProfileManage>&#31649;&#29702;&#30740;&#31350;&#26631;&#31614;&#32452;&#21512;</Fluffy.ResearchTree.ProfileManage>
+  <Fluffy.ResearchTree.ProfileEditCurrent>&#32534;&#36753;&#24403;&#21069;&#32452;&#21512;</Fluffy.ResearchTree.ProfileEditCurrent>
+  <Fluffy.ResearchTree.ProfileRowLabel>&#32452;&#21512;</Fluffy.ResearchTree.ProfileRowLabel>
+  <Fluffy.ResearchTree.ProfileNew>&#26032;&#24314;</Fluffy.ResearchTree.ProfileNew>
+  <Fluffy.ResearchTree.ProfileDelete>&#21024;&#38500;</Fluffy.ResearchTree.ProfileDelete>
+  <Fluffy.ResearchTree.ProfileName>&#21517;&#31216;</Fluffy.ResearchTree.ProfileName>
+  <Fluffy.ResearchTree.ProfileManageShort>&#31649;&#29702;</Fluffy.ResearchTree.ProfileManageShort>
+  <Fluffy.ResearchTree.ProfileNewQuick>&#20174;&#24403;&#21069;&#30740;&#31350;&#26631;&#31614;&#32452;&#21512;&#24555;&#36895;&#21019;&#24314;&#26032;&#26631;&#31614;&#12290;</Fluffy.ResearchTree.ProfileNewQuick>
+  <Fluffy.ResearchTree.ProfileLoading>&#27491;&#22312;&#20934;&#22791;&#30740;&#31350;&#26631;&#31614;&#32452;&#21512;&#12290;</Fluffy.ResearchTree.ProfileLoading>
+  <Fluffy.ResearchTree.ProfileSwitch>&#20999;&#25442;&#21040; {0}</Fluffy.ResearchTree.ProfileSwitch>
+  <Fluffy.ResearchTree.ProfileCreated>&#24050;&#21019;&#24314;&#30740;&#31350;&#26631;&#31614;&#32452;&#21512;&#65306;{0}</Fluffy.ResearchTree.ProfileCreated>
+  <Fluffy.ResearchTree.ProfileApplied>&#24050;&#24212;&#29992;&#30740;&#31350;&#26631;&#31614;&#32452;&#21512;&#26356;&#25913;&#24182;&#35831;&#27714;&#21047;&#26032;&#30740;&#31350;&#26641;&#12290;</Fluffy.ResearchTree.ProfileApplied>
+  <Fluffy.ResearchTree.ProfileNewDefaultName>&#26032;&#32452;&#21512;</Fluffy.ResearchTree.ProfileNewDefaultName>
 </LanguageData>

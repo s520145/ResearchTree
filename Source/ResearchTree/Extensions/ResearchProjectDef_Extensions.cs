@@ -18,7 +18,7 @@ public static class ResearchProjectDef_Extensions
     {
         get
         {
-            if (_unlockedByCache.Any())
+            if (_unlockedByCache.Count > 0)
             {
                 return _unlockedByCache;
             }

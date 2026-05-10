@@ -235,3 +235,10 @@ $RECYCLE.BIN/
 # Rimworld specific
 _PublisherPlus.xml
 lastrun.log
+
+# Packaging output
+dist/
+.package_stage/
+
+# Local agent/runtime state
+.omx/

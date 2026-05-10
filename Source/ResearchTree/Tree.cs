@@ -41,6 +41,13 @@ public static class Tree
 
     private static bool _loggedInitialDraw;
 
+    private static readonly Dictionary<string, TreeState> ProfileStateCache = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly HashSet<string> ProfilesBuilding = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly System.Collections.Generic.Queue<string> ProfileBuildQueue = new();
+    private static string _pendingProfileId;
+    private static HashSet<string> _buildingIncludedTabs;
+    private static bool _profileBuildQueued;
+
     // --- caches for hot paths ---
     private static List<Node>[] _layerBuckets;                 // [0..L]
     private static List<Edge<Node, Node>>[] _inEdgesPerLayer;  // [0..L]
@@ -60,6 +67,27 @@ public static class Tree
     };
 
     private static List<CollapsedEdge> _collapsedEdges;
+
+    private sealed class TreeState
+    {
+        public string ProfileId;
+        public string Signature;
+        public bool Initialized;
+        public bool NoTabsSelected;
+        public bool FirstLoadDone;
+        public bool OrderDirty;
+        public IntVec2 Size;
+        public List<Node> Nodes;
+        public List<Edge<Node, Node>> Edges;
+        public List<TechLevel> RelevantTechLevels;
+        public Dictionary<TechLevel, IntRange> TechLevelBounds;
+        public Dictionary<ResearchProjectDef, Node> ResearchToNodes;
+        public List<Node>[] LayerBuckets;
+        public List<Edge<Node, Node>>[] InEdgesPerLayer;
+        public List<Edge<Node, Node>>[] OutEdgesPerLayer;
+        public Node[][] LayerSlots;
+        public List<CollapsedEdge> CollapsedEdges;
+    }
 
     private sealed class CollapsedEdge
     {
@@ -656,14 +684,245 @@ public static class Tree
         return ResearchToNodesCache.TryGetValue(research);
     }
 
-    public static void Reset(bool alsoZoom)
+    public static bool IsProfileCached(string profileId)
     {
-        Messages.Message("Fluffy.ResearchTree.ResolutionChange".Translate(), MessageTypeDefOf.NeutralEvent);
+        var settings = FluffyResearchTreeMod.instance?.Settings;
+        var profile = settings?.Profiles.FirstOrDefault(item =>
+            string.Equals(item.Id, profileId, StringComparison.OrdinalIgnoreCase));
 
-        Queue.Notify_TreeWillReset();
+        return profile != null &&
+               ProfileStateCache.TryGetValue(profile.Id, out var state) &&
+               string.Equals(state.Signature, settings.ProfileSignature(profile), StringComparison.Ordinal);
+    }
 
+    public static bool IsProfileBuilding(string profileId)
+    {
+        return !string.IsNullOrWhiteSpace(profileId) && ProfilesBuilding.Contains(profileId);
+    }
+
+    public static void InvalidateProfileCache()
+    {
+        ProfileStateCache.Clear();
+        ProfilesBuilding.Clear();
+        ProfileBuildQueue.Clear();
+        _profileBuildQueued = false;
+        _pendingProfileId = null;
+    }
+
+    public static void SwitchToProfile(string profileId)
+    {
+        var settings = FluffyResearchTreeMod.instance?.Settings;
+        if (settings == null || string.IsNullOrWhiteSpace(profileId))
+        {
+            return;
+        }
+
+        settings.EnsureTabCache();
+        var profile = settings.Profiles.FirstOrDefault(item =>
+            string.Equals(item.Id, profileId, StringComparison.OrdinalIgnoreCase));
+        if (profile == null)
+        {
+            return;
+        }
+
+        MainTabWindow_ResearchTree.Instance?.SaveActiveProfileViewState();
+        settings.SetActiveProfile(profile.Id);
+        FluffyResearchTreeMod.instance.WriteSettings();
+
+        if (IsProfileCached(profile.Id))
+        {
+            Queue.Notify_TreeWillReset();
+            ApplyState(ProfileStateCache[profile.Id]);
+            Queue.Notify_TreeReinitialized();
+            MainTabWindow_ResearchTree.Instance?.Notify_ProfileTreeSwitched(profile.Id);
+            Assets.RefreshResearch = true;
+            return;
+        }
+
+        _pendingProfileId = profile.Id;
+        QueueProfileBuild(profile.Id);
+    }
+
+    public static void QueueBackgroundProfileBuilds()
+    {
+        if (!Initialized || _initializing ||
+            FluffyResearchTreeMod.instance?.Settings?.LoadType == Constants.LoadTypeDoNotGenerateResearchTree)
+        {
+            return;
+        }
+
+        var settings = FluffyResearchTreeMod.instance.Settings;
+        settings.EnsureTabCache();
+
+        foreach (var profile in settings.Profiles)
+        {
+            if (profile == null ||
+                string.Equals(profile.Id, settings.ActiveTabProfileId, StringComparison.OrdinalIgnoreCase) ||
+                IsProfileCached(profile.Id) ||
+                IsProfileBuilding(profile.Id))
+            {
+                continue;
+            }
+
+            QueueProfileBuild(profile.Id);
+        }
+    }
+
+    private static void QueueProfileBuild(string profileId)
+    {
+        if (string.IsNullOrWhiteSpace(profileId) || IsProfileCached(profileId) || ProfilesBuilding.Contains(profileId))
+        {
+            return;
+        }
+
+        ProfilesBuilding.Add(profileId);
+        ProfileBuildQueue.Enqueue(profileId);
+
+        if (_profileBuildQueued)
+        {
+            return;
+        }
+
+        _profileBuildQueued = true;
+        LongEventHandler.QueueLongEvent(BuildNextQueuedProfileState, "ResearchPal.BuildingResearchTreeAsync", false,
+            null);
+    }
+
+    private static void BuildNextQueuedProfileState()
+    {
+        try
+        {
+            while (ProfileBuildQueue.Count > 0)
+            {
+                var profileId = ProfileBuildQueue.Dequeue();
+                BuildCachedProfileState(profileId);
+            }
+        }
+        finally
+        {
+            _profileBuildQueued = false;
+        }
+    }
+
+    private static void BuildCachedProfileState(string profileId)
+    {
+        var settings = FluffyResearchTreeMod.instance?.Settings;
+        var profile = settings?.Profiles.FirstOrDefault(item =>
+            string.Equals(item.Id, profileId, StringComparison.OrdinalIgnoreCase));
+        if (settings == null || profile == null)
+        {
+            ProfilesBuilding.Remove(profileId);
+            return;
+        }
+
+        var previousState = CaptureCurrentState(settings.ActiveTabProfileId, settings.ProfileSignature(settings.ActiveProfile));
+
+        try
+        {
+            ClearRuntimeState();
+            BeginProfileBuild(profile);
+            RunInitializationPipeline();
+            Initialized = true;
+            FirstLoadDone = true;
+            ProfileStateCache[profile.Id] = CaptureCurrentState(profile.Id, settings.ProfileSignature(profile));
+        }
+        catch (Exception ex)
+        {
+            Logging.Error($"Error building cached research profile {profile.Name}: {ex}", true);
+        }
+        finally
+        {
+            EndProfileBuild();
+            ApplyState(previousState);
+            ProfilesBuilding.Remove(profileId);
+        }
+
+        if (string.Equals(_pendingProfileId, profileId, StringComparison.OrdinalIgnoreCase) &&
+            IsProfileCached(profileId))
+        {
+            _pendingProfileId = null;
+            Queue.Notify_TreeWillReset();
+            ApplyState(ProfileStateCache[profileId]);
+            Queue.Notify_TreeReinitialized();
+            MainTabWindow_ResearchTree.Instance?.Notify_ProfileTreeSwitched(profileId);
+            Assets.RefreshResearch = true;
+        }
+    }
+
+    public static void CacheActiveProfileState()
+    {
+        var settings = FluffyResearchTreeMod.instance?.Settings;
+        var profile = settings?.ActiveProfile;
+        if (profile == null || !Initialized)
+        {
+            return;
+        }
+
+        ProfileStateCache[profile.Id] = CaptureCurrentState(profile.Id, settings.ProfileSignature(profile));
+    }
+
+    private static TreeState CaptureCurrentState(string profileId, string signature)
+    {
+        return new TreeState
+        {
+            ProfileId = profileId,
+            Signature = signature,
+            Initialized = Initialized,
+            NoTabsSelected = NoTabsSelected,
+            FirstLoadDone = FirstLoadDone,
+            OrderDirty = OrderDirty,
+            Size = Size,
+            Nodes = _nodes,
+            Edges = _edges,
+            RelevantTechLevels = _relevantTechLevels,
+            TechLevelBounds = _techLevelBounds,
+            ResearchToNodes = new Dictionary<ResearchProjectDef, Node>(ResearchToNodesCache),
+            LayerBuckets = _layerBuckets,
+            InEdgesPerLayer = _inEdgesPerLayer,
+            OutEdgesPerLayer = _outEdgesPerLayer,
+            LayerSlots = _layerSlots,
+            CollapsedEdges = _collapsedEdges
+        };
+    }
+
+    private static void ApplyState(TreeState state)
+    {
+        if (state == null)
+        {
+            return;
+        }
+
+        Initialized = state.Initialized;
+        NoTabsSelected = state.NoTabsSelected;
+        FirstLoadDone = state.FirstLoadDone;
+        OrderDirty = state.OrderDirty;
+        Size = state.Size;
+        _nodes = state.Nodes;
+        _edges = state.Edges;
+        _relevantTechLevels = state.RelevantTechLevels;
+        _techLevelBounds = state.TechLevelBounds;
+        _layerBuckets = state.LayerBuckets;
+        _inEdgesPerLayer = state.InEdgesPerLayer;
+        _outEdgesPerLayer = state.OutEdgesPerLayer;
+        _layerSlots = state.LayerSlots;
+        _collapsedEdges = state.CollapsedEdges;
+        ResearchToNodesCache.Clear();
+        if (state.ResearchToNodes != null)
+        {
+            foreach (var pair in state.ResearchToNodes)
+            {
+                ResearchToNodesCache[pair.Key] = pair.Value;
+            }
+        }
+
+        _initializing = false;
+        _loggedInitialDraw = false;
+        MainTabWindow_ResearchTree.InvalidateTreeRectCache();
+    }
+
+    private static void ClearRuntimeState()
+    {
         NoTabsSelected = false;
-
         Size = IntVec2.Zero;
         _nodes = null;
         ResearchToNodesCache.Clear();
@@ -675,7 +934,31 @@ public static class Tree
         OrderDirty = false;
         FirstLoadDone = false;
         _collapsedEdges = null;
+        _layerBuckets = null;
+        _inEdgesPerLayer = null;
+        _outEdgesPerLayer = null;
+        _layerSlots = null;
         MainTabWindow_ResearchTree.InvalidateTreeRectCache();
+    }
+
+    private static void BeginProfileBuild(ResearchTabProfile profile)
+    {
+        _buildingIncludedTabs = profile?.IncludedTabs != null
+            ? new HashSet<string>(profile.IncludedTabs, StringComparer.OrdinalIgnoreCase)
+            : null;
+    }
+
+    private static void EndProfileBuild()
+    {
+        _buildingIncludedTabs = null;
+    }
+    public static void Reset(bool alsoZoom)
+    {
+        Messages.Message("Fluffy.ResearchTree.ResolutionChange".Translate(), MessageTypeDefOf.NeutralEvent);
+
+        Queue.Notify_TreeWillReset();
+        InvalidateProfileCache();
+        ClearRuntimeState();
         if (MainTabWindow_ResearchTree.Instance != null)
         {
             if (alsoZoom)
@@ -713,6 +996,20 @@ public static class Tree
         LongEventHandler.QueueLongEvent(() => ProfiledStep(label, step), textKey, doAsynchronously, extraAction);
     }
 
+    private static void RunInitializationPipeline()
+    {
+        ProfiledStep($"{InitializePerformancePrefix}CheckPrerequisites", CheckPrerequisites);
+        ProfiledStep($"{InitializePerformancePrefix}CreateEdges", createEdges);
+        ProfiledStep($"{InitializePerformancePrefix}HorizontalPositions", horizontalPositions);
+        ProfiledStep($"{InitializePerformancePrefix}NormalizeEdges", normalizeEdges);
+        ProfiledStep($"{InitializePerformancePrefix}BuildCollapsedEdges", BuildCollapsedEdges);
+        ProfiledStep($"{InitializePerformancePrefix}BuildBuckets", BuildBuckets);
+        ProfiledStep($"{InitializePerformancePrefix}Collapse", collapse);
+        ProfiledStep($"{InitializePerformancePrefix}MinimizeCrossings", minimizeCrossings);
+        ProfiledStep($"{InitializePerformancePrefix}MinimizeEdgeLength", minimizeEdgeLength);
+        ProfiledStep($"{InitializePerformancePrefix}RemoveEmptyRows", removeEmptyRows);
+    }
+
     public static void Initialize()
     {
         if (FluffyResearchTreeMod.instance?.Settings?.LoadType == Constants.LoadTypeDoNotGenerateResearchTree
@@ -722,24 +1019,16 @@ public static class Tree
         }
 
         _initializing = true;
+        BeginProfileBuild(FluffyResearchTreeMod.instance?.Settings?.ActiveProfile);
 
         if (FluffyResearchTreeMod.instance?.Settings?.LoadType == Constants.LoadTypeLoadInBackground)
         {
             try
             {
-                ProfiledStep($"{InitializePerformancePrefix}CheckPrerequisites", CheckPrerequisites);
-                ProfiledStep($"{InitializePerformancePrefix}CreateEdges", createEdges);
-                ProfiledStep($"{InitializePerformancePrefix}HorizontalPositions", horizontalPositions);
-                ProfiledStep($"{InitializePerformancePrefix}NormalizeEdges", normalizeEdges);
-                ProfiledStep($"{InitializePerformancePrefix}BuildCollapsedEdges", BuildCollapsedEdges);
-                ProfiledStep($"{InitializePerformancePrefix}BuildBuckets", BuildBuckets);
-                ProfiledStep($"{InitializePerformancePrefix}Collapse", collapse);
-                ProfiledStep($"{InitializePerformancePrefix}MinimizeCrossings", minimizeCrossings);
-                ProfiledStep($"{InitializePerformancePrefix}MinimizeEdgeLength", minimizeEdgeLength);
-                ProfiledStep($"{InitializePerformancePrefix}RemoveEmptyRows", removeEmptyRows);
-
+                RunInitializationPipeline();
                 Logging.Message("Done");
                 Initialized = true;
+                CacheActiveProfileState();
             }
             catch (Exception ex)
             {
@@ -747,6 +1036,7 @@ public static class Tree
             }
 
             _initializing = false;
+            EndProfileBuild();
             _reopenResearchTabAfterInit = true;
             return;
         }
@@ -777,6 +1067,9 @@ public static class Tree
                 Initialized = true;
                 _initializing = false;
                 Logging.Message("Done");
+                CacheActiveProfileState();
+                EndProfileBuild();
+                QueueBackgroundProfileBuilds();
             }, $"{InitializePerformancePrefix}Finalize", "Fluffy.ResearchTree.PreparingTree.LayoutNew");
         QueueProfiledLongEvent(Queue.Notify_TreeReinitialized,
             $"{InitializePerformancePrefix}NotifyQueueReinitialized", "Fluffy.ResearchTree.RestoreQueue");
@@ -1544,7 +1837,9 @@ public static class Tree
         {
             st.EnsureTabCache(); // Keep the tab cache up-to-date when mods change mid-run.
 
-            var hasSelection = st.IncludedTabs != null && st.IncludedTabs.Count > 0;
+            var includedTabs = _buildingIncludedTabs ??
+                               new HashSet<string>(st.IncludedTabs ?? [], StringComparer.OrdinalIgnoreCase);
+            var hasSelection = includedTabs.Count > 0;
             var hasKnownTabs = st.AllTabsCache != null && st.AllTabsCache.Count > 0;
 
             if (hasKnownTabs && !hasSelection)
@@ -1563,7 +1858,7 @@ public static class Tree
                 {
                     var tab = TryGetProjectTab(def);
                     // If no tab can be resolved, skip filtering to avoid removing the project.
-                    if (tab == null || st.TabIncluded(tab))
+                    if (tab == null || includedTabs.Contains(tab.defName))
                     {
                         includedDefs.Add(def);
                     }
@@ -1697,6 +1992,34 @@ public static class Tree
         {
             node.ForceRefreshCaches();
         }
+    }
+
+    public static void NotifyResearchStateChanged()
+    {
+        ResearchNode.ClearStaticCaches();
+
+        if (Initialized && _nodes != null)
+        {
+            foreach (var node in _nodes.OfType<ResearchNode>())
+            {
+                node.ForceRefreshCaches();
+            }
+        }
+
+        foreach (var state in ProfileStateCache.Values)
+        {
+            if (state?.Nodes == null)
+            {
+                continue;
+            }
+
+            foreach (var node in state.Nodes.OfType<ResearchNode>())
+            {
+                node.ForceRefreshCaches();
+            }
+        }
+
+        Assets.RefreshResearch = true;
     }
 
     public static void Draw(Rect visibleRect)
@@ -2072,7 +2395,7 @@ public static class Tree
 
     private static void drawTechLevel(TechLevel techlevel, Rect visibleRect)
     {
-        if (!TechLevelBounds.ContainsKey(techlevel))
+        if (!TechLevelBounds.TryGetValue(techlevel, out var bounds))
         {
             return;
         }
@@ -2087,13 +2410,13 @@ public static class Tree
             return;
         }
 
-        var num = ((Constants.NodeSize.x + Constants.NodeMargins.x) * TechLevelBounds[techlevel].min) -
+        var num = ((Constants.NodeSize.x + Constants.NodeMargins.x) * bounds.min) -
                   (Constants.NodeMargins.x / 2f);
-        var num2 = ((Constants.NodeSize.x + Constants.NodeMargins.x) * TechLevelBounds[techlevel].max) -
+        var num2 = ((Constants.NodeSize.x + Constants.NodeMargins.x) * bounds.max) -
                    (Constants.NodeMargins.x / 2f);
         GUI.color = Assets.TechLevelColor;
         Text.Anchor = TextAnchor.MiddleCenter;
-        if (TechLevelBounds[techlevel].min > 0 && num > visibleRect.xMin && num < visibleRect.xMax)
+        if (bounds.min > 0 && num > visibleRect.xMin && num < visibleRect.xMax)
         {
             Widgets.DrawLine(new Vector2(num, visibleRect.yMin), new Vector2(num, visibleRect.yMax),
                 Assets.TechLevelColor, 1f);
@@ -2103,7 +2426,7 @@ public static class Tree
                     Constants.TechLevelLabelSize.y), techlevel.ToStringHuman());
         }
 
-        if (TechLevelBounds[techlevel].max < Size.x && num2 > visibleRect.xMin && num2 < visibleRect.xMax)
+        if (bounds.max < Size.x && num2 > visibleRect.xMin && num2 < visibleRect.xMax)
         {
             if (!Assets.IsHiddenByTechLevelRestrictions(techlevel + 1))
             {

@@ -28,19 +28,21 @@ internal class FluffyResearchTreeSettings : ModSettings
 
     public bool VerboseLogging;
 
-    // 保存：选择的 Tab defName 列表（原版科研页签）
+    // Saved ResearchTabDef names included in the generated tree.
     public HashSet<string> IncludedTabs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-    // 记录是否已初始化默认 Tab 选择（用于判定“空集合”是默认状态还是用户手动清空）
+    public List<ResearchTabProfile> TabProfiles = new();
+
+    public string ActiveTabProfileId;
+
+    // Distinguishes first-run defaults from a deliberate empty tab selection.
     public bool TabsInitialized;
 
-    // 选项：跳过已完成
     public bool SkipCompleted = true;
 
-    // 选项：启用按 Tab 的可视化分组
     public bool VisualGroupByTab = true;
 
-    // UI 缓存：所有可选 Tab（运行时收集）
+    // Runtime cache of selectable research tabs.
     [Unsaved(false)] public List<ResearchTabDef> AllTabsCache;
 
     private static readonly PropertyInfo ResearchTabProperty =
@@ -74,7 +76,10 @@ internal class FluffyResearchTreeSettings : ModSettings
         Scribe_Values.Look(ref VisualGroupByTab, "VisualGroupByTab", true);
         Scribe_Values.Look(ref TabsInitialized, "TabsInitialized");
         Scribe_Collections.Look(ref IncludedTabs, "IncludedTabs", LookMode.Value);
+        Scribe_Collections.Look(ref TabProfiles, "TabProfiles", LookMode.Deep);
+        Scribe_Values.Look(ref ActiveTabProfileId, "ActiveTabProfileId");
         IncludedTabs ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        TabProfiles ??= new List<ResearchTabProfile>();
 
         if (!TabsInitialized && IncludedTabs.Count > 0)
         {
@@ -111,14 +116,20 @@ internal class FluffyResearchTreeSettings : ModSettings
         }
 
         TabsInitialized = true;
+        TabProfiles =
+        [
+            new ResearchTabProfile(
+                ResearchTabProfileSelection.DefaultProfileId,
+                "Fluffy.ResearchTree.ProfileDefault".Translate(),
+                IncludedTabs)
+        ];
+        ActiveTabProfileId = TabProfiles[0].Id;
     }
 
     public void EnsureTabCache()
     {
-        Logging.Message("[ResearchTree]:EnsureTabCache");
         if (AllTabsCache != null) return;
 
-        // 从所有研究项目收集“出现过的 tab”，但排除 Anomaly
         AllTabsCache = DefDatabase<ResearchTabDef>.AllDefsListForReading
             .Where(t => !string.Equals(t.tutorTag, "Research-Tab-Anomaly", StringComparison.OrdinalIgnoreCase))
             .OrderBy(t => t.defName)
@@ -133,49 +144,9 @@ internal class FluffyResearchTreeSettings : ModSettings
             .Where(tab => tab != null && tabsWithResearch.Contains(tab))
             .ToList();
 
-        IncludedTabs ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        var validTabNames = new HashSet<string>(
-            AllTabsCache.Where(tab => tab != null).Select(tab => tab.defName),
-            StringComparer.OrdinalIgnoreCase);
-
-        var settingsDirty = false;
-
-        if (IncludedTabs.Count > 0)
-        {
-            var removedCount = IncludedTabs.RemoveWhere(name => !validTabNames.Contains(name));
-            if (removedCount > 0)
-            {
-                settingsDirty = true;
-            }
-        }
-
-        if (!TabsInitialized)
-        {
-            foreach (var tab in AllTabsCache)
-            {
-                if (tab == null) continue;
-                IncludedTabs.Add(tab.defName);
-            }
-
-            TabsInitialized = true;
-        }
-
-        if (IncludedTabs.Count == 0 && validTabNames.Count > 0)
-        {
-            IncludedTabs = new HashSet<string>(validTabNames, StringComparer.OrdinalIgnoreCase);
-            TabsInitialized = true;
-            settingsDirty = true;
-        }
-
-        if (settingsDirty)
+        if (NormalizeProfiles())
         {
             FluffyResearchTreeMod.instance?.WriteSettings();
-        }
-
-        foreach (var tab in AllTabsCache)
-        {
-            Logging.Message($"[ResearchTree]:{tab.defName} / {tab.LabelCap}");
         }
     }
 
@@ -205,8 +176,151 @@ internal class FluffyResearchTreeSettings : ModSettings
 
     public bool TabIncluded(ResearchTabDef def)
     {
-        if (IncludedTabs == null || IncludedTabs.Count == 0) return true; // 未配置=不过滤
+        if (IncludedTabs == null || IncludedTabs.Count == 0)
+        {
+            return !TabsInitialized;
+        }
+
         return IncludedTabs.Contains(def.defName);
     }
 
+    public ResearchTabProfile ActiveProfile
+    {
+        get
+        {
+            EnsureTabCache();
+            return ActiveProfileWithoutCacheRefresh();
+        }
+    }
+
+    public IEnumerable<ResearchTabProfile> Profiles
+    {
+        get
+        {
+            EnsureTabCache();
+            return TabProfiles;
+        }
+    }
+
+    public void SetActiveProfile(string profileId)
+    {
+        EnsureTabCache();
+        var profile = FindProfile(profileId);
+        if (profile == null)
+        {
+            return;
+        }
+
+        ActiveTabProfileId = profile.Id;
+        SyncLegacySelectionFromActive();
+    }
+
+    public bool SetActiveProfileTabIncluded(string defName, bool included)
+    {
+        EnsureTabCache();
+        var profile = ActiveProfileWithoutCacheRefresh();
+        if (profile == null || string.IsNullOrWhiteSpace(defName))
+        {
+            return false;
+        }
+
+        var changed = included
+            ? profile.IncludedTabs.Add(defName)
+            : profile.IncludedTabs.Remove(defName);
+
+        if (changed)
+        {
+            SyncLegacySelectionFromActive();
+        }
+
+        return changed;
+    }
+
+    public void ReplaceProfiles(IEnumerable<ResearchTabProfileData> profiles, string activeProfileId)
+    {
+        EnsureTabCache();
+
+        TabProfiles = (profiles ?? Enumerable.Empty<ResearchTabProfileData>())
+            .Select(ResearchTabProfile.FromData)
+            .ToList();
+        ActiveTabProfileId = activeProfileId;
+        NormalizeProfiles();
+    }
+
+    public string ProfileSignature(ResearchTabProfile profile)
+    {
+        if (profile == null)
+        {
+            return string.Empty;
+        }
+
+        var tabs = string.Join("|", profile.IncludedTabs.OrderBy(tab => tab, StringComparer.OrdinalIgnoreCase));
+        return $"{profile.Id}:{SkipCompleted}:{HideNodesBlockedByTechLevel}:{VisualGroupByTab}:{tabs}";
+    }
+
+    private bool NormalizeProfiles()
+    {
+        var result = ResearchTabProfileSelection.Normalize(
+            AllTabsCache?.Where(tab => tab != null).Select(tab => tab.defName),
+            TabProfiles?.Select(profile => profile.ToData()),
+            ActiveTabProfileId,
+            IncludedTabs,
+            TabsInitialized);
+
+        var dirty = result.Dirty;
+        foreach (var profile in result.Profiles)
+        {
+            if (string.Equals(profile.Id, ResearchTabProfileSelection.DefaultProfileId,
+                    StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(profile.Name, "Default", StringComparison.Ordinal))
+            {
+                profile.Name = "Fluffy.ResearchTree.ProfileDefault".Translate();
+                dirty = true;
+            }
+        }
+
+        TabProfiles = result.Profiles.Select(ResearchTabProfile.FromData).ToList();
+        ActiveTabProfileId = result.ActiveProfileId;
+        TabsInitialized = result.TabsInitialized;
+        dirty |= SyncLegacySelectionFromActive();
+
+        return dirty;
+    }
+
+    private ResearchTabProfile ActiveProfileWithoutCacheRefresh()
+    {
+        if (TabProfiles == null || TabProfiles.Count == 0)
+        {
+            return null;
+        }
+
+        return FindProfile(ActiveTabProfileId) ?? TabProfiles[0];
+    }
+
+    private ResearchTabProfile FindProfile(string profileId)
+    {
+        if (string.IsNullOrWhiteSpace(profileId) || TabProfiles == null)
+        {
+            return null;
+        }
+
+        return TabProfiles.FirstOrDefault(
+            profile => string.Equals(profile.Id, profileId, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private bool SyncLegacySelectionFromActive()
+    {
+        var profile = ActiveProfileWithoutCacheRefresh();
+        var activeTabs = profile?.IncludedTabs ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var current = IncludedTabs ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (current.SetEquals(activeTabs))
+        {
+            IncludedTabs = new HashSet<string>(current, StringComparer.OrdinalIgnoreCase);
+            return false;
+        }
+
+        IncludedTabs = new HashSet<string>(activeTabs, StringComparer.OrdinalIgnoreCase);
+        return true;
+    }
 }

@@ -46,8 +46,8 @@
   <Fluffy.ResearchTree.GenerationInProgress>Der Forschungsbaum wird noch erzeugt, bitte warten…</Fluffy.ResearchTree.GenerationInProgress>
   <Fluffy.ResearchTree.UIScaleWarning>Wenn Sie die UI-Skala größer als 1x verwenden, kann es vorkommen, dass die Forschungsbeschriftungen abgeschnitten werden, wenn Sie die Option zum Laden im Hintergrund verwenden.
 Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Problem haben.</Fluffy.ResearchTree.UIScaleWarning>
-  <Fluffy.ResearchTree.CtrlFunctionScroll>Verwenden Sie die Strg-Taste, um den Suchbaum vertikal zu verschieben.</Fluffy.ResearchTree.CtrlFunctionScroll>
-  <Fluffy.ResearchTree.CtrlFunctionZoom>Verwenden Sie die Strg-Taste, um den Forschungsbaum zu vergrößern.</Fluffy.ResearchTree.CtrlFunctionZoom>
+  <Fluffy.ResearchTree.CtrlFunctionScroll>Verwenden Sie Strg, um den Forschungsbaum vertikal zu verschieben; Alt verschiebt ihn horizontal.</Fluffy.ResearchTree.CtrlFunctionScroll>
+  <Fluffy.ResearchTree.CtrlFunctionZoom>Verwenden Sie Strg, um den Forschungsbaum zu zoomen; Alt verschiebt ihn horizontal.</Fluffy.ResearchTree.CtrlFunctionZoom>
   <Fluffy.ResearchTree.ResolutionChange>ForschungsBaum: Grafik-Änderung erkannt, Forschungsbaum wird neu generiert</Fluffy.ResearchTree.ResolutionChange>
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>Storyteller erlaubt diese Technik nicht</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Die mittelalterlichen Einstellungen erlauben diese Technik nicht</Fluffy.ResearchTree.RimedievalDoesNotAllow>
@@ -86,4 +86,18 @@ Bitte verwenden Sie die Option "Beim ersten Öffnen laden", wenn Sie dieses Prob
   <Fluffy.ResearchTree.cancel>Abbrechen</Fluffy.ResearchTree.cancel>
   <Fluffy.ResearchTree.rebuild>Neu aufbauen</Fluffy.ResearchTree.rebuild>
   <Fluffy.ResearchTree.refresh>Forschungstag-Filter angewendet und Aktualisierung des Forschungsbaums angefordert</Fluffy.ResearchTree.refresh>
+  <Fluffy.ResearchTree.ProfileDefault>Default</Fluffy.ResearchTree.ProfileDefault>
+  <Fluffy.ResearchTree.ProfileManage>Manage research tag profiles</Fluffy.ResearchTree.ProfileManage>
+  <Fluffy.ResearchTree.ProfileEditCurrent>Edit current profile</Fluffy.ResearchTree.ProfileEditCurrent>
+  <Fluffy.ResearchTree.ProfileRowLabel>Views</Fluffy.ResearchTree.ProfileRowLabel>
+  <Fluffy.ResearchTree.ProfileNew>New</Fluffy.ResearchTree.ProfileNew>
+  <Fluffy.ResearchTree.ProfileDelete>Delete</Fluffy.ResearchTree.ProfileDelete>
+  <Fluffy.ResearchTree.ProfileName>Name</Fluffy.ResearchTree.ProfileName>
+  <Fluffy.ResearchTree.ProfileManageShort>Manage</Fluffy.ResearchTree.ProfileManageShort>
+  <Fluffy.ResearchTree.ProfileNewQuick>Create a new profile from the current research tag selection.</Fluffy.ResearchTree.ProfileNewQuick>
+  <Fluffy.ResearchTree.ProfileLoading>Research tag profile is being prepared.</Fluffy.ResearchTree.ProfileLoading>
+  <Fluffy.ResearchTree.ProfileSwitch>Switch to {0}</Fluffy.ResearchTree.ProfileSwitch>
+  <Fluffy.ResearchTree.ProfileCreated>Created research tag profile: {0}</Fluffy.ResearchTree.ProfileCreated>
+  <Fluffy.ResearchTree.ProfileApplied>Applied research tag profile changes and requested a tree refresh.</Fluffy.ResearchTree.ProfileApplied>
+  <Fluffy.ResearchTree.ProfileNewDefaultName>New profile</Fluffy.ResearchTree.ProfileNewDefaultName>
 </LanguageData>

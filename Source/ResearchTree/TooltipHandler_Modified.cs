@@ -12,13 +12,12 @@ public static class TooltipHandler_Modified
     private static readonly FieldInfo activeTipsFieldInfo = AccessTools.Field(typeof(TooltipHandler), "activeTips");
     private static readonly FieldInfo frameFieldInfo = AccessTools.Field(typeof(TooltipHandler), "frame");
 
-    // ===== PATCH: Tooltip 全局开关（轻量无侵入） =====
     public static bool GloballyDisabled;
 
     public static void TipRegionIfEnabled(UnityEngine.Rect rect, string tip)
     {
         if (GloballyDisabled) return;
-        TipRegion(rect, tip); // 复用你现在已有的 API
+        TipRegion(rect, tip);
     }
 
     public static void TipRegion(Rect rect, TipSignal tip)
@@ -37,16 +36,16 @@ public static class TooltipHandler_Modified
         }
 
         var activeTips = (Dictionary<int, ActiveTip>)activeTipsFieldInfo.GetValue(null);
-        if (!activeTips.ContainsKey(tip.uniqueId))
+        if (!activeTips.TryGetValue(tip.uniqueId, out var activeTip))
         {
-            var activeTip = new ActiveTip(tip);
+            activeTip = new ActiveTip(tip);
             activeTips.Add(tip.uniqueId, activeTip);
-            activeTips[tip.uniqueId].firstTriggerTime = Time.realtimeSinceStartup;
+            activeTip.firstTriggerTime = Time.realtimeSinceStartup;
         }
 
-        activeTips[tip.uniqueId].lastTriggerFrame = (int)frameFieldInfo.GetValue(null);
-        activeTips[tip.uniqueId].signal.text = tip.text;
-        activeTips[tip.uniqueId].signal.textGetter = tip.textGetter;
+        activeTip.lastTriggerFrame = (int)frameFieldInfo.GetValue(null);
+        activeTip.signal.text = tip.text;
+        activeTip.signal.textGetter = tip.textGetter;
         activeTipsFieldInfo.SetValue(null, activeTips);
     }
 }

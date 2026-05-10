@@ -130,7 +130,19 @@ internal class FluffyResearchTreeMod : Mod
                 color => { Settings.BackgroundColor = color; }));
         }
 
+        var skipCompletedBefore = Settings.SkipCompleted;
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.SkipCompleted".Translate(), ref Settings.SkipCompleted);
+        if (skipCompletedBefore != Settings.SkipCompleted)
+        {
+            Tree.InvalidateProfileCache();
+            if (Tree.Initialized)
+            {
+                Tree.ResetNodeAvailabilityCache();
+            }
+
+            Assets.RefreshResearch = true;
+        }
+
         listing_Standard.CheckboxLabeled("Fluffy.ResearchTree.VisualGroupByTab".Translate(), ref Settings.VisualGroupByTab);
         if (Widgets.ButtonText(listing_Standard.GetRect(30f), "Fluffy.ResearchTree.RequestRebuild".Translate()))
         {
@@ -157,15 +169,12 @@ internal class FluffyResearchTreeMod : Mod
 
         listing_Standard.NewColumn();
 
-        // 右列标题
         listing_Standard.Label("Fluffy.ResearchTree.AllTabsCache".Translate());
 
-        // 计算可视区域和内容高度
-        float outRectHeight = rect.height - 80f; // 给顶部按钮等留一点空间
+        float outRectHeight = rect.height - 80f;
         Rect outRect = listing_Standard.GetRect(outRectHeight);
         Rect viewRect = new Rect(0f, 0f, outRect.width - 20f, (Settings.AllTabsCache?.Count ?? 0) * 28f);
 
-        // 开始滚动视图
         Widgets.BeginScrollView(outRect, ref scrollPosTabs, viewRect);
         var ls2 = new Listing_Standard { ColumnWidth = viewRect.width };
         ls2.Begin(viewRect);
@@ -179,8 +188,11 @@ internal class FluffyResearchTreeMod : Mod
                 bool on = Settings.IncludedTabs.Contains(tab.defName);
                 var label = $"{tab.LabelCap} ({tab.modContentPack?.Name ?? "Core"})";
                 ls2.CheckboxLabeled(label, ref on);
-                if (on) Settings.IncludedTabs.Add(tab.defName);
-                else Settings.IncludedTabs.Remove(tab.defName);
+                if (Settings.SetActiveProfileTabIncluded(tab.defName, on))
+                {
+                    Tree.InvalidateProfileCache();
+                    Assets.RefreshResearch = true;
+                }
             }
         }
 

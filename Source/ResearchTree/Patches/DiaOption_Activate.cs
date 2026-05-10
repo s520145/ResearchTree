@@ -9,7 +9,7 @@ public class DiaOption_Activate
 {
     private static void Prefix(string ___text)
     {
-        if (!"VoidMonolithViewResearch".Translate().ToString().Equals(___text))
+        if (!string.Equals("VoidMonolithViewResearch".Translate().ToString(), ___text, System.StringComparison.Ordinal))
         {
             return;
         }

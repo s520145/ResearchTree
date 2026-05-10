@@ -12,7 +12,7 @@ public class UINotIncluded_Button_Worker_OnRepaint
     public static bool Prepare()
     {
         return LoadedModManager.RunningModsListForReading
-            .Any(m => m.PackageId == "gondragon.uinotincluded".ToLowerInvariant());
+            .Any(m => string.Equals(m.PackageId, "gondragon.uinotincluded", System.StringComparison.OrdinalIgnoreCase));
     }
 
     public static MethodBase TargetMethod()

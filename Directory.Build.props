@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Legacy RimWorld/Harmony API shapes are intentionally preserved. -->
+    <NoWarn>$(NoWarn);CA1016;CA1051;CA1707;CA1711;CA1725;CA1852;CA2211</NoWarn>
+  </PropertyGroup>
+</Project>

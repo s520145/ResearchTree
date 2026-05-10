@@ -26,5 +26,6 @@ public class ResearchManager_FinishProject
         }
 
         Queue.TryStartNext(proj);
+        Tree.NotifyResearchStateChanged();
     }
 }

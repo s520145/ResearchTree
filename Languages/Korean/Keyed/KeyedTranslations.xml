@@ -44,8 +44,8 @@
   <Fluffy.ResearchTree.GenerationInProgress>연구 트리를 생성하는 중입니다. 잠시만 기다려 주세요…</Fluffy.ResearchTree.GenerationInProgress>
   <Fluffy.ResearchTree.UIScaleWarning>UI 배율이 1x보다 크면 백그라운드 로딩 옵션을 사용할 때 연구 레이블이 잘릴 수 있습니다.
 이런 문제가 발생하면 '처음 열 때 로딩'을 사용하세요.</Fluffy.ResearchTree.UIScaleWarning>
-  <Fluffy.ResearchTree.CtrlFunctionScroll>Ctrl 키로 연구 트리를 세로로 스크롤합니다.</Fluffy.ResearchTree.CtrlFunctionScroll>
-  <Fluffy.ResearchTree.CtrlFunctionZoom>Ctrl 키로 연구 트리를 확대/축소합니다.</Fluffy.ResearchTree.CtrlFunctionZoom>
+  <Fluffy.ResearchTree.CtrlFunctionScroll>Ctrl 키로 연구 트리를 세로로 스크롤하고, Alt 키로 가로로 스크롤합니다.</Fluffy.ResearchTree.CtrlFunctionScroll>
+  <Fluffy.ResearchTree.CtrlFunctionZoom>Ctrl 키로 연구 트리를 확대/축소하고, Alt 키로 가로로 스크롤합니다.</Fluffy.ResearchTree.CtrlFunctionZoom>
   <Fluffy.ResearchTree.ResolutionChange>ResearchTree: 그래픽 변경을 감지했습니다. 연구 트리를 다시 생성합니다.</Fluffy.ResearchTree.ResolutionChange>
   <Fluffy.ResearchTree.StorytellerDoesNotAllow>스토리텔러가 이 기술을 허용하지 않습니다.</Fluffy.ResearchTree.StorytellerDoesNotAllow>
   <Fluffy.ResearchTree.RimedievalDoesNotAllow>Rimedieval 설정에서 이 기술을 허용하지 않습니다.</Fluffy.ResearchTree.RimedievalDoesNotAllow>
@@ -80,4 +80,18 @@
   <Fluffy.ResearchTree.cancel>취소</Fluffy.ResearchTree.cancel>
   <Fluffy.ResearchTree.rebuild>다시 빌드</Fluffy.ResearchTree.rebuild>
   <Fluffy.ResearchTree.refresh>연구 태그 필터를 적용했고 연구 트리 새로 고침을 요청했습니다.</Fluffy.ResearchTree.refresh>
+  <Fluffy.ResearchTree.ProfileDefault>Default</Fluffy.ResearchTree.ProfileDefault>
+  <Fluffy.ResearchTree.ProfileManage>Manage research tag profiles</Fluffy.ResearchTree.ProfileManage>
+  <Fluffy.ResearchTree.ProfileEditCurrent>Edit current profile</Fluffy.ResearchTree.ProfileEditCurrent>
+  <Fluffy.ResearchTree.ProfileRowLabel>Views</Fluffy.ResearchTree.ProfileRowLabel>
+  <Fluffy.ResearchTree.ProfileNew>New</Fluffy.ResearchTree.ProfileNew>
+  <Fluffy.ResearchTree.ProfileDelete>Delete</Fluffy.ResearchTree.ProfileDelete>
+  <Fluffy.ResearchTree.ProfileName>Name</Fluffy.ResearchTree.ProfileName>
+  <Fluffy.ResearchTree.ProfileManageShort>Manage</Fluffy.ResearchTree.ProfileManageShort>
+  <Fluffy.ResearchTree.ProfileNewQuick>Create a new profile from the current research tag selection.</Fluffy.ResearchTree.ProfileNewQuick>
+  <Fluffy.ResearchTree.ProfileLoading>Research tag profile is being prepared.</Fluffy.ResearchTree.ProfileLoading>
+  <Fluffy.ResearchTree.ProfileSwitch>Switch to {0}</Fluffy.ResearchTree.ProfileSwitch>
+  <Fluffy.ResearchTree.ProfileCreated>Created research tag profile: {0}</Fluffy.ResearchTree.ProfileCreated>
+  <Fluffy.ResearchTree.ProfileApplied>Applied research tag profile changes and requested a tree refresh.</Fluffy.ResearchTree.ProfileApplied>
+  <Fluffy.ResearchTree.ProfileNewDefaultName>New profile</Fluffy.ResearchTree.ProfileNewDefaultName>
 </LanguageData>

@@ -15,5 +15,6 @@ public class ResearchManager_StopProject
         }
 
         Queue.TryStartNext(proj);
+        Tree.NotifyResearchStateChanged();
     }
 }

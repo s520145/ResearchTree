@@ -1,6 +1,7 @@
 ﻿// MainTabWindow_ResearchTree.cs
 // Copyright Karel Kroeze, 2020-2020
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,6 +21,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private readonly QuickSearchWidget _quickSearchWidget = new();
 
+    private readonly Dictionary<string, ProfileViewState> _profileViewStates = new();
+
     private Rect _baseViewRect;
 
     private Rect _baseViewRectInner;
@@ -32,6 +35,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     private bool _logFirstDrawNextFrame;
 
     private Vector2 _mousePosition = Vector2.zero;
+    private Vector2 _profileTabScroll = Vector2.zero;
 
     private Rect _viewRect;
 
@@ -39,20 +43,41 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private float _zoomLevel = 1f;
 
-    private bool _panning;                 // 是否已进入平移
-    private Vector2 _dragStart;            // 按下时坐标
-    private const float PanThreshold = 4f; // 启动平移的像素阈值（避免轻点触发）
-    private readonly HashSet<int> _capturedMouseButtons = new(); // 记录始于窗口内部的鼠标按钮
+    private bool _panning;
+    private Vector2 _dragStart;
+    private const float PanThreshold = 4f;
+    private readonly HashSet<int> _capturedMouseButtons = new();
     private const float TopBarControlGap = 6f;
     private const float TopBarLabelPadding = 24f;
-    private const float TopBarMinSearchWidth = 220f;
+    private const float TopBarMinSearchWidth = 290f;
     private const float TopBarMinButtonWidth = 140f;
+    private const float ProfileTabMinWidth = 86f;
+    private const float ProfileTabMaxWidth = 280f;
+    private const float ProfileTabTextPadding = 30f;
+    private const float ProfileTabAddWidth = 34f;
+    private const float ProfileTabManageWidth = 86f;
+    private const float ProfileRowHeight = 32f;
+    private const float ProfileRowInset = 3f;
+    private const float WheelScrollStep = 10f;
     private const long PreOpenWarnThresholdMs = 250;
     private const long FirstDrawWarnThresholdMs = 200;
 
     public bool ViewRectDirty = true;
 
     public bool ViewRectInnerDirty = true;
+
+    private readonly struct ProfileViewState
+    {
+        public ProfileViewState(Vector2 scrollPosition, float zoomLevel)
+        {
+            ScrollPosition = scrollPosition;
+            ZoomLevel = zoomLevel;
+        }
+
+        public Vector2 ScrollPosition { get; }
+
+        public float ZoomLevel { get; }
+    }
 
     public MainTabWindow_ResearchTree()
     {
@@ -168,10 +193,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         }
     }
 
-    /// <summary>
-    /// 根据研究树的尺寸动态计算拖拽速度系数。
-    /// 当树较大（研究项较多）时，增加拖拽灵敏度以保持一致的操作体验。
-    /// </summary>
     private float DragSpeedMultiplier
     {
         get
@@ -181,13 +202,10 @@ public class MainTabWindow_ResearchTree : MainTabWindow
                 return 1f;
             }
 
-            // 计算树相对于可视区域的大小比例
             float widthRatio = TreeRect.width / _baseViewRectInner.width;
             float heightRatio = TreeRect.height / _baseViewRectInner.height;
             float sizeRatio = Mathf.Max(widthRatio, heightRatio, 1f);
 
-            // 使用平方根来平滑调整：树很大时不会让拖拽速度过快
-            // 基础速度 1.0，最大速度限制在 3.0 左右
             return Mathf.Clamp(Mathf.Sqrt(sizeRatio), 1f, 3f);
         }
     }
@@ -212,6 +230,34 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         setRects();
         ApplyTreeInitializedState();
         ClampScroll();
+        Tree.QueueBackgroundProfileBuilds();
+    }
+
+    public void SaveActiveProfileViewState()
+    {
+        var profileId = FluffyResearchTreeMod.instance?.Settings?.ActiveTabProfileId;
+        if (string.IsNullOrWhiteSpace(profileId))
+        {
+            return;
+        }
+
+        _profileViewStates[profileId] = new ProfileViewState(_scrollPosition, ZoomLevel);
+    }
+
+    public void Notify_ProfileTreeSwitched(string profileId)
+    {
+        Assets.RefreshResearch = true;
+        InvalidateTreeRectCache();
+        setRects();
+        ApplyTreeInitializedState();
+
+        if (!string.IsNullOrWhiteSpace(profileId) && _profileViewStates.TryGetValue(profileId, out var state))
+        {
+            ZoomLevel = state.ZoomLevel;
+            _scrollPosition = state.ScrollPosition;
+        }
+
+        ClampScroll();
     }
 
     public override void PreOpen()
@@ -222,16 +268,14 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         {
             base.PreOpen();
 
-            // 启用默认的吸收逻辑，确保地图不会在窗口上方被点击
-            closeOnClickedOutside = false;   // 避免 RimWorld 的“点外面就关”的默认行为
-            preventCameraMotion = true;      // 避免地图摄像机因这个点击而响应
+            closeOnClickedOutside = false;
+            preventCameraMotion = true;
 
             setRects();
             Tree.WaitForInitialization();
             Assets.RefreshResearch = true;
             closeOnClickedOutside = false;
 
-            // 重置所有拖拽状态，避免遗留状态导致问题
             _capturedMouseButtons.Clear();
             _panning = false;
             _dragStart = Vector2.zero;
@@ -245,6 +289,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             _logFirstDrawNextFrame = true;
 
             ApplyTreeInitializedState();
+            Tree.QueueBackgroundProfileBuilds();
         }
         finally
         {
@@ -302,6 +347,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         {
             Tree.FirstLoadDone = true;
         }
+
+        Tree.CacheActiveProfileState();
     }
 
     private void setRects()
@@ -332,7 +379,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     public override void DoWindowContents(Rect canvas)
     {
-        // 顶栏
         drawTopBar(new Rect(canvas.xMin, canvas.yMin, canvas.width, Constants.TopBarHeight));
 
         if (!Tree.Initialized)
@@ -352,9 +398,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             return;
         }
 
-        // 关键修复：在最早时机预处理MouseDown
-        // 标记是否需要吸收空白点击，但不立即Use（给节点机会）
-        // 同时处理左键(0)和右键(1)，防止穿透到地图
         bool shouldAbsorbMouseDown = false;
         var evt = Event.current;
         if (evt.type == EventType.MouseDown && (evt.button == 0 || evt.button == 1) && Mouse.IsOver(windowRect))
@@ -365,13 +408,11 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             }
         }
 
-        // 先处理输入（同帧生效）
         handleZoom();
         handleDolly();
         handleDragging();
         ClampScroll();
 
-        // 再应用缩放并绘制
         applyZoomLevel();
         Stopwatch firstDrawTimer = null;
         if (_logFirstDrawNextFrame)
@@ -387,7 +428,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             Tree.Draw(VisibleRect);
             Queue.DrawLabels(VisibleRect);
 
-            // 如果之前标记需要吸收MouseDown，且节点未处理（事件仍是MouseDown），现在Use它
             if (shouldAbsorbMouseDown && Event.current.type == EventType.MouseDown)
             {
                 Event.current.Use();
@@ -424,7 +464,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
             case EventType.MouseDrag:
                 return _panning;
             case EventType.ScrollWheel:
-                // 滚轮事件会紧跟一个 Repaint，再绘制即可
                 return true;
             default:
                 return false;
@@ -441,59 +480,48 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         if (e.type == EventType.Used)
         {
-            Log.Message($"[AbsorbInput] Event already used, type: {e.type}");
             return;
         }
 
         var pointerOverWindow = Mouse.IsOver(windowRect);
         var capturing = _capturedMouseButtons.Count > 0;
 
-        Log.Message($"[AbsorbInput] Event: {e.type}, Button: {e.button}, Pos: {e.mousePosition}, PointerOver: {pointerOverWindow}, Capturing: {capturing}");
-
         if (!pointerOverWindow && !capturing)
         {
-            Log.Message($"[AbsorbInput] Not over window and not capturing, skipping");
             return;
         }
 
         switch (e.type)
         {
             case EventType.MouseDown:
-                // 不要吸收滚动条区域的事件
                 if (IsPointInScrollbarArea(e.mousePosition))
                 {
-                    Log.Message($"[AbsorbInput] In scrollbar area, not absorbing");
                     return;
                 }
-                Log.Message($"[AbsorbInput] Absorbing MouseDown, capturing button {e.button}");
                 _capturedMouseButtons.Add(e.button);
                 e.Use();
                 break;
             case EventType.ScrollWheel:
             case EventType.ContextClick:
-                Log.Message($"[AbsorbInput] Absorbing {e.type}");
                 e.Use();
                 break;
             case EventType.MouseDrag:
                 if (!capturing || !_capturedMouseButtons.Contains(e.button))
                 {
-                    Log.Message($"[AbsorbInput] Not capturing or button not captured, skipping MouseDrag");
                     return;
                 }
 
-                Log.Message($"[AbsorbInput] Absorbing MouseDrag");
                 e.Use();
                 break;
             case EventType.MouseUp:
                 _capturedMouseButtons.Remove(e.button);
-                Log.Message($"[AbsorbInput] Absorbing MouseUp");
                 e.Use();
                 break;
         }
     }
 
 
-    private void DrawGenerationInProgressMessage(Rect canvas)
+    private static void DrawGenerationInProgressMessage(Rect canvas)
     {
         var messageRect = new Rect(
             canvas.xMin,
@@ -520,7 +548,7 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         GUI.color = previousColor;
     }
 
-    private void DrawNoTabsSelectedMessage(Rect canvas)
+    private static void DrawNoTabsSelectedMessage(Rect canvas)
     {
         var messageRect = new Rect(
             canvas.xMin,
@@ -557,10 +585,8 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     // default W A S D move
     private static void handleDolly()
     {
-        // 每帧一次，避免在 Layout/MouseMove 阶段重复加步长
         if (Event.current.type != EventType.Repaint) return;
 
-        // 步长随帧时间、缩放与树尺寸变化：树越大或缩得越小，单帧移动更多
         float step = 600f * Time.unscaledDeltaTime * Mathf.Max(1f, Instance.ZoomLevel) * Instance.DragSpeedMultiplier;
 
         if (KeyBindingDefOf.MapDolly_Left.IsDown) _scrollPosition.x -= step;
@@ -574,21 +600,29 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     private void handleZoom()
     {
         if (!Tree.Initialized) return;
-        if (!Event.current.isScrollWheel) return;
+        var evt = Event.current;
+        if (!evt.isScrollWheel) return;
 
-        if (Event.current.control == FluffyResearchTreeMod.instance.Settings.CtrlFunction)
+        if (evt.alt)
         {
-            _scrollPosition.y += Event.current.delta.y * 10f;
+            _scrollPosition.x += evt.delta.y * WheelScrollStep;
             ClampScroll();
             return;
         }
 
-        var mousePosition = Event.current.mousePosition;
-        var vector = (Event.current.mousePosition - _scrollPosition) / ZoomLevel;
-        ZoomLevel += Event.current.delta.y * Constants.ZoomStep * ZoomLevel;
+        if (evt.control == FluffyResearchTreeMod.instance.Settings.CtrlFunction)
+        {
+            _scrollPosition.y += evt.delta.y * WheelScrollStep;
+            ClampScroll();
+            return;
+        }
+
+        var mousePosition = evt.mousePosition;
+        var vector = (evt.mousePosition - _scrollPosition) / ZoomLevel;
+        ZoomLevel += evt.delta.y * Constants.ZoomStep * ZoomLevel;
         _scrollPosition = mousePosition - (vector * ZoomLevel);
         ClampScroll();
-        Event.current.Use();
+        evt.Use();
     }
 
     private void handleDragging()
@@ -597,30 +631,24 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         var e = Event.current;
 
-        // 如果事件已被使用，不要处理（让GUI控件优先）
         if (e.type == EventType.Used) return;
 
         bool inWindow = Mouse.IsOver(this.windowRect);
 
         if (e.type == EventType.MouseDown && inWindow && e.button == 0)
         {
-            // 关键修复：在MouseDown时就检查是否在滚动条上
             if (IsPointInScrollbarArea(e.mousePosition))
             {
-                // 在滚动条上，清空状态，不记录
                 _dragStart = Vector2.zero;
                 return;
             }
 
-            // 只记录起始点，不Use事件
-            // 让研究节点和其他GUI有机会处理MouseDown
             _dragStart = _mousePosition = e.mousePosition;
             return;
         }
 
         if (e.type == EventType.MouseUp && e.button == 0)
         {
-            // 清理所有拖拽状态
             if (_panning)
             {
                 _panning = false;
@@ -632,28 +660,23 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
         if (e.type == EventType.MouseDrag && e.button == 0 && _dragStart != Vector2.zero)
         {
-            // 检查起始点是否在窗口内
             bool inView = inWindow && InteractionRect.Contains(_dragStart);
             if (!inView) return;
 
-            // 检查是否超过阈值
             if (!_panning)
             {
                 if ((e.mousePosition - _dragStart).sqrMagnitude < PanThreshold * PanThreshold)
                     return;
 
-                // 超过阈值，开始平移
                 _panning = true;
                 _capturedMouseButtons.Add(e.button);
             }
 
-            // 执行平移，应用动态拖拽速度系数
             var delta = e.mousePosition - _mousePosition;
             _scrollPosition -= delta * DragSpeedMultiplier / ZoomLevel;
             ClampScroll();
             _mousePosition = e.mousePosition;
 
-            // 关键修复：拖拽时Use事件，防止穿透
             e.Use();
             return;
         }
@@ -661,57 +684,38 @@ public class MainTabWindow_ResearchTree : MainTabWindow
 
     private bool IsPointInScrollbarArea(Vector2 point)
     {
-        // Unity滚动条宽度约为16-18像素，但为了安全起见使用更大的区域
         float scrollbarSize = 20f;
 
-        // 滚动条实际在windowRect的边缘，不是ViewRect的边缘
         var winRect = windowRect;
 
-        // 调试日志
-        Log.Message($"[ScrollbarCheck] Point: {point}, WindowRect: {winRect}, TreeRect: {TreeRect.width}x{TreeRect.height}");
-
-        // 检查是否可能需要垂直滚动条
         if (TreeRect.height > _baseViewRect.height)
         {
-            // 垂直滚动条在窗口右侧边缘附近
-            // 根据实际测试，滚动条可能从x=2516开始
-            // 扩大右侧检测范围，防止滚动条右侧空白区域误触关闭窗口
-            float scrollbarLeft = winRect.xMax - 50f;  // 扩大左侧检测范围
-            float scrollbarRight = winRect.xMax + 20f; // 扩大右侧检测范围，覆盖窗口边缘空白
-
-            Log.Message($"[ScrollbarCheck] Vertical scrollbar area: x=[{scrollbarLeft}, {scrollbarRight}], y=[{winRect.yMin}, {winRect.yMax}]");
+            float scrollbarLeft = winRect.xMax - 50f;
+            float scrollbarRight = winRect.xMax + 20f;
 
             if (point.x >= scrollbarLeft &&
                 point.x <= scrollbarRight &&
                 point.y >= winRect.yMin &&
                 point.y <= winRect.yMax)
             {
-                Log.Message($"[ScrollbarCheck] Point IS in vertical scrollbar area!");
                 return true;
             }
         }
 
-        // 检查是否可能需要水平滚动条
         if (TreeRect.width > _baseViewRect.width)
         {
-            // 水平滚动条在窗口底部边缘
-            // 扩大底部检测范围，防止滚动条下方空白区域误触关闭窗口
             float scrollbarTop = winRect.yMax - scrollbarSize;
-            float scrollbarBottom = winRect.yMax + 20f; // 扩大底部检测范围
-
-            Log.Message($"[ScrollbarCheck] Horizontal scrollbar area: y=[{scrollbarTop}, {scrollbarBottom}], x=[{winRect.xMin}, {winRect.xMax}]");
+            float scrollbarBottom = winRect.yMax + 20f;
 
             if (point.y >= scrollbarTop &&
                 point.y <= scrollbarBottom &&
                 point.x >= winRect.xMin &&
                 point.x <= winRect.xMax)
             {
-                Log.Message($"[ScrollbarCheck] Point IS in horizontal scrollbar area!");
                 return true;
             }
         }
 
-        Log.Message($"[ScrollbarCheck] Point is NOT in scrollbar area");
         return false;
     }
 
@@ -734,16 +738,28 @@ public class MainTabWindow_ResearchTree : MainTabWindow
     private void drawTopBar(Rect canvas)
     {
         float buttonWidth = CalculateTopBarButtonWidth();
-        float rightColumnMinWidth = Mathf.Max(TopBarMinSearchWidth, buttonWidth);
-        float innerRequiredWidth = buttonWidth + TopBarControlGap + rightColumnMinWidth;
+        float innerRequiredWidth = TopBarMinSearchWidth;
+        if (ModsConfig.AnomalyActive)
+        {
+            innerRequiredWidth += buttonWidth + TopBarControlGap;
+        }
+
         float leftWidth = Mathf.Min(canvas.width, innerRequiredWidth + (Constants.Margin * 2f));
 
-        var left = new Rect(canvas.x, canvas.y, leftWidth, canvas.height);
-        var right = canvas;
+        var primaryRow = new Rect(canvas.x, canvas.y, canvas.width, Constants.PrimaryTopBarHeight);
+        var left = new Rect(primaryRow.x, primaryRow.y, leftWidth, primaryRow.height);
+        var right = primaryRow;
         right.xMin = Mathf.Min(canvas.xMax, left.xMax + Constants.Margin);
 
         DrawSearchBar(left.ContractedBy(Constants.Margin));
         Queue.DrawQueue(right.ContractedBy(Constants.Margin), !_panning);
+
+        var profileRow = new Rect(
+            canvas.x + Constants.Margin,
+            primaryRow.yMax + TopBarControlGap,
+            Mathf.Max(0f, canvas.width - (Constants.Margin * 2f)),
+            ProfileRowHeight);
+        DrawProfileTabs(profileRow);
     }
 
     private void DrawSearchBar(Rect canvas)
@@ -753,7 +769,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         string anomalyLabel = "Fluffy.ResearchTree.Anomaly".Translate();
         string toggleLabel = skipCompleted ? "Fluffy.ResearchTree.invisible".Translate()
                                            : "Fluffy.ResearchTree.visible".Translate();
-        string tabsLabel = "Fluffy.ResearchTree.filter".Translate();
 
         float buttonWidth = CalculateTopBarButtonWidth();
         const int rowCount = 2;
@@ -763,76 +778,286 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         float contentHeight = rowHeight * rowCount + verticalGap;
         float startY = canvas.yMin + Mathf.Max(0f, (canvas.height - contentHeight) / 2f);
 
-        float leftColumnWidth = buttonWidth;
-        float rightColumnX = canvas.xMin + leftColumnWidth + TopBarControlGap;
-        float rightColumnWidth = Mathf.Max(0f, canvas.xMax - rightColumnX);
-
-        var tabsRect = new Rect(canvas.xMin, startY, leftColumnWidth, rowHeight);
-        var searchRect = new Rect(rightColumnX, startY, rightColumnWidth, rowHeight);
+        var searchRect = new Rect(canvas.xMin, startY, canvas.width, rowHeight);
 
         float secondRowY = startY + rowHeight + verticalGap;
 
         Rect? anomalyRect = null;
+        float toggleX = canvas.xMin;
         if (anomalyActive)
         {
-            anomalyRect = new Rect(canvas.xMin, secondRowY, leftColumnWidth, rowHeight);
+            anomalyRect = new Rect(canvas.xMin, secondRowY, buttonWidth, rowHeight);
+            toggleX = anomalyRect.Value.xMax + TopBarControlGap;
         }
 
-        float toggleX = rightColumnX;
-        float toggleWidth = Mathf.Max(0f, rightColumnWidth);
+        float toggleWidth = Mathf.Max(0f, canvas.xMax - toggleX);
         var toggleRect = new Rect(toggleX, secondRowY, toggleWidth, rowHeight);
-
-        if (Widgets.ButtonText(tabsRect, tabsLabel))
-        {
-            FluffyResearchTreeMod.instance.Settings.EnsureTabCache();
-            Find.WindowStack.Add(new Dialog_SelectResearchTabs());
-        }
 
         _quickSearchWidget.OnGUI(searchRect, () => updateSearchResults(canvas));
 
-        if (anomalyRect.HasValue && Widgets.ButtonText(anomalyRect.Value, anomalyLabel))
+        if (anomalyRect.HasValue && DrawTopBarButton(anomalyRect.Value, anomalyLabel))
         {
             ((MainTabWindow_Research)MainButtonDefOf.Research.TabWindow).CurTab = ResearchTabDefOf.Anomaly;
             Find.MainTabsRoot.ToggleTab(MainButtonDefOf.Research);
             return;
         }
 
-        var toggleColor = skipCompleted ? new Color(0.1f, 0.5f, 0.1f) : new Color(0.6f, 0.1f, 0.1f);
-        Widgets.DrawBoxSolid(toggleRect, toggleColor);
-
-        var oldAnchor = Text.Anchor;
-        var oldColor = GUI.color;
-        Text.Anchor = TextAnchor.MiddleCenter;
-        GUI.color = Color.white;
-        {
-            var prevFont = Text.Font;
-            Text.Font = GameFont.Small;
-            var labelSize = Text.CalcSize(toggleLabel);
-            if (labelSize.x > toggleRect.width - 8f)
-            {
-                Text.Font = GameFont.Tiny;
-            }
-            Widgets.Label(toggleRect, toggleLabel);
-            Text.Font = prevFont;
-        }
-        Text.Anchor = oldAnchor;
-        GUI.color = oldColor;
-
-        if (Widgets.ButtonInvisible(toggleRect, doMouseoverSound: true))
+        var toggleColor = skipCompleted
+            ? new Color(0.12f, 0.42f, 0.16f, 0.82f)
+            : new Color(0.50f, 0.18f, 0.14f, 0.82f);
+        if (DrawTopBarButton(toggleRect, toggleLabel, null, toggleColor))
         {
             FluffyResearchTreeMod.instance.Settings.SkipCompleted = !FluffyResearchTreeMod.instance.Settings.SkipCompleted;
             Tree.ResetNodeAvailabilityCache();
+            Tree.InvalidateProfileCache();
             Assets.RefreshResearch = true;
         }
     }
 
-    private float CalculateTopBarButtonWidth()
+    private void DrawProfileTabs(Rect canvas)
+    {
+        var settings = FluffyResearchTreeMod.instance.Settings;
+        settings.EnsureTabCache();
+
+        var profiles = settings.Profiles.ToList();
+        if (profiles.Count == 0 || canvas.width <= 0f || canvas.height <= 0f)
+        {
+            return;
+        }
+
+        Widgets.DrawBoxSolidWithOutline(canvas, new Color(0.035f, 0.04f, 0.045f, 0.82f),
+            new Color(0.22f, 0.24f, 0.26f, 0.9f), 1);
+        var inner = canvas.ContractedBy(ProfileRowInset);
+
+        var manageRect = new Rect(inner.x, inner.y, ProfileTabManageWidth, inner.height);
+        var addRect = new Rect(inner.xMax - ProfileTabAddWidth, inner.y,
+            ProfileTabAddWidth, inner.height);
+        var scrollRect = new Rect(manageRect.xMax + TopBarControlGap, inner.y,
+            Mathf.Max(0f, addRect.xMin - TopBarControlGap - manageRect.xMax - TopBarControlGap), inner.height);
+        if (scrollRect.width <= 0f)
+        {
+            return;
+        }
+
+        if (DrawTopBarButton(manageRect, "Fluffy.ResearchTree.ProfileManageShort".Translate(),
+                "Fluffy.ResearchTree.ProfileManage".Translate(), new Color(0.18f, 0.27f, 0.36f, 0.88f)))
+        {
+            Find.WindowStack.Add(new Dialog_ResearchTabProfiles());
+        }
+
+        var oldFont = Text.Font;
+        Text.Font = GameFont.Small;
+        var tabWidths = profiles.Select(GetProfileTabWidth).ToList();
+        Text.Font = oldFont;
+
+        var totalWidth = tabWidths.Sum() + Mathf.Max(0, tabWidths.Count - 1) * TopBarControlGap;
+        var maxScroll = Mathf.Max(0f, totalWidth - scrollRect.width);
+        HandleProfileTabWheel(scrollRect, maxScroll);
+        _profileTabScroll.x = Mathf.Clamp(_profileTabScroll.x, 0f, maxScroll);
+        _profileTabScroll.y = 0f;
+
+        GUI.BeginGroup(scrollRect);
+        var x = -_profileTabScroll.x;
+        for (var i = 0; i < profiles.Count; i++)
+        {
+            var profile = profiles[i];
+            var tabRect = new Rect(x, 0f, tabWidths[i], inner.height);
+            DrawProfileTab(tabRect, profile, settings.ActiveTabProfileId);
+            x += tabRect.width + TopBarControlGap;
+        }
+        GUI.EndGroup();
+
+        if (DrawTopBarButton(addRect, "+", "Fluffy.ResearchTree.ProfileNewQuick".Translate(),
+                new Color(0.18f, 0.34f, 0.22f, 0.84f)))
+        {
+            CreateProfileFromActiveSelection();
+        }
+
+    }
+
+    private void HandleProfileTabWheel(Rect scrollRect, float maxScroll)
+    {
+        if (maxScroll <= 0f)
+        {
+            _profileTabScroll = Vector2.zero;
+            return;
+        }
+
+        var evt = Event.current;
+        if (evt.type != EventType.ScrollWheel || !scrollRect.Contains(evt.mousePosition))
+        {
+            return;
+        }
+
+        _profileTabScroll.x = Mathf.Clamp(_profileTabScroll.x + evt.delta.y * WheelScrollStep * 3f, 0f, maxScroll);
+        _profileTabScroll.y = 0f;
+        evt.Use();
+    }
+
+    private static void CreateProfileFromActiveSelection()
+    {
+        var settings = FluffyResearchTreeMod.instance.Settings;
+        settings.EnsureTabCache();
+
+        var profiles = settings.Profiles.Select(profile => profile.ToData()).ToList();
+        var active = settings.ActiveProfile;
+        var id = ResearchTabProfileSelection.CreateUniqueId(profiles);
+        var name = ResearchTabProfileSelection.CreateUniqueName(
+            profiles,
+            "Fluffy.ResearchTree.ProfileNewDefaultName".Translate().ToString());
+        var includedTabs = active?.IncludedTabs ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        profiles.Add(new ResearchTabProfileData(id, name, includedTabs));
+        settings.ReplaceProfiles(profiles, id);
+        settings.SetActiveProfile(id);
+        FluffyResearchTreeMod.instance.WriteSettings();
+
+        Tree.CacheActiveProfileState();
+        MainTabWindow_ResearchTree.Instance?.Notify_ProfileTreeSwitched(id);
+        Messages.Message("Fluffy.ResearchTree.ProfileCreated".Translate(name),
+            MessageTypeDefOf.TaskCompletion, historical: false);
+    }
+
+    private static void DrawProfileTab(Rect rect, ResearchTabProfile profile, string activeProfileId)
+    {
+        var active = string.Equals(profile.Id, activeProfileId, System.StringComparison.OrdinalIgnoreCase);
+        var building = Tree.IsProfileBuilding(profile.Id);
+
+        var label = building ? $"{profile.Name}..." : profile.Name;
+        var fillColor = active
+            ? new Color(0.18f, 0.30f, 0.42f, 0.94f)
+            : building
+                ? new Color(0.40f, 0.33f, 0.15f, 0.82f)
+                : new Color(0.09f, 0.10f, 0.11f, 0.78f);
+        var outlineColor = active ? new Color(0.64f, 0.78f, 0.95f, 0.95f) : new Color(0.32f, 0.32f, 0.32f, 0.78f);
+
+        if (Mouse.IsOver(rect))
+        {
+            fillColor = active
+                ? new Color(0.29f, 0.45f, 0.62f, 0.95f)
+                : new Color(fillColor.r + 0.06f, fillColor.g + 0.06f, fillColor.b + 0.06f, fillColor.a);
+        }
+
+        Widgets.DrawBoxSolidWithOutline(rect, fillColor, outlineColor, 1);
+        if (active)
+        {
+            Widgets.DrawBoxSolid(new Rect(rect.x + 3f, rect.yMax - 3f, Mathf.Max(0f, rect.width - 6f), 2f),
+                new Color(0.63f, 0.86f, 1f, 0.95f));
+        }
+
+        DrawCenteredLabel(HorizontallyPadded(rect, 6f), label);
+
+        if (Widgets.ButtonInvisible(rect, doMouseoverSound: true))
+        {
+            Tree.SwitchToProfile(profile.Id);
+        }
+
+        var tooltip = building
+            ? "Fluffy.ResearchTree.ProfileLoading".Translate()
+            : "Fluffy.ResearchTree.ProfileSwitch".Translate(profile.Name);
+        TooltipHandler.TipRegion(rect, tooltip);
+    }
+
+    private static bool DrawTopBarButton(Rect rect, string label, string tooltip = null, Color? fillColor = null)
+    {
+        if (rect.width <= 0f || rect.height <= 0f)
+        {
+            return false;
+        }
+
+        var color = fillColor ?? new Color(0.14f, 0.14f, 0.14f, 0.76f);
+        if (Mouse.IsOver(rect))
+        {
+            color = new Color(
+                Mathf.Min(color.r + 0.08f, 1f),
+                Mathf.Min(color.g + 0.08f, 1f),
+                Mathf.Min(color.b + 0.08f, 1f),
+                color.a);
+        }
+
+        Widgets.DrawBoxSolidWithOutline(rect, color, new Color(0.38f, 0.38f, 0.38f, 0.86f), 1);
+        DrawCenteredLabel(HorizontallyPadded(rect, 6f), label);
+
+        if (!string.IsNullOrEmpty(tooltip))
+        {
+            TooltipHandler.TipRegion(rect, tooltip);
+        }
+
+        return Widgets.ButtonInvisible(rect, doMouseoverSound: true);
+    }
+
+    private static void DrawCenteredLabel(Rect rect, string label)
+    {
+        var oldAnchor = Text.Anchor;
+        var oldColor = GUI.color;
+        var oldFont = Text.Font;
+
+        Text.Font = GameFont.Small;
+        var fittedLabel = FitLabelToWidth(label, rect.width);
+        if (Text.CalcSize(fittedLabel).x > rect.width)
+        {
+            Text.Font = GameFont.Tiny;
+            fittedLabel = FitLabelToWidth(label, rect.width);
+        }
+
+        Text.Anchor = TextAnchor.MiddleCenter;
+        GUI.color = Color.white;
+        Widgets.Label(rect, fittedLabel);
+
+        Text.Anchor = oldAnchor;
+        GUI.color = oldColor;
+        Text.Font = oldFont;
+    }
+
+    private static float GetProfileTabWidth(ResearchTabProfile profile)
+    {
+        var label = Tree.IsProfileBuilding(profile.Id) ? $"{profile.Name}..." : profile.Name ?? string.Empty;
+        return Mathf.Clamp(Text.CalcSize(label).x + ProfileTabTextPadding, ProfileTabMinWidth, ProfileTabMaxWidth);
+    }
+
+    private static Rect HorizontallyPadded(Rect rect, float padding)
+    {
+        var appliedPadding = Mathf.Min(padding, rect.width / 2f);
+        rect.xMin += appliedPadding;
+        rect.xMax -= appliedPadding;
+        return rect;
+    }
+
+    private static string FitLabelToWidth(string label, float width)
+    {
+        if (string.IsNullOrEmpty(label) || width <= 0f)
+        {
+            return string.Empty;
+        }
+
+        if (Text.CalcSize(label).x <= width)
+        {
+            return label;
+        }
+
+        const string suffix = "...";
+        if (Text.CalcSize(suffix).x > width)
+        {
+            return string.Empty;
+        }
+
+        for (var length = Mathf.Min(label.Length, 64); length > 0; length--)
+        {
+            var candidate = label.Substring(0, length) + suffix;
+            if (Text.CalcSize(candidate).x <= width)
+            {
+                return candidate;
+            }
+        }
+
+        return suffix;
+    }
+
+    private static float CalculateTopBarButtonWidth()
     {
         float buttonWidth = TopBarMinButtonWidth;
         var oldFont = Text.Font;
         Text.Font = GameFont.Small;
-
-        buttonWidth = Mathf.Max(buttonWidth, Text.CalcSize("Fluffy.ResearchTree.filter".Translate()).x + TopBarLabelPadding);
 
         string toggleLabel = FluffyResearchTreeMod.instance.Settings.SkipCompleted
             ? "Fluffy.ResearchTree.invisible".Translate()
@@ -848,7 +1073,6 @@ public class MainTabWindow_ResearchTree : MainTabWindow
         Text.Font = oldFont;
         return buttonWidth;
     }
-
 
     public void CenterOn(Node node)
     {
